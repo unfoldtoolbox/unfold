@@ -36,7 +36,7 @@ html_theme_options = {
     # an arbitrary url.
     'navbar_links': [
         ("Home",'index'),
-        ("Download from Github", "http://github.com/behinger/deconvolution",True)
+        ("Download from Github", "http://github.com/behinger/unfold",True)
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
@@ -349,7 +349,6 @@ man_pages = [
 
 # If true, show URL addresses after external links.
 #man_show_urls = False
-
 
 # -- Options for Texinfo output -------------------------------------------
 

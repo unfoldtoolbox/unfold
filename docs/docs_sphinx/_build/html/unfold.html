@@ -60,7 +60,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="index.html">Home</a></li>
-                <li><a href="http://github.com/behinger/deconvolution">Download from Github</a></li>
+                <li><a href="http://github.com/behinger/unfold">Download from Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -174,9 +174,9 @@
   <div class="section" id="unfold-function-documentation">
 <h1>Unfold function documentation<a class="headerlink" href="#unfold-function-documentation" title="Permalink to this headline">¶</a></h1>
 <p>The documentation on this webpage is identical to the one in the matlab functions.</p>
-<span class="target" id="module-scripts.dc_toolbox"></span><dl class="function">
-<dt id="scripts.dc_toolbox.dc_beta2unfold">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_beta2unfold</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_beta2unfold" title="Permalink to this definition">¶</a></dt>
+<span class="target" id="module-src.dc_toolbox"></span><dl class="function">
+<dt id="src.dc_toolbox.dc_beta2unfold">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_beta2unfold</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_beta2unfold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an &#8220;unfold&#8221;-struct that contains the predictor betas over time
 and accompanying information. This structure is further used in all
 plotting functions</p>
@@ -229,8 +229,8 @@ unfold.chanlocs = EEG.chanlocs</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_continuousArtifactDetect">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_continuousArtifactDetect</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_continuousArtifactDetect" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_continuousArtifactDetect">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_continuousArtifactDetect</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_continuousArtifactDetect" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Reject commonly recorded artifactual potentials (c.r.a.p.)</dt>
 <dd><p class="first">This function has been altered very much by Benedikt Ehinger
@@ -292,8 +292,8 @@ Davis, CA
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_continuousArtifactExclude">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_continuousArtifactExclude</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_continuousArtifactExclude" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_continuousArtifactExclude">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_continuousArtifactExclude</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_continuousArtifactExclude" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Function to exclude (artifactual) continuous data from being modeled</dt>
 <dd>This function inputs a rejection vector and excludes the content from
@@ -323,8 +323,8 @@ values at the given times to 0.</dd>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_designmat">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_designmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_designmat" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_designmat">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_designmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_designmat" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Generate Designmatrix out of EEG.event structure and a cfg.formula</dt>
 <dd>Input an EEG event structure and you will get an EEG.deconv.X field with
@@ -427,8 +427,8 @@ contains a constant (y~1).</div>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_designmat_addcol">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_designmat_addcol</code><span class="sig-paren">(</span><em>EEG</em>, <em>newrow</em>, <em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_designmat_addcol" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_designmat_addcol">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_designmat_addcol</code><span class="sig-paren">(</span><em>EEG</em>, <em>newrow</em>, <em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_designmat_addcol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a single custom column to the deconv-Designmat &#8220;dcX&#8221;</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -450,8 +450,8 @@ contains a constant (y~1).</div>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_epoch">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_epoch</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_epoch" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_epoch">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_epoch</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_epoch" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Epoch the data according to the deconv structure</dt>
 <dd>Deconvolution works on continuous data, thus to compare it to the
@@ -482,8 +482,8 @@ from deconv.X that were removed during epoching.</dd>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_getParam">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_getParam</code><span class="sig-paren">(</span><em>unfold</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_getParam" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_getParam">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_getParam</code><span class="sig-paren">(</span><em>unfold</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_getParam" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Evaluates a continuous/spline parameter at specific values</dt>
 <dd>For example you get an beta for par1 at 3 for a continuous
@@ -522,8 +522,8 @@ parameterdomain</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_getSplineidx">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_getSplineidx</code><span class="sig-paren">(</span><em>EEG</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_getSplineidx" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_getSplineidx">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_getSplineidx</code><span class="sig-paren">(</span><em>EEG</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_getSplineidx" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>returns a list of the splines in EEG and a parameter list where only the</dt>
 <dd>first index of the spline remains</dd>
@@ -554,8 +554,8 @@ paramList: Returns a list with the number of parameters (The number of columns i
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_glmfit">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_glmfit</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_glmfit" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_glmfit">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_glmfit</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_glmfit" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Fit the fullX designmatrix on the data and returns beta and stats</dt>
 <dd>This function solves the Equation X*beta = EEG.data, with X = Designmat.
@@ -624,8 +624,8 @@ n-timesplines, n-fourierbasis or samples)</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_glmfit_nodc">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_glmfit_nodc</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_glmfit_nodc" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_glmfit_nodc">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_glmfit_nodc</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_glmfit_nodc" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>A function to solve the inverse problem without deconvolution</dt>
 <dd>Currently it solves the pseudo-inverse of EEG.deconv.X and multiplies it
@@ -649,8 +649,8 @@ EEG.devon.beta</td>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_imputeMissing">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_imputeMissing</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_imputeMissing" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_imputeMissing">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_imputeMissing</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_imputeMissing" title="Permalink to this definition">¶</a></dt>
 <dd><p>We impute missing values by several methods.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -681,8 +681,8 @@ correlations between predictors (c.f. Horton &amp; Kleinmann 2007)</dd>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_plotDesignmat">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_plotDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_plotDesignmat" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_plotDesignmat">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_plotDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_plotDesignmat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the designmatrix
 If the matrix is very large (the timeshifted/dcX matrix) we do not plot
 everything, but only the middle 1000s. We also try to zoom in
@@ -712,8 +712,8 @@ Secret option: &#8216;addContData&#8217;</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_plotEventCorrmat">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_plotEventCorrmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_plotEventCorrmat" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_plotEventCorrmat">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_plotEventCorrmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_plotEventCorrmat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots a correlation matrix of the event structure</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -734,8 +734,8 @@ returned</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_plotEventHistogram">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_plotEventHistogram</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_plotEventHistogram" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_plotEventHistogram">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_plotEventHistogram</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_plotEventHistogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function that plots histogram of all events in the EEG.event structure</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -753,8 +753,8 @@ returned</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_plotParam2d">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_plotParam2d</code><span class="sig-paren">(</span><em>t</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_plotParam2d" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_plotParam2d">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_plotParam2d</code><span class="sig-paren">(</span><em>t</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_plotParam2d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Function not yet ready (sorry)</dt>
 <dd>This function plots an imagesc plot of time vs. parameter of choice</dd>
@@ -776,8 +776,8 @@ no search is supported to find the spline number directly.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_plotParamTopo">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_plotParamTopo</code><span class="sig-paren">(</span><em>unfold</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_plotParamTopo" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_plotParamTopo">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_plotParamTopo</code><span class="sig-paren">(</span><em>unfold</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_plotParamTopo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates topoplots over time. each row is a predictor or predictor-value-combination</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -813,8 +813,8 @@ customized to whichever caxis</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_spl2continuous">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_spl2continuous</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_spl2continuous" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_spl2continuous">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_spl2continuous</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_spl2continuous" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>converts spline betas to continuous based values. This removes time-basis</dt>
 <dd>functions and parameter-basis functions</dd>
@@ -845,8 +845,8 @@ customized to whichever caxis</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_timeexpandDesignmat">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_timeexpandDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_timeexpandDesignmat" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_timeexpandDesignmat">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_timeexpandDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_timeexpandDesignmat" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Timeshift / Deconvolve Designmatrix This function takes the designmatrix</dt>
 <dd>(saved in EEG.deconv.X, a EEG.points times nPredictor matrix) and makes
@@ -892,8 +892,8 @@ to convolve. In case of &#8216;full&#8217;, the parameter is not used.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.dc_toolbox.dc_unfold2csv">
-<code class="descclassname">scripts.dc_toolbox.</code><code class="descname">dc_unfold2csv</code><span class="sig-paren">(</span><em>unfold</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.dc_toolbox.dc_unfold2csv" title="Permalink to this definition">¶</a></dt>
+<dt id="src.dc_toolbox.dc_unfold2csv">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_unfold2csv</code><span class="sig-paren">(</span><em>unfold</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_unfold2csv" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Exports betas in an organized csv file to be opened in another tool</dt>
 <dd>returns a data-table</dd>
@@ -936,7 +936,7 @@ gets one column</p>
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Aug 15, 2017.<br/>
+      Last updated on Aug 17, 2017.<br/>
     </p>
   </div>
 </footer>

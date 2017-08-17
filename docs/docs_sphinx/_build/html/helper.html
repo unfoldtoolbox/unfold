@@ -59,7 +59,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="index.html">Home</a></li>
-                <li><a href="http://github.com/behinger/deconvolution">Download from Github</a></li>
+                <li><a href="http://github.com/behinger/unfold">Download from Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -173,9 +173,9 @@
   <div class="section" id="helper-functions">
 <h1>Helper Functions<a class="headerlink" href="#helper-functions" title="Permalink to this headline">¶</a></h1>
 <p>The documentation on this webpage is identical to the one in the matlab functions.</p>
-<span class="target" id="module-scripts.helper"></span><dl class="function">
-<dt id="scripts.helper.get_min">
-<code class="descclassname">scripts.helper.</code><code class="descname">get_min</code><span class="sig-paren">(</span><em>a</em>, <em>B</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.helper.get_min" title="Permalink to this definition">¶</a></dt>
+<span class="target" id="module-src.helper"></span><dl class="function">
+<dt id="src.helper.get_min">
+<code class="descclassname">src.helper.</code><code class="descname">get_min</code><span class="sig-paren">(</span><em>a</em>, <em>B</em><span class="sig-paren">)</span><a class="headerlink" href="#src.helper.get_min" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function returns the index of the minimum distance of all elemnts in
 B from a.
 If a is a vector, the function recursively calls itself.
@@ -186,8 +186,8 @@ selects the first one.
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.helper.hline">
-<code class="descclassname">scripts.helper.</code><code class="descname">hline</code><span class="sig-paren">(</span><em>y</em>, <em>in1</em>, <em>in2</em>, <em>in3</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.helper.hline" title="Permalink to this definition">¶</a></dt>
+<dt id="src.helper.hline">
+<code class="descclassname">src.helper.</code><code class="descname">hline</code><span class="sig-paren">(</span><em>y</em>, <em>in1</em>, <em>in2</em>, <em>in3</em><span class="sig-paren">)</span><a class="headerlink" href="#src.helper.hline" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>function h=hline(y, linetype, label)</dt>
 <dd><p class="first">Draws a horizontal line on the current axes at the location specified by &#8216;y&#8217;.  Optional arguments are
@@ -214,8 +214,15 @@ the current axes, close to the line, which reads &#8220;The Answer&#8221;.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.helper.sparseconv">
-<code class="descclassname">scripts.helper.</code><code class="descname">sparseconv</code><span class="sig-paren">(</span><em>x</em>, <em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.helper.sparseconv" title="Permalink to this definition">¶</a></dt>
+<dt id="src.helper.imagesc">
+<code class="descclassname">src.helper.</code><code class="descname">imagesc</code><span class="sig-paren">(</span><em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.helper.imagesc" title="Permalink to this definition">¶</a></dt>
+<dd><p>IMAGESC Summary of this function goes here
+Detailed explanation goes here</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.helper.sparseconv">
+<code class="descclassname">src.helper.</code><code class="descname">sparseconv</code><span class="sig-paren">(</span><em>x</em>, <em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#src.helper.sparseconv" title="Permalink to this definition">¶</a></dt>
 <dd><p>SPARSECONV Speedy convolution of sparse vectors</p>
 <p>OUT = SPARSECONV(X, F) computes the convolution of the
 (sparse) input vectors X and F.</p>
@@ -224,8 +231,8 @@ Esat Sista KULeuven</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="scripts.helper.vline">
-<code class="descclassname">scripts.helper.</code><code class="descname">vline</code><span class="sig-paren">(</span><em>x</em>, <em>in1</em>, <em>in2</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.helper.vline" title="Permalink to this definition">¶</a></dt>
+<dt id="src.helper.vline">
+<code class="descclassname">src.helper.</code><code class="descname">vline</code><span class="sig-paren">(</span><em>x</em>, <em>in1</em>, <em>in2</em><span class="sig-paren">)</span><a class="headerlink" href="#src.helper.vline" title="Permalink to this definition">¶</a></dt>
 <dd><p>function h=vline(x, linetype, label)</p>
 <p>Draws a vertical line on the current axes at the location specified by &#8216;x&#8217;.  Optional arguments are
 &#8216;linetype&#8217; (default is &#8216;r:&#8217;) and &#8216;label&#8217;, which applies a text label to the graph near the line.  The
@@ -262,7 +269,7 @@ the current axes, close to the line, which reads &#8220;The Answer&#8221;.</p>
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Aug 15, 2017.<br/>
+      Last updated on Aug 17, 2017.<br/>
     </p>
   </div>
 </footer>
