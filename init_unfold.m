@@ -5,7 +5,7 @@ projectFolder  = which('init_unfold.m');
 scriptDir = fullfile(projectFolder,'src');
 
 
-addpath(genpath(fullfile(projectFolder,'scripts')))
+addpath(genpath(scriptDir))
 addpath(fullfile(projectFolder,'lib','erplab'))
 addpath(fullfile(projectFolder,'lib','gramm'))
 addpath(fullfile(projectFolder,'lib','lsmr'))
