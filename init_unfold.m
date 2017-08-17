@@ -1,5 +1,5 @@
 
-fprintf('\nAdding toolboxes and subfolders to path...')
+fprintf('\nAdding toolboxes and subfolders to path... \n')
 
 projectFolder  = fileparts(which('init_unfold.m'));
 scriptDir = fullfile(projectFolder,'src');
