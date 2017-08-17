@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unfold’s toolbox workflow &mdash; unfold  documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/doc_style.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/paper/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="unfold  documentation" href="index.html" />
+    <link rel="up" title="Toolbox Overview" href="overview.html" />
+    <link rel="next" title="Tutorials" href="tutorials.html" />
+    <link rel="prev" title="Toolbox Overview" href="overview.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          Unfold Toolbox</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Home</a></li>
+                <li><a href="http://github.com/behinger/deconvolution">Download from Github</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Navigation <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="overview.html">Toolbox Overview</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Unfold&#8217;s toolbox workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#specification-for-input-data">Specification for Input-Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#imputation-of-missing-data">Imputation of missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#removing-artefactual-data">Removing artefactual data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-predictorsplines">Fields of <code class="docutils literal"><span class="pre">deconv.predictorSplines()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#why-deconvolution">Why deconvolution?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#how-does-deconvolution-work">How does deconvolution work?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="toolbox-tut02.html">Longstart: 2x2 ANOVA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="toolbox-tut03.html">Non-Linear Predictors using splines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="toolbox-tut04.html">with deconvolution vs. without deconvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="toolbox-tut05.html">Time-Basis functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="unfold.html">Unfold function documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helper.html">Helper Functions</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">this page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="overview.html">Toolbox Overview</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Unfold&#8217;s toolbox workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#specification-for-input-data">Specification for Input-Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#imputation-of-missing-data">Imputation of missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#removing-artefactual-data">Removing artefactual data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-predictorsplines">Fields of <code class="docutils literal"><span class="pre">deconv.predictorSplines()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="overview.html">Toolbox Overview</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">Unfold&#8217;s toolbox workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#specification-for-input-data">Specification for Input-Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#imputation-of-missing-data">Imputation of missing data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#removing-artefactual-data">Removing artefactual data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-predictorsplines">Fields of <code class="docutils literal"><span class="pre">deconv.predictorSplines()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="col-md-9 content">
+      
+  <div class="section" id="unfold-s-toolbox-workflow">
+<h1>Unfold&#8217;s toolbox workflow<a class="headerlink" href="#unfold-s-toolbox-workflow" title="Permalink to this headline">¶</a></h1>
+<p>We start with continuous data with events that mark times in the data that are of interest. Usually these are stimulus onsets, buttonpresses etc.</p>
+<dl class="docutils">
+<dt>Definition of the design (<code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat()</span></code>)</dt>
+<dd>We first need to define which triggers (let&#8217;s assume we have an event type &#8216;stimulus&#8217; and one &#8216;keypress&#8217;) should be included in the deconvolution. Because each event could belong to a different condition, which again could be different for stimuli/keypresses, we can define a simple formula for each event. These formulas are commonly used in <code class="xref mat mat-func docutils literal"><span class="pre">R()</span></code> and also matlab and are called Wilkinson-Formulas. They allow to easily specify very simple designs, e.g. 2x2 with only categorical, but also continuous variables, spline-based (additive models, GAM) and mixture between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code>) for your design-specifications.</dd>
+<dt>Timeshift of the designmatrix (<code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>)</dt>
+<dd>In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated. The resulting timeshifted/expanded designmatrix is denoted as <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code>.</dd>
+<dt>Fitting the model (<code class="xref mat mat-func docutils literal"><span class="pre">dc_glmfit()</span></code>)</dt>
+<dd>There are multiple ways to fit the expanded designmatrix <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code>. The unfold-toolbox offers a memory-friendly iterative least squares algorithm, default matlab pseudo-inverse and regularized glmnet (LASSO,ridge-regression and elastic-net).</dd>
+<dt>Transforming parameters (dc_beta2unfold)</dt>
+<dd>(optional) In some cases, e.g. using time-basis functions (splines/fourier) or when using spline-nonlinear predictors, it is helpful to transform the estimated parameters back to their native space. For example if we use 10 time-splines instead of 100 sample points, we receive 10 parameter-estimate (betas). In this case we want to transform the 10 betas back to the domain of 100 samples. This increases the interpretation. This step is also possible for continuous predictors, but because a slope is readily interpretable, not as necessary.</dd>
+<dt>Plotting (e.g. <code class="xref mat mat-func docutils literal"><span class="pre">dc_plotParam()</span></code>)</dt>
+<dd>The toolbox offers multiple functions to explore also quite complex designs. These functions work on 1D (ERP-like), 2D (erpimage-like) or as timeseries of topoplots.</dd>
+<dt>Group-Level Statistics</dt>
+<dd>Most commonly users estimate the parameters for all subjects and then test the parameters against an H0 of no effect. If no prior knowledege on the time/location of the effect is known, we recommend to use cluster-permutation based statistics. We recommend the EPT-TFCE toolbox which we included in our toolbox for convenience. The toolbox currently does not have functions to do single-subject statistics.</dd>
+</dl>
+</div>
+<div class="section" id="specification-for-input-data">
+<h1>Specification for Input-Data<a class="headerlink" href="#specification-for-input-data" title="Permalink to this headline">¶</a></h1>
+<p>Data need to be in continuous form. We use the default format of EEG.</p>
+<p>The minimal required fields (the usual EEGlab-structure) are:</p>
+<ul class="simple">
+<li>EEG.data (chan x time)</li>
+<li>EEG.times (vector of time points)</li>
+<li>EEG.srate (samplingrate in Hz)</li>
+<li>EEG.event (structure of events, same structure as in EEGlab)<ul>
+<li>event.type (e.g. &#8216;stimulus&#8217; or &#8216;keypress&#8217;)</li>
+<li>event.latency (in samples)</li>
+<li>event.customField (<code class="xref mat mat-func docutils literal"><span class="pre">customField()</span></code> = name of your variable, e.g. <code class="xref mat mat-func docutils literal"><span class="pre">color()</span></code>. The content should be in this case a string &#8216;red&#8217; or, for continuous variables, a number)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="imputation-of-missing-data">
+<h1>Imputation of missing data<a class="headerlink" href="#imputation-of-missing-data" title="Permalink to this headline">¶</a></h1>
+<p>In linear models, missing data need to be imputed (&#8216;interpolated&#8217;) or the event needs to be excluded. We currently offer four methods to deal with this in the function <code class="xref mat mat-func docutils literal"><span class="pre">dc_imputeMissing()</span></code> (to be called after the design specification):</p>
+<dl class="docutils">
+<dt>drop</dt>
+<dd>this removes events that have a missing field in a single explanatory variable</dd>
+<dt>marginal</dt>
+<dd>fills in a random sample from the values in other events. This preserves the overall distribution of missing events</dd>
+<dt>mean</dt>
+<dd>fill in missing predictor-values with the mean of the remaining events.</dd>
+<dt>median</dt>
+<dd>fill in missing predictor-values with the median of the remaining events.</dd>
+</dl>
+</div>
+<div class="section" id="removing-artefactual-data">
+<h1>Removing artefactual data<a class="headerlink" href="#removing-artefactual-data" title="Permalink to this headline">¶</a></h1>
+<p>Because we start with continuous data, usual removal of data stretches does not work the same. The function <code class="xref mat mat-func docutils literal"><span class="pre">dc_continuousArtifactExclude()</span></code> allows one to reject continuous portions of data that are either marked automatically or manually. We expect a &#8216;winrej&#8217;-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment)</p>
+</div>
+<div class="section" id="comparison-between-deconvolved-and-non-deconvolved-classical">
+<h1>Comparison between deconvolved and non-deconvolved (classical)<a class="headerlink" href="#comparison-between-deconvolved-and-non-deconvolved-classical" title="Permalink to this headline">¶</a></h1>
+<p>we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial <a class="reference internal" href="toolbox-tut04.html"><em>with deconvolution vs. without deconvolution</em></a></p>
+</div>
+<div class="section" id="explanation-of-all-variable-fields">
+<h1>Explanation of all variable fields<a class="headerlink" href="#explanation-of-all-variable-fields" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="fields-of-eeg-deconv">
+<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">EEG.deconv()</span></code><a class="headerlink" href="#fields-of-eeg-deconv" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>effects_mean</dt>
+<dd>In case of effects coding contains the mean of the designmatrix columns. We do not want to keep the original event structure around, thus we save this information here</dd>
+<dt>predictorSplines</dt>
+<dd>all information on the splines are saved in here (see below). Splines are a bit more involved to describe, additional information needs to be saved</dd>
+<dt>formula</dt>
+<dd>contains all formulas specified in <code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat()</span></code></dd>
+<dt>X</dt>
+<dd>The designmatrix. This can be used for &#8216;classical&#8217; massive-univariate linear modeling</dd>
+<dt>variableType</dt>
+<dd>Type of each variable/predictor, can be &#8216;categorical&#8217;,&#8217;continuous&#8217; and &#8216;spline&#8217;</dd>
+<dt>variableNames</dt>
+<dd>Name of each variable/predictor</dd>
+<dt>colnames: {1×10 cell}</dt>
+<dd>The name of each column of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code>. As soon as categorical variables are used, we will have more columns than variables.</dd>
+<dt>cols2variableNames</dt>
+<dd>A list connecting the columns of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code> with the variables. A 0 means that the intercept is meant.</dd>
+<dt>col2eventtype</dt>
+<dd>A list connecting the colums of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code> with the event. Multiple events can be modeled but they are not separable based on <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code> alone.</dd>
+<dt>eventtype</dt>
+<dd>The names of the events that are modeled. Only interesting if multiple different events were modeled.</dd>
+<dt>dcX</dt>
+<dd>Timeshifted designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>. If you need to modify this, have a look at <code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat_addcol()</span></code> to see which fields should be modified.</dd>
+<dt>dcBasis</dt>
+<dd>The basis-function of the timeshift for the deconvolution. This matrix could be the identity matrix in case of &#8220;stick&#8221;/dirac-functions. Useful only for splines/fourier time-basis functions</dd>
+<dt>dcBasistime: [1×20 double]</dt>
+<dd>A vector containing the time in seconds over what range the timeshift occured. This encodes the time of the resulting ERP</dd>
+<dt>dcX_termidx</dt>
+<dd>A list connecting the columns of <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code> with columns of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code></dd>
+<dt>dcBeta</dt>
+<dd>deconvolved betas. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_glmfit()</span></code>. This is the main outcome of this toolbox</dd>
+<dt>channel</dt>
+<dd>for which channel the deconvolved betas have been calculated</dd>
+<dt>XBeta</dt>
+<dd>non-deconvolved betas. This is a massive univariate fit where each timepoint and each electrode were fitted independently. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_glmfit_nodc()</span></code></dd>
+</dl>
+</div>
+<div class="section" id="fields-of-unfold">
+<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">unfold()</span></code><a class="headerlink" href="#fields-of-unfold" title="Permalink to this headline">¶</a></h2>
+<p>the unfold structure is the output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_beta2unfold()</span></code>. This function removes the time-splines if used and possibly evaluates splines at (automatically) specific quantiles.</p>
+<dl class="docutils">
+<dt>deconv</dt>
+<dd>same as EEG.deconv</dd>
+<dt>times</dt>
+<dd>same as EEG.times, thus the epoch-time in ms</dd>
+<dt>chanlocs</dt>
+<dd>same as EEG.chanlocs</dd>
+<dt>epoch</dt>
+<dd>a structure defining for each beta-value to what event and predictor it belong. In case &#8216;convertsplines&#8217; was activated in <code class="xref mat mat-func docutils literal"><span class="pre">dc_beta2unfold()</span></code> the spline-betas were evaluated at specified values, then these values are also saved here.</dd>
+<dt>beta_nodc</dt>
+<dd>the betas without deconvolution [channel x time x predictors]</dd>
+<dt>beta</dt>
+<dd>the betas with deconvolution [channel x time x predictors]</dd>
+</dl>
+</div>
+<div class="section" id="fields-of-deconv-predictorsplines">
+<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">deconv.predictorSplines()</span></code><a class="headerlink" href="#fields-of-deconv-predictorsplines" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>paramValues</dt>
+<dd>[5988×1 double]</dd>
+<dt>nSplines</dt>
+<dd>9</dd>
+<dt>min</dt>
+<dd>: -7.9975</dd>
+<dt>max</dt>
+<dd>: 7.9782</dd>
+<dt>spline2val</dt>
+<dd>: [1×1000 double]</dd>
+<dt>spline2val_idx</dt>
+<dd>: [1×5988 double]</dd>
+<dt>basis</dt>
+<dd>: [1000×9 double]</dd>
+<dt>X</dt>
+<dd>: [5988×9 double]</dd>
+<dt>name</dt>
+<dd>: &#8216;splineA&#8217;</dd>
+<dt>colnames</dt>
+<dd>: {1×9 cell}</dd>
+</dl>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
+      Last updated on Aug 15, 2017.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
