@@ -1,10 +1,10 @@
 [submodule "lib/gramm"]
-path = lib/gramm
-url = https://github.com/piermorel/gramm
+	path = lib/gramm
+	url = https://github.com/piermorel/gramm
 [submodule "lib/ept_TFCE"]
-path = lib/ept_TFCE
-url = https://github.com/Mensen/ept_TFCE-matlab.git/
+	path = lib/ept_TFCE
+	url = https://github.com/Mensen/ept_TFCE-matlab.git/
 [submodule "lib/eegvis"]
-path = lib/eegvis
-url = https://github.com/behinger/eegvis
+	path = lib/eegvis
+	url = https://github.com/behinger/eegvis
 
