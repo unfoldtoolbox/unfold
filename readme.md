@@ -11,7 +11,7 @@ A toolbox for deconvolution of overlapping EEG signals and (non)-linear modeling
 
 ### Installation
 ``` 
-git clone https://github.com/behinger/deconvolution
+git clone https://github.com/behinger/unfold
 git submodule update --init --recursive --remote
 ```
 
