@@ -61,7 +61,7 @@ end
 EEG = dc_designmat(EEG,cfgDesign);
 % error
 timelimits = [-1.5,2.5];
-EEG = dc_timeexpandDesignmat(EEG,'timelimits',timelimits,'method','full','timeshiftparam',7);
+EEG = dc_timeexpandDesignmat(EEG,'timelimits',timelimits,'method','full','timeexpandparam',7);
 EEG= dc_glmfit(EEG,'method','lsmr');
 % EEG2= dc_glmfit(EEG,'method','glmnet');
 

@@ -1,5 +1,5 @@
 function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
-%Timeshift / Deconvolve Designmatrix This function takes the designmatrix
+%Timeexpand / Deconvolve Designmatrix This function takes the designmatrix
 % (saved in EEG.deconv.X, a EEG.points times nPredictor matrix) and makes
 % copies over time (in the range of the windowlength).
 %
@@ -7,14 +7,14 @@ function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
 %  cfg.method(string): default 'full'; Three methods are available:
 %
 %        * 'full'        We shift the signal over each point in time
-%        * 'splines'    We use cubic splines (number = TIMESHIFTPARAM) to approximate the signal. This makes sense as neighbouring timepoints are very likely correlated.
-%        * 'fourier'    We use a fourier set (up to the first TIMESHIFTPARAM frequencies) to model the signal.
+%        * 'splines'    We use cubic splines (number = TimeexpandPARAM) to approximate the signal. This makes sense as neighbouring timepoints are very likely correlated.
+%        * 'fourier'    We use a fourier set (up to the first TimeexpandPARAM frequencies) to model the signal.
 %
-%  cfg.windowlength (2 integer):     defines over how many samples the timeshift should go, this is
+%  cfg.windowlength (2 integer):     defines over how many samples the timeexpand should go, this is
 %       analog to the epoch-size. This should be as long, as you think
 %       overlap can happen in your data.
 %
-%  cfg.timeshiftparam (integer):    depending on whether cfg.method is splines or fourier defines how
+%  cfg.timeexpandparam (integer):    depending on whether cfg.method is splines or fourier defines how
 %       many splines or fourier frequencies (in case of fourier, the
 %       effective parametersize is twice as large due to the sin/cos 'duplication') should be used
 %       to convolve. In case of 'full', the parameter is not used.
@@ -26,14 +26,14 @@ function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
 %   * EEG.dcX_termidx - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor
 %
 %*Example:*
-%       EEG = dc_timeexpandDesignmat(EEG,'method','splines','windowlength',128,'timeshiftparam',30)
+%       EEG = dc_timeexpandDesignmat(EEG,'method','splines','windowlength',128,'timeexpandparam',30)
 
 fprintf('\ndc_timeexpandDesignmat(): Timeexpanding the designmatrix...\n');
 
 cfg = finputcheck(varargin,...
     { 'method',         'string' ,  {'full','splines','spline','fourier'}, 'full';
     'timelimits','integer',[],[];...
-    'timeshiftparam', 'integer', [], 30;...
+    'timeexpandparam', 'integer', [], 30;...
     'sparse','boolean',[],1;...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
@@ -153,14 +153,14 @@ switch cfg.method
         switch cfg.method
             case 'splines'
 
-                if cfg.timeshiftparam > cfg.windowlength
-                    warning('Spline: Your timeshiftparam is larger than the maximum (%i, max %i). Lower it (or in crease epoch length) to get rid of this warning',cfg.timeshiftparam,cfg.windowlength)
-                    cfg.timeshiftparam = cfg.windowlength;
+                if cfg.timeexpandparam > cfg.windowlength
+                    warning('Spline: Your timeexpandparam is larger than the maximum (%i, max %i). Lower it (or in crease epoch length) to get rid of this warning',cfg.timeexpandparam,cfg.windowlength)
+                    cfg.timeexpandparam = cfg.windowlength;
                 end
-                if cfg.timeshiftparam < 3
-                    error('You need at least three splines (timeshiftparam & windowlength have to be >2)')
+                if cfg.timeexpandparam < 3
+                    error('You need at least three splines (timeexpandparam & windowlength have to be >2)')
                 end
-                knots = linspace(1,cfg.windowlength,cfg.timeshiftparam-2);
+                knots = linspace(1,cfg.windowlength,cfg.timeexpandparam-2);
                 knots = [repmat(knots(1),1,3) knots repmat(knots(end),1,3)];
                 basis = Bernstein(1:cfg.windowlength,knots,[],4)'; % 4 is the order
                 basis(end,end) = 1; % there seems to be a bug in the above function. The last entry should be 1 and not 0
@@ -182,13 +182,13 @@ switch cfg.method
                 %                 midpoint = spl_pnts*2-1;
                 %
                 %% this needs the spline toolbox of matlab.
-                %                 basis2 = Create_splines_linspace(cfg.windowlength-1,cfg.timeshiftparam-2,0)'; % minus two because the function adds two by default
+                %                 basis2 = Create_splines_linspace(cfg.windowlength-1,cfg.timeexpandparam-2,0)'; % minus two because the function adds two by default
                 %                 basis2(1,:) = [];
             case 'fourier'
                 % due to the cos/sin duplication it is easier to think of
                 % this parameter as half of what it actually is. Thus we
                 % fix it here
-                cfg.timeshiftparam = 2*cfg.timeshiftparam;
+                cfg.timeexpandparam = 2*cfg.timeexpandparam;
                 
                 dF = 1/(cfg.windowlength/EEG.srate); % 1 / T
                 fprintf('frequency resolution 1/T = %.2f Hz \n',dF)
@@ -198,27 +198,27 @@ switch cfg.method
                 basisCos = real(basis);
                 
                 
-                if cfg.timeshiftparam > cfg.windowlength
-                    fprintf('timeshiftparam (%i) is too large, choosing full fourier set (%i params) \n',cfg.timeshiftparam,cfg.windowlength)
-                    cfg.timeshiftparam = cfg.windowlength;
+                if cfg.timeexpandparam > cfg.windowlength
+                    fprintf('timeexpandparam (%i) is too large, choosing full fourier set (%i params) \n',cfg.timeexpandparam,cfg.windowlength)
+                    cfg.timeexpandparam = cfg.windowlength;
                 end
                 
-                if (cfg.windowlength ~= cfg.timeshiftparam) && (mod(cfg.timeshiftparam,2)==0)
-                    fprintf('rounding timeshiftparam from even %i to odd %i \n',cfg.timeshiftparam,cfg.timeshiftparam-1)
-                    cfg.timeshiftparam = cfg.timeshiftparam-1;
+                if (cfg.windowlength ~= cfg.timeexpandparam) && (mod(cfg.timeexpandparam,2)==0)
+                    fprintf('rounding timeexpandparam from even %i to odd %i \n',cfg.timeexpandparam,cfg.timeexpandparam-1)
+                    cfg.timeexpandparam = cfg.timeexpandparam-1;
                 end
                 
-                fprintf('Fourier basisfunctions: using DC + the lower frequencies up to %.2f Hz (approximation) \n',floor((cfg.timeshiftparam)/2) * dF)
+                fprintf('Fourier basisfunctions: using DC + the lower frequencies up to %.2f Hz (approximation) \n',floor((cfg.timeexpandparam)/2) * dF)
                 
-                basis = zeros(cfg.timeshiftparam,cfg.windowlength);
+                basis = zeros(cfg.timeexpandparam,cfg.windowlength);
                 
                 % note that because we use the first cosine-basis which is
                 % the intercept/DC-offset we start at 1 / 2 for cos/sin
                 % The second thing to note is the ceil/floor, this is due
                 % to uneven windowlength requiring to take one more basis
                 % function from the cos, but not the sin
-                basis([1 2:2:end],:) = basisCos(1:ceil((cfg.timeshiftparam+1)/2),:);
-                basis(3:2:end,:) = basisSin(2:floor((cfg.timeshiftparam+1)/2),:);
+                basis([1 2:2:end],:) = basisCos(1:ceil((cfg.timeexpandparam+1)/2),:);
+                basis(3:2:end,:) = basisSin(2:floor((cfg.timeexpandparam+1)/2),:);
                 
                 % The full fourier set would look like ths:
                 %   maxCos = ceil((cfg.windowlength+1)/2);
@@ -243,7 +243,7 @@ switch cfg.method
         % the convolved vector by a certain amount of the
         % windowsize
         
-        timeshift = -round( (cfg.timelimits(1)  + cfg.timelimits(2))/2*EEG.srate); %round for float to int conversion
+        timeexpand = -round( (cfg.timelimits(1)  + cfg.timelimits(2))/2*EEG.srate); %round for float to int conversion
         
         % for each predictor
         for l = 1:size(eventvec,1)
@@ -254,13 +254,13 @@ switch cfg.method
                 % depending on where the epoch windows are relative to 0
                 % (see comment above) we have to shift accordingly
                 tmpconv = conv(eventvec(l,:),basis(e,:),'same');
-                if timeshift <0
-                    ts = abs(timeshift);
+                if timeexpand <0
+                    ts = abs(timeexpand);
                     % shift the convolution backwards
                     
                     tmpconv = [zeros(1,ts),tmpconv(1:(end-ts))];
-                elseif timeshift >0
-                    ts = abs(timeshift);
+                elseif timeexpand >0
+                    ts = abs(timeexpand);
                     % shift the convolution forward
                     
                     tmpconv = [tmpconv(ts+1:end),zeros(1,ts)];

@@ -477,7 +477,7 @@ from deconv.X that were removed during epoching.</dd>
 </table>
 <dl class="docutils">
 <dt><em>Example:</em></dt>
-<dd>EEG_epoch = dc_epoch(EEG,&#8217;winrej&#8217;,winrej,&#8217;timelimits&#8217;,cfgTimeshift.timelimits)</dd>
+<dd>EEG_epoch = dc_epoch(EEG,&#8217;winrej&#8217;,winrej,&#8217;timelimits&#8217;,cfgTimeexpand.timelimits)</dd>
 </dl>
 </dd></dl>
 
@@ -684,7 +684,7 @@ correlations between predictors (c.f. Horton &amp; Kleinmann 2007)</dd>
 <dt id="src.dc_toolbox.dc_plotDesignmat">
 <code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_plotDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_plotDesignmat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the designmatrix
-If the matrix is very large (the timeshifted/dcX matrix) we do not plot
+If the matrix is very large (the timeexpanded/dcX matrix) we do not plot
 everything, but only the middle 1000s. We also try to zoom in
 automatically, but this fails sometimes</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -692,7 +692,7 @@ automatically, but this fails sometimes</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>cfg.timeshift'</strong> (<em>boolean</em>) &#8211; 0: Plots EEG.deconv.X (default)
+<li><strong>cfg.timeexpand'</strong> (<em>boolean</em>) &#8211; 0: Plots EEG.deconv.X (default)
 1: Plots EEG.deconv.dcX</li>
 <li><strong>cfg.logColor</strong> (<em>boolean</em>) &#8211; plot the color on logscale (default 0)</li>
 <li><strong>cfg.sort</strong> (<em>boolean</em>) &#8211; Sort the designmatrix</li>
@@ -705,7 +705,7 @@ automatically, but this fails sometimes</p>
 <dl class="docutils">
 <dt><em>Example:</em></dt>
 <dd><p class="first">dc_plot_designmat(EEG)</p>
-<p class="last">dc_plot_designmat(EEG,&#8217;timeshift&#8217;,1) %plot the timeshifted X
+<p class="last">dc_plot_designmat(EEG,&#8217;timeexpand&#8217;,1) %plot the timeexpanded X
 Secret option: &#8216;addContData&#8217;</p>
 </dd>
 </dl>
@@ -848,7 +848,7 @@ customized to whichever caxis</li>
 <dt id="src.dc_toolbox.dc_timeexpandDesignmat">
 <code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_timeexpandDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_timeexpandDesignmat" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
-<dt>Timeshift / Deconvolve Designmatrix This function takes the designmatrix</dt>
+<dt>Timeexpand / Deconvolve Designmatrix This function takes the designmatrix</dt>
 <dd>(saved in EEG.deconv.X, a EEG.points times nPredictor matrix) and makes
 copies over time (in the range of the windowlength).</dd>
 </dl>
@@ -860,14 +860,14 @@ copies over time (in the range of the windowlength).</dd>
 <li><strong>cfg.method</strong> (<em>string</em>) &#8211; <p>default &#8216;full&#8217;; Three methods are available:</p>
 <ul>
 <li>&#8216;full&#8217;        We shift the signal over each point in time</li>
-<li>&#8216;splines&#8217;    We use cubic splines (number = TIMESHIFTPARAM) to approximate the signal. This makes sense as neighbouring timepoints are very likely correlated.</li>
-<li>&#8216;fourier&#8217;    We use a fourier set (up to the first TIMESHIFTPARAM frequencies) to model the signal.</li>
+<li>&#8216;splines&#8217;    We use cubic splines (number = TimeexpandPARAM) to approximate the signal. This makes sense as neighbouring timepoints are very likely correlated.</li>
+<li>&#8216;fourier&#8217;    We use a fourier set (up to the first TimeexpandPARAM frequencies) to model the signal.</li>
 </ul>
 </li>
-<li><strong>cfg.windowlength</strong> (<em>2 integer</em>) &#8211; defines over how many samples the timeshift should go, this is
+<li><strong>cfg.windowlength</strong> (<em>2 integer</em>) &#8211; defines over how many samples the timeexpand should go, this is
 analog to the epoch-size. This should be as long, as you think
 overlap can happen in your data.</li>
-<li><strong>cfg.timeshiftparam</strong> (<em>integer</em>) &#8211; depending on whether cfg.method is splines or fourier defines how
+<li><strong>cfg.timeexpandparam</strong> (<em>integer</em>) &#8211; depending on whether cfg.method is splines or fourier defines how
 many splines or fourier frequencies (in case of fourier, the
 effective parametersize is twice as large due to the sin/cos &#8216;duplication&#8217;) should be used
 to convolve. In case of &#8216;full&#8217;, the parameter is not used.</li>
@@ -887,7 +887,7 @@ to convolve. In case of &#8216;full&#8217;, the parameter is not used.</li>
 </table>
 <dl class="docutils">
 <dt><em>Example:</em></dt>
-<dd>EEG = dc_timeexpandDesignmat(EEG,&#8217;method&#8217;,&#8217;splines&#8217;,&#8217;windowlength&#8217;,128,&#8217;timeshiftparam&#8217;,30)</dd>
+<dd>EEG = dc_timeexpandDesignmat(EEG,&#8217;method&#8217;,&#8217;splines&#8217;,&#8217;windowlength&#8217;,128,&#8217;timeexpandparam&#8217;,30)</dd>
 </dl>
 </dd></dl>
 
