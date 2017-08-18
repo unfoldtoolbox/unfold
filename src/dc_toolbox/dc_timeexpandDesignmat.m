@@ -28,7 +28,7 @@ function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
 %*Example:*
 %       EEG = dc_timeexpandDesignmat(EEG,'method','splines','windowlength',128,'timeshiftparam',30)
 
-fprintf('\ndc_deconvolveDesignmat(): Timeshifting the designmatrix...\n');
+fprintf('\ndc_timeexpandDesignmat(): Timeexpanding the designmatrix...\n');
 
 cfg = finputcheck(varargin,...
     { 'method',         'string' ,  {'full','splines','spline','fourier'}, 'full';
