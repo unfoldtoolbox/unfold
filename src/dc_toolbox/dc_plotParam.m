@@ -96,6 +96,10 @@ end
 % In this function we subselect points at which splines/continuous regressors are supposed to be plotted
 % First checks for splines, second checks whether the splines have been
 % converted to the value-domain. if not, we plot the spline beta as is
+% TODO: This has to be adapted that continuous variables can be plotted as
+% well evaluated at some parameter values. I think we should think about
+% this in general - when to convert beta-parameter estimates to actual
+% values?! Maybe only here? not in the beta2unfold?
 if any(strcmp(unfold.deconv.variableType,'spline')) && size(unfold.(betaSetName{1}),3) > size(unfold.deconv.predictorSplines{1}.spline2val,2)
 unfold = dc_getParam(unfold,cfg);
 end
