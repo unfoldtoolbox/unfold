@@ -212,5 +212,5 @@ switch sim
     otherwise
         error('unknown simulation')
 end
-EEG = simulate_data2(signals,varargin{:});
+EEG = simulate_data(signals,varargin{:});
 rng(sprev);

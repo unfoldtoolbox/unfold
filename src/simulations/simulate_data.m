@@ -157,7 +157,7 @@ eventTimes = cumsum(timeToNextEvent);
 for sIx = 1:length(signals)
     
     % generate the simulated data
-    EEG_tmp=generate_signal2(X{sIx},eventTimes(eventSignal==sIx),sig,signals{sIx},cfg);
+    EEG_tmp=generate_signal(X{sIx},eventTimes(eventSignal==sIx),sig,signals{sIx},cfg);
     
     % concatenate multiple signals
     if sIx == 1

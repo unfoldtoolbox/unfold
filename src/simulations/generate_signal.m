@@ -1,4 +1,4 @@
-function EEG=generate_signal2(X,eventTimes,sig,signals,cfg)
+function EEG=generate_signal(X,eventTimes,sig,signals,cfg)
 
 if any(eventTimes<= 0|eventTimes >= cfg.pnts)
     warning('some eventtimes are smaller than 0 or longer than the data length')
