@@ -1,4 +1,4 @@
-function [] = dc_plotParam2d(t,varargin)
+function [] = dc_plotParam2d(unfold,varargin)
 %Function not yet ready (sorry)
 % This function plots an imagesc plot of time vs. parameter of choice
 %
@@ -11,38 +11,42 @@ function [] = dc_plotParam2d(t,varargin)
 
 warning('Deprecated. This function is currently not used, but might be used to define erpimages')
 cfg= finputcheck(varargin,...
-    {'type','string',unique(t.type),[];
-    'parameter','string',unique(t.parameter),[];
-    'figure','boolean',[0 1],1;
-    'add_intercept','boolean',[0 1],1; % we think interpreting results is easiest with the intercept included
+    {'plotParam','cell',[],{};
+    'add_intercept','boolean',[0 1],0;
+    'channel','integer',[],[];
     },'mode','ignore');
 if(ischar(cfg))
     error(cfg);
 end
 
+if cfg.add_intercept
+    error('adding intercept not yet supported')
+end
 
-select = strcmp(t.type,cfg.type);
-tmpIntercept = t.signal(select&strcmp(t.parameter,'(Intercept)'));
-
-
-a = t(select&strcmp(t.parameter,cfg.parameter),:);
-
-tidx = sort(unique(a.timevec));
-paramidx = unique(a.paramvalue);
-b = full(sparse(arrayfun(@(x)find(x==tidx),a.timevec),arrayfun(@(x)find(x==paramidx),a.paramvalue),a.signal));
-
+paramIdx = find(strcmp(unfold.deconv.variableType,'spline') | strcmp(unfold.deconv.variableType,'continuous'));
 if cfg.add_intercept
     b = bsxfun(@minus,b,tmpIntercept);
 end
-if cfg.figure
-    figure;
+betaSetName = 'beta_nodc'
+if any(strcmp(unfold.deconv.variableType,'spline')) && size(unfold.(betaSetName),3) > size(unfold.deconv.predictorSplines{1}.spline2val,2)
+
 end
-imagesc(tidx,paramidx,b')
+
+for p = 1:length(paramIdx)
+    figure
+    varName = unfold.deconv.variableNames(paramIdx(p));
+    unfoldTmp = dc_getParam(unfold);
+    ix = strcmp(varName,{unfold.epoch.name});
+    val = [unfold.epoch.value];
+    imagesc(unfold.times,val(ix),squeeze(unfold.(betaSetName)(cfg.channel,:,ix))')
+    
+    ylabel(varName)
+    xlabel('time [s]')
+    set(gca,'YDir','normal')
+    colorbar
+    text(1,-0.1,['Intercept Added: ' num2str(cfg.add_intercept)],'units','normalized')
+    
+end
 
 % Design Stuff
-title(cfg.type)
-ylabel(cfg.parameter)
-xlabel('time [s]')
-set(gca,'YDir','normal')
-colorbar
-text(1,-0.1,['Intercept Added: ' num2str(cfg.add_intercept)],'units','normalized')
+

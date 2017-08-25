@@ -40,17 +40,22 @@ function output = dc_beta2unfold(EEG,varargin)
 % * event: event of the variable, e.g.: 'eventA'
 
 
-
+if isfield(EEG.deconv,'XBeta')
+    nchan = size(EEG.deconv.XBeta,1);
+elseif isfield(EEG.deconv,'dcBeta')
+    nchan = size(EEG.deconv.dcBeta,1);
+end
+    
 cfg = finputcheck(varargin,...
     { 'deconv', 'integer',[-1 0 1],-1;
     'convertSplines','boolean',[0,1],1;
-    'channel','integer',[],1:size(EEG.data,1);
+    'channel','integer',[],1:nchan;
     },'mode','error');
 
 if(ischar(cfg)); error(cfg);end
 
 if isfield(EEG,'nbchan')
-    assert(all(ismember(cfg.channel,1:size(EEG.data,1))))
+    assert(all(ismember(cfg.channel,1:nchan)))
 end
 
 dcBetaExists   = isfield(EEG.deconv,'dcBeta')&& isnumeric(EEG.deconv.dcBeta);
@@ -142,10 +147,13 @@ for pred = paramList
         % change name incase of spline and no conversion
         if ismember(pred,splIdxList)
             colname = EEG.deconv.colnames(pred);
-            splt = regexp(colname,'(.+?)_([-]?[\d]*\.[\d]*)','tokens');
-            splt = splt{1}{1};
-            value(loopRunner) = str2num(splt{2});
-            name(loopRunner)= splt(1);
+            
+            
+            splt = regexp(colname,'([-]?[\d]*\.?[\d]*)$','tokens');
+            number = splt{1}{1}{1};
+            name(loopRunner) = {colname{1}(1:(end-length(number)-1))}; % -1 to get rigd of the "_"
+            value(loopRunner) = str2num(number);
+%             name(loopRunner)= splt(1);
         else
             value(loopRunner) = nan;
             name(loopRunner)= EEG.deconv.colnames(pred);

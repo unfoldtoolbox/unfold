@@ -21,9 +21,17 @@ function [resAll] = dc_spl2continuous(EEG,varargin)
 % dc_spl2continuous(EEG,'spline_idx',1)
 
 
+
+if isfield(EEG.deconv,'XBeta')
+    nchan = size(EEG.deconv.XBeta,1);
+elseif isfield(EEG.deconv,'dcBeta')
+    nchan = size(EEG.deconv.dcBeta,1);
+end
+
+
 cfg = finputcheck(varargin,...
     {'spline_idx','integer',[],[]; %this is mandatory, which one do you want to evaluate?
-    'channel','integer',[],1:size(EEG.data,1); % subselect channels
+    'channel','integer',[],1:nchan; % subselect channels
     'time','integer',[],[min(EEG.deconv.dcBasistime);max(EEG.deconv.dcBasistime)]; %take all time-points by default
     'spline_value','real',[],[]; %take all values defined in spline2valby default
     'deconv','boolean',[],1;

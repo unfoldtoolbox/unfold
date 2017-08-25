@@ -100,6 +100,8 @@ end
 % well evaluated at some parameter values. I think we should think about
 % this in general - when to convert beta-parameter estimates to actual
 % values?! Maybe only here? not in the beta2unfold?
+
+% TODO: Bug if different spline-numbers are used
 if any(strcmp(unfold.deconv.variableType,'spline')) && size(unfold.(betaSetName{1}),3) > size(unfold.deconv.predictorSplines{1}.spline2val,2)
 unfold = dc_getParam(unfold,cfg);
 end

@@ -37,6 +37,11 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
+if cfg.add_intercept
+    error('not supported yet')
+    % TODO: combine the preprocessing of dc_plotParam with this funciton
+    % here and plotParam2D
+end
 % data_bsl = bsxfun(@minus,unfold.data,mean(unfold.data(:,unfold.times<-0.1,:),2));
 % plot_topobutter(data_bsl(1:64,:,:),unfold.times,unfold.chanlocs(1:64))
 

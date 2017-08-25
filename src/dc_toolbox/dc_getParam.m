@@ -169,7 +169,7 @@ for predIDX = [paramList;paramListSpline]
             
         else
             values = unfold.deconv.X(:,predIDX(1));
-            % we do not have access at this point to which 'X' entrie belongs to that event. 
+            % we do not have access at this point to which 'X' entry belongs to that event. 
             % Thus we discard every 0 value and hope a bit, that it does not matter because 0 is the intercept anyway.
             % This is supoptimal and I'm sorry if it creats inconveniences.
             % We would need to introduce a whole new field to carry around
