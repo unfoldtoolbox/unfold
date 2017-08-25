@@ -60,7 +60,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="index.html">Home</a></li>
-                <li><a href="http://github.com/behinger/deconvolution">Download from Github</a></li>
+                <li><a href="http://github.com/behinger/unfold">Download from Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -195,8 +195,8 @@
 <dl class="docutils">
 <dt>Definition of the design (<code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat()</span></code>)</dt>
 <dd>We first need to define which triggers (let&#8217;s assume we have an event type &#8216;stimulus&#8217; and one &#8216;keypress&#8217;) should be included in the deconvolution. Because each event could belong to a different condition, which again could be different for stimuli/keypresses, we can define a simple formula for each event. These formulas are commonly used in <code class="xref mat mat-func docutils literal"><span class="pre">R()</span></code> and also matlab and are called Wilkinson-Formulas. They allow to easily specify very simple designs, e.g. 2x2 with only categorical, but also continuous variables, spline-based (additive models, GAM) and mixture between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code>) for your design-specifications.</dd>
-<dt>Timeshift of the designmatrix (<code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>)</dt>
-<dd>In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated. The resulting timeshifted/expanded designmatrix is denoted as <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code>.</dd>
+<dt>Timeexpand of the designmatrix (<code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>)</dt>
+<dd>In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated. The resulting timeexpanded/expanded designmatrix is denoted as <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code>.</dd>
 <dt>Fitting the model (<code class="xref mat mat-func docutils literal"><span class="pre">dc_glmfit()</span></code>)</dt>
 <dd>There are multiple ways to fit the expanded designmatrix <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code>. The unfold-toolbox offers a memory-friendly iterative least squares algorithm, default matlab pseudo-inverse and regularized glmnet (LASSO,ridge-regression and elastic-net).</dd>
 <dt>Transforming parameters (dc_beta2unfold)</dt>
@@ -271,11 +271,11 @@
 <dt>eventtype</dt>
 <dd>The names of the events that are modeled. Only interesting if multiple different events were modeled.</dd>
 <dt>dcX</dt>
-<dd>Timeshifted designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>. If you need to modify this, have a look at <code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat_addcol()</span></code> to see which fields should be modified.</dd>
+<dd>Timeexpanded designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>. If you need to modify this, have a look at <code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat_addcol()</span></code> to see which fields should be modified.</dd>
 <dt>dcBasis</dt>
-<dd>The basis-function of the timeshift for the deconvolution. This matrix could be the identity matrix in case of &#8220;stick&#8221;/dirac-functions. Useful only for splines/fourier time-basis functions</dd>
+<dd>The basis-function of the timeexpand for the deconvolution. This matrix could be the identity matrix in case of &#8220;stick&#8221;/dirac-functions. Useful only for splines/fourier time-basis functions</dd>
 <dt>dcBasistime: [1×20 double]</dt>
-<dd>A vector containing the time in seconds over what range the timeshift occured. This encodes the time of the resulting ERP</dd>
+<dd>A vector containing the time in seconds over what range the timeexpand occured. This encodes the time of the resulting ERP</dd>
 <dt>dcX_termidx</dt>
 <dd>A list connecting the columns of <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code> with columns of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code></dd>
 <dt>dcBeta</dt>
@@ -344,7 +344,7 @@
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Aug 15, 2017.<br/>
+      Last updated on Aug 17, 2017.<br/>
     </p>
   </div>
 </footer>

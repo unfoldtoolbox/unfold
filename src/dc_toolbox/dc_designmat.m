@@ -147,8 +147,6 @@ if iscell(cfg.formula)
                 
                 % find the ones that where 0 in EEG2.deconv.cols2variableNames
                 % and reset them to 0 (0 meaning the intercept)
-                ix = EEG2.deconv.cols2variableNames==max(deconvAll.cols2variableNames);
-                EEG2.deconv.cols2variableNames(ix) = 0;
                 deconvAll.cols2variableNames = [deconvAll.cols2variableNames EEG2.deconv.cols2variableNames];
             end
             

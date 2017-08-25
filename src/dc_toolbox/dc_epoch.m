@@ -14,7 +14,7 @@ function EEG_epoch = dc_epoch(EEG,varargin)
 %   Epoched EEG file to cfg.timelimits
 %
 %*Example:*
-% EEG_epoch = dc_epoch(EEG,'winrej',winrej,'timelimits',cfgTimeshift.timelimits)
+% EEG_epoch = dc_epoch(EEG,'winrej',winrej,'timelimits',cfgTimeexpand.timelimits)
 %
 
 

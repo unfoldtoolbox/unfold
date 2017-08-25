@@ -124,36 +124,36 @@ display('basic plotting tests without error')
 %%
 %%
 for testCase =  4%1:6
-    cfgTimeshift = [];
-    cfgTimeshift.timelimits = [-.1,0.8];
+    cfgTimeexpand = [];
+    cfgTimeexpand.timelimits = [-.1,0.8];
     switch testCase
         case 1
-            cfgTimeshift.method = 'full';%'fourier';%'full';%'spxlines'
-            %cfgTimeshift.timeshiftparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
-            cfgTimeshift.sparse = 0;
+            cfgTimeexpand.method = 'full';%'fourier';%'full';%'spxlines'
+            %cfgTimeexpand.timeexpandparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
+            cfgTimeexpand.sparse = 0;
         case 2
-            cfgTimeshift.method = 'fourier';%'fourier';%'full';%'spxlines'
-            cfgTimeshift.timeshiftparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
-            cfgTimeshift.sparse = 0;
+            cfgTimeexpand.method = 'fourier';%'fourier';%'full';%'spxlines'
+            cfgTimeexpand.timeexpandparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
+            cfgTimeexpand.sparse = 0;
         case 3
-            cfgTimeshift.method = 'splines';%'fourier';%'full';%'spxlines'
-            cfgTimeshift.timeshiftparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
-            cfgTimeshift.sparse = 0;
+            cfgTimeexpand.method = 'splines';%'fourier';%'full';%'spxlines'
+            cfgTimeexpand.timeexpandparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
+            cfgTimeexpand.sparse = 0;
         case 4
-            cfgTimeshift.method = 'full';%'fourier';%'full';%'spxlines'
-            %cfgTimeshift.timeshiftparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
-            cfgTimeshift.sparse = 1;
+            cfgTimeexpand.method = 'full';%'fourier';%'full';%'spxlines'
+            %cfgTimeexpand.timeexpandparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
+            cfgTimeexpand.sparse = 1;
         case 5
-            cfgTimeshift.method = 'fourier';%'fourier';%'full';%'spxlines'
-            cfgTimeshift.timeshiftparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
-            cfgTimeshift.sparse = 1;
+            cfgTimeexpand.method = 'fourier';%'fourier';%'full';%'spxlines'
+            cfgTimeexpand.timeexpandparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
+            cfgTimeexpand.sparse = 1;
         case 6
-            cfgTimeshift.method = 'splines';%'fourier';%'full';%'spxlines'
-            cfgTimeshift.timeshiftparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
-            cfgTimeshift.sparse = 1;
+            cfgTimeexpand.method = 'splines';%'fourier';%'full';%'spxlines'
+            cfgTimeexpand.timeexpandparam = 20; % either number of frequencies (param = * 2 because of cos/sin), or number of splines
+            cfgTimeexpand.sparse = 1;
     end
-    EEG2 = dc_timeexpandDesignmat(EEG,cfgTimeshift);
-    fprintf('timeshift test %i/%i without error \n',testCase,6)
+    EEG2 = dc_timeexpandDesignmat(EEG,cfgTimeexpand);
+    fprintf('timeexpand test %i/%i without error \n',testCase,6)
 end
 
 EEG = EEG2;
@@ -162,7 +162,7 @@ EEG = EEG2;
 %% Cleaning Test
 
 
-%% fit the timeshifted DesignMat
+%% fit the timeexpanded DesignMat
 EEG2= dc_glmfit(EEG,'channel',[1],'method','lsmr');
 EEG3= dc_glmfit(EEG,'channel',[1],'method','pinv');
 EEG4= dc_glmfit(EEG,'channel',[1],'method','matlab');

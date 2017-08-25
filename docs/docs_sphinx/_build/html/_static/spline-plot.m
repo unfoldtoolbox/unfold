@@ -1,6 +1,6 @@
 b = [0.1 0.5 1 2 0.2 4 2]/2;
 N = 200;
-x = sort(rand(N,1)*7+1)
+x = sort(rand(N,1)*7+1);
 y = [];
 yD = log(8-x) + randn(N,1)*0.1;
 % yD = yD-min(yD);
@@ -21,7 +21,7 @@ ylabel('signal to be explained')
 set(get(gcf,'Children'),'Box','off','YTick',[],'XTick',[])
 
 set(gcf,'Position',[   716   687   763   309])
-export_fig nonlinear1.png
+export_fig nonlinear1.png -transparent
 %% Boxcar function fit
 tmp = floor(x)
 
@@ -53,9 +53,9 @@ set(get(gcf,'Children'),'Box','off','YTick',[],'XTick',[])
 xlabel('predictor value (e.g. saccadic amplitude)')
 ylabel('signal to be explained')
 set(gcf,'Position',[   716   687   763   309])
-export_fig nonlinear_boxcar.png
+export_fig nonlinear_boxcar.png -transparent
 %% Spline Fit
-basisSpline = EEG.deconv.dcBasis';
+basisSpline = Bernstein(1:20,[1 1 1 linspace(1,20,5) 20 20 20],[],4);
 tmp = ceil(x*19/7)-2;
 basisBox = [tmp == 1 tmp==2 tmp==3 tmp==4 tmp==5 tmp==6 tmp==7 tmp==8 tmp==9 tmp==10 tmp==11 tmp==12 tmp==13 tmp==14 tmp==15 tmp==16 tmp == 17 tmp==18 tmp==19 tmp ==20];
 
@@ -63,7 +63,7 @@ betaSpline = pinv([ones(N,1) basisBox*basisSpline]) * yD(:)
 
 figure
 subplot(1,2,1)
-plot(EEG.deconv.dcBasis','--')
+plot(basisSpline,'--')
 xlabel('basis set')
 subplot(1,2,2)
 plot(x,yD','o','Color',[0.5 0.5 0.5])
@@ -76,4 +76,4 @@ ylabel('signal to be explained')
 
 set(get(gcf,'Children'),'Box','off','YTick',[],'XTick',[])
 set(gcf,'Position',[   716   687   763   309])
-export_fig nonlinear_spline.png
+export_fig nonlinear_spline.png -transparent

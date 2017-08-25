@@ -8,8 +8,8 @@ Definition of the design (`dc_designmat`)
   We first need to define which triggers (let's assume we have an event type 'stimulus' and one 'keypress') should be included in the deconvolution. Because each event could belong to a different condition, which again could be different for stimuli/keypresses, we can define a simple formula for each event. These formulas are commonly used in `R` and also matlab and are called Wilkinson-Formulas. They allow to easily specify very simple designs, e.g. 2x2 with only categorical, but also continuous variables, spline-based (additive models, GAM) and mixture between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as `X`) for your design-specifications.
 
 
-Timeshift of the designmatrix (`dc_timeexpandDesignmat`)
-  In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated. The resulting timeshifted/expanded designmatrix is denoted as `dcX`.
+Timeexpand of the designmatrix (`dc_timeexpandDesignmat`)
+  In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated. The resulting timeexpanded/expanded designmatrix is denoted as `dcX`.
 
 
 Fitting the model (`dc_glmfit`)
@@ -106,13 +106,13 @@ eventtype
   The names of the events that are modeled. Only interesting if multiple different events were modeled.
 
 dcX
-  Timeshifted designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of `dc_timeexpandDesignmat`. If you need to modify this, have a look at `dc_designmat_addcol` to see which fields should be modified.
+  Timeexpanded designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of `dc_timeexpandDesignmat`. If you need to modify this, have a look at `dc_designmat_addcol` to see which fields should be modified.
 
 dcBasis
-  The basis-function of the timeshift for the deconvolution. This matrix could be the identity matrix in case of "stick"/dirac-functions. Useful only for splines/fourier time-basis functions
+  The basis-function of the timeexpand for the deconvolution. This matrix could be the identity matrix in case of "stick"/dirac-functions. Useful only for splines/fourier time-basis functions
 
 dcBasistime: [1×20 double]
-  A vector containing the time in seconds over what range the timeshift occured. This encodes the time of the resulting ERP
+  A vector containing the time in seconds over what range the timeexpand occured. This encodes the time of the resulting ERP
 
 dcX_termidx
   A list connecting the columns of `dcX` with columns of `X`

@@ -1,11 +1,11 @@
 function dc_plotDesignmat(EEG,varargin)
 %Plots the designmatrix
-%If the matrix is very large (the timeshifted/dcX matrix) we do not plot
+%If the matrix is very large (the timeexpanded/dcX matrix) we do not plot
 %everything, but only the middle 1000s. We also try to zoom in
 %automatically, but this fails sometimes
 %
 %Arguments:
-%   cfg.timeshift' (boolean):
+%   cfg.timeexpand' (boolean):
 %        0: Plots EEG.deconv.X (default)
 %        1: Plots EEG.deconv.dcX
 %   cfg.logColor(boolean): plot the color on logscale (default 0)
@@ -15,7 +15,7 @@ function dc_plotDesignmat(EEG,varargin)
 %*Example:*
 % dc_plot_designmat(EEG)
 %
-% dc_plot_designmat(EEG,'timeshift',1) %plot the timeshifted X
+% dc_plot_designmat(EEG,'timeexpand',1) %plot the timeexpanded X
 
 % Secret option: 'addContData'
 cfg = finputcheck(varargin,...
@@ -59,7 +59,7 @@ nPredTheory = length(EEG.deconv.colnames);
 if cfg.figure
     figure
 end
-if cfg.timeshift && cfg.addContData
+if cfg.timeexpand && cfg.addContData
     subplot(1,20,[2:20])
 end
 ig = imagesc(1:nPred,yAxis,X);
@@ -79,7 +79,7 @@ if length(r)>3
 end
 
 
-if cfg.timeshift && cfg.addContData
+if cfg.timeexpand && cfg.addContData
     subplot(1,20,1)
     plot(EEG.data(1,:),EEG.times/1000)
 %     zoom yon
@@ -90,7 +90,7 @@ if cfg.timeshift && cfg.addContData
 
 end
 
-if cfg.timeshift
+if cfg.timeexpand
 %     warning('auto-zoom to useful resolution (25x the stimulus-window)')
 %     warning('XXX could be dimension 2 for splines?')
 

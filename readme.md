@@ -8,3 +8,14 @@ A toolbox for deconvolution of overlapping EEG signals and (non)-linear modeling
 * Regularization using glmnet
 * Spline-Regression
 * Temporal basis functions (Fourier & Splines)
+
+### Installation
+``` 
+git clone https://github.com/behinger/unfold
+git submodule update --init --recursive --remote
+```
+
+### Running
+```
+run('init_unfold.m')
+```

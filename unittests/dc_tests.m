@@ -13,10 +13,10 @@ test_imputeMissing
 cfg = struct();
 cfg.designmat.coding = {'dummy','reference'};
 cfg.designmat.splinespacing = {'linear','log','quantile','logreverse'};
-cfg.timeshiftDesignmat.timelimits = {[-0.5,1.5],[-0.5,-0.1],[1 2]};
-cfg.timeshiftDesignmat.method = {'full','splines','fourier'};
-cfg.timeshiftDesignmat.timeshiftparam = [3, 5,10,35];
-cfg.timeshiftDesignmat.sparse = [0,1];
+cfg.timeexpandDesignmat.timelimits = {[-0.5,1.5],[-0.5,-0.1],[1 2]};
+cfg.timeexpandDesignmat.method = {'full','splines','fourier'};
+cfg.timeexpandDesignmat.timeexpandparam = [3, 5,10,35];
+cfg.timeexpandDesignmat.sparse = [0,1];
 cfg.glmfit.method={'lsmr','matlab','pinv'};
 cfg.glmfit.channel = 1;
 cfg.beta2EEG.convertSplines = [0,1];
@@ -42,7 +42,7 @@ cfg.beta2EEG.channel = 1;
     end
 
 designmat = allcomb_wrapper(cfg.designmat);
-timeshift = allcomb_wrapper(cfg.timeshiftDesignmat);
+timeexpand = allcomb_wrapper(cfg.timeexpandDesignmat);
 glmfit = allcomb_wrapper(cfg.glmfit);
 beta2EEG = allcomb_wrapper(cfg.beta2EEG);
 % error
@@ -57,9 +57,9 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
             cfgDesignLoop.splinespacing = d{2};
             EEGd = dc_designmat(EEG,cfgDesignLoop);
             
-            for t = timeshift'
+            for t = timeexpand'
                 
-                EEGt = dc_timeexpandDesignmat(EEGd,'timelimits',t{1},'method',t{2},'timeshiftparam',t{3},'sparse',t{4});
+                EEGt = dc_timeexpandDesignmat(EEGd,'timelimits',t{1},'method',t{2},'timeexpandparam',t{3},'sparse',t{4});
                 
                 for g = glmfit'
                     EEGg= dc_glmfit(EEGt,'method',g{1},'channel',g{2});

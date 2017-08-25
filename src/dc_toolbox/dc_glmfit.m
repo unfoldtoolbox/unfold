@@ -174,7 +174,7 @@ fprintf('\n LMfit finished \n')
 beta = beta'; % I prefer channels X betas (easier to multiply things to)
 
 
-% We need to remove customrows, as they were not timeshifted.
+% We need to remove customrows, as they were not timeexpanded.
 eventcell = cellfun(@(x)iscell(x(1)),EEG.deconv.eventtype)*1;
 eventnan = cellfun(@(x)isnan(x(1)),EEG.deconv.eventtype(~eventcell));
 eventnan = find(~eventcell);
