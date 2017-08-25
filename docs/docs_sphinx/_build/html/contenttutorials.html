@@ -89,9 +89,9 @@
 <li class="toctree-l1 current"><a class="reference internal" href="tutorials.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="">Content Tutorials</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#why-deconvolution">Why deconvolution?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#how-does-deconvolution-work">How does deconvolution work?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul>
@@ -126,9 +126,9 @@
 <li class="toctree-l1 current"><a class="reference internal" href="tutorials.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="">Content Tutorials</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#why-deconvolution">Why deconvolution?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#how-does-deconvolution-work">How does deconvolution work?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a></li>
@@ -168,9 +168,9 @@
 <li class="toctree-l1 current"><a class="reference internal" href="tutorials.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="">Content Tutorials</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#why-deconvolution">Why deconvolution?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#how-does-deconvolution-work">How does deconvolution work?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a></li>
@@ -185,7 +185,7 @@
       
   <div class="section" id="content-tutorials">
 <h1>Content Tutorials<a class="headerlink" href="#content-tutorials" title="Permalink to this headline">¶</a></h1>
-<p>We recommend the articles of Smith on the regression-based framework of ERP waveforms (<code class="xref mat mat-func docutils literal"><span class="pre">Link</span> <span class="pre">Smith</span> <span class="pre">&amp;</span> <span class="pre">Kutas</span> <span class="pre">2015a</span></code>,b) for an introduction to linear modeling in ERP analyses. The second part explicitly discusses deconvolution. This overview will just give you the gist on these topics.</p>
+<p>We highly recommend the articles of Smith &amp; Kutas on the regression-based framework of ERP waveforms (<code class="xref mat mat-func docutils literal"><span class="pre">Link</span> <span class="pre">Smith</span> <span class="pre">&amp;</span> <span class="pre">Kutas</span> <span class="pre">2015a</span></code>,b) for an introduction to linear modeling in ERP analyses. The second part explicitly discusses deconvolution. This overview will give you the gist on these topics.</p>
 <div class="section" id="introduction-to-linear-modeling">
 <h2>Introduction to linear modeling<a class="headerlink" href="#introduction-to-linear-modeling" title="Permalink to this headline">¶</a></h2>
 <p>Linear modeling tries to explain the data (ERPs / EEG signals) as a sum of some predictors / independent variables. In M/EEG analysis usually one GLM is fitted separately for each electrode and time-point. It can be formally stated as</p>
@@ -195,6 +195,25 @@
 <div class="math">
 \[\beta = X^{-1}y\]</div>
 <p>The choice of predictors (<span class="math">\(x_1,x_n...\)</span>) is up to the analyst of the signal. In order to understand how to use the toolbox it is helpful to understand the designmatrix <span class="math">\(X\)</span>. This designmatrix has multiple columns, each representing a predictor. Each row is one repetition, usually in EEG, one trial. If the predictor is a categorical one, some kind of encoding has to be used (reference/effects are currently supported). This encoding translates for example a two condition predictor &#8216;face&#8217; vs &#8216;house&#8217; in one predictor called the intercept, which in reference coding represents the reference-category (we use &#8216;face&#8217;) and the other predictor represents the difference of &#8216;face&#8217; and &#8216;house&#8217;, because everything &#8216;face&#8217; can explain, has already been soaked up by the first predictor.</p>
+</div>
+<div class="section" id="why-deconvolution">
+<h2>Why deconvolution?<a class="headerlink" href="#why-deconvolution" title="Permalink to this headline">¶</a></h2>
+<p>It is standard practice in M/EEG research to separate events in time, so that no overlap occurs. But in some cases this is not possible. Especially in reading or free-viewing, that is experiments involving eye movements. Fixations occur on average every 250ms. Long lasting potentials like P300 or N400 occur around 400ms after stimulus onset. It is clear that in each fixation, the activity of the previous fixation is overlapping. Also even without long lasting potentials, baselines are influenced by the previous stimulus (e.g. Lütkenhof 2010).</p>
+<p>If the overlap for two conditions is exactly identical, the differences between the conditions are unaffected. But often this is not the case. For example fixation durations are correlated with many cognitive variables of interest. And if fixation durations differ between two conditions, bias can arise as the overlap of the potentials is different. This can hide as well as generate differences between conditions. One example is given in the following plot.</p>
+<img alt="_images/deconvolutionProblem.png" src="_images/deconvolutionProblem.png" />
+<p>In this example, a difference between conditions A &amp; B arises only due to their different distances to the subsequent event (shown as histograms in B). This difference completely vanishes if we use deconvolution.</p>
+</div>
+<div class="section" id="how-does-deconvolution-work">
+<h2>How does deconvolution work?<a class="headerlink" href="#how-does-deconvolution-work" title="Permalink to this headline">¶</a></h2>
+<p>Deconvolution tries to disentangle the signal. This is possible as the overlap is a bit different in each trial. Thus an algorithm can try to disentangle the process. The simplest way to do this is linear deconvolution, assuming that the signals of two events are linearly added. This has support in physiology: voltages are added linearly, that is, if two sources are active at the same time their voltage potentials can be summed. Linear deconvolution assumes that the first event does not influence the processing of the second event, an assumption that is most certainly wrong in the general case. But, importantly, one has to deal with this in a more generic ERP analysis as well. At least with deconvolution, some part of the overlap can be corrected for.</p>
+<p>To understand deconvolution it is useful to first have a look at <strong>convolution</strong>.</p>
+<img alt="_images/convolutionExplanation.png" src="_images/convolutionExplanation.png" />
+<p>Here two types of events are visible, red <strong>stimuli</strong> events and green <strong>saccade</strong> events. If one where to measure a single event in isolation, one would find the kernels depicted on the right. This is the response we usually are interested in. If we add this kernel at all respective places in the timeseries, we receive the second row. If we now add up the signals at each point in time, we receive the measured EEG. The task of deconvolution is to find out the kernel without knowing its shape. The only information we have is the measured EEG and the times when events occurred.</p>
+<p><strong>Deconvolution</strong></p>
+<p>The key insight in how deconvolution using LMs works is, that each sample of the timeseries can be thought of a linear summation of kernel responses with respectively different times in the kernels. As an example take a voltage at sample $n$. Assume that there are three previous events that we think could overlap to explain this voltage. This voltage is the result of, for example, a summation of kernel A at t==5 and kernel B t==2 and kernel B at t==7. Yet another sample $n_2$ might have only two events <strong>but with slightly different kernel-timings</strong> e.g. A at t==1 and B at <em>t==2</em>. We now have an example where B is at t==2, but A is at t==1 once and at t==5 the other time. This allows us to disentangle the signal.</p>
+<p>In practice this works by timeexpanding our designmatrix. For the following example, the designmatrix was a design with two columns/predictors. One for the stimulus-kernel and one for the saccade-kernel.</p>
+<img alt="../../docs/tutorials/deconvolutionExplanaion.png" src="../../docs/tutorials/deconvolutionExplanaion.png" />
+<p>Time is on the x-axis. A beta-parameter needs to be estimated for each row with blocks of the designmatrix (the red/green blocks). The sample (blue) is assumed to be the linear sum of (in the dashed example) three events with different betas associated (they are different also for the same event <em>green</em>, because the distance to the event is different). After constructing this matrix and expanding the designmatrix in time, we can again invert it and solve for all unknown betas. It might be interesting to note that the influence of an event can also be modeled in the past. For example motor potentials are usually visible before the keypress. In practice one defines a window around each event, e.g. [-0.5 to 1s] and the toolbox takes care of the rest.</p>
 </div>
 <div class="section" id="introduction-to-additive-spline-linear-modeling">
 <h2>Introduction to additive/spline linear modeling<a class="headerlink" href="#introduction-to-additive-spline-linear-modeling" title="Permalink to this headline">¶</a></h2>
@@ -206,16 +225,6 @@
 <p>In this example we split the continuous predictor into seven categorical predictors. In the modelfit (right plot) one can clearly see the step-function of this approach. A more sensible approach would enforce smooth borders and try to control the smoothness of the function. This can be achieved by using spline-basis functions instead of boxcars</p>
 <img alt="_images/nonlinear_spline.png" src="_images/nonlinear_spline.png" />
 <p>In order to get from the basisfunctions (left) to the function fit (right), each basis-function is multiplied by a fitted beta-coefficient value and then summed. These weighted basis-functions are in addition plotted in the right plot. It is important to note that the number of basis-functions is important to prevent over or underfitting. In the unfold toolbox one has to set the number of splines by hand. Nested crossvalidation to get a good estimate of the number of splines to use is certainly possible but computationally extremely expensive. In the field of additive modeling this issue is so far an unresolved problem.</p>
-</div>
-<div class="section" id="why-deconvolution">
-<h2>Why deconvolution?<a class="headerlink" href="#why-deconvolution" title="Permalink to this headline">¶</a></h2>
-<p>It is standard practice in M/EEG research to separate events in time, so that no overlap occurs. But in some cases this is not possible. Especially in reading or free-viewing, that is experiments involving eye movements. Fixations occur on average every 250ms. Long lasting potentials like P300 or N400 occur around 400ms after stimulus onset. It is clear that in each fixation, the activity of the previous fixation is overlapping. Also even without long lasting potentials, baselines are influenced by the previous stimulus (e.g. Lütkenhof 2010).</p>
-<p>If the overlap for two conditions is exactly identical, the differences between the conditions are unaffected. But often this is not the case. For example fixation durations are correlated with many cognitive variables of interest. And if fixation durations differ between two conditions, bias can arise as the overlap of the potentials is different. This can hide as well as generate differences between conditions.</p>
-</div>
-<div class="section" id="how-does-deconvolution-work">
-<h2>How does deconvolution work?<a class="headerlink" href="#how-does-deconvolution-work" title="Permalink to this headline">¶</a></h2>
-<p>Deconvolution tries to disentangle the signal. This is possible as the overlap is a bit different in each trial. Thus an algorithm can try to disentangle the process. The simplest way to do this is linear deconvolution, assuming that the signals of two events are linearly added. This has support in physiology: voltages are added linearly, that is, if two sources are active at the same time their voltage potentials can be summed. Linear deconvolution assumes that the first event does not influence the processing of the second event, an assumption that is most certainly wrong in the general case. But, importantly, one has to deal with this in a more generic ERP analysis as well. At least with deconvolution, some part of the overlap can be corrected for.</p>
-<p>XX Explain timeexpanding</p>
 </div>
 </div>
 
@@ -232,7 +241,7 @@
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Aug 17, 2017.<br/>
+      Last updated on Aug 25, 2017.<br/>
     </p>
   </div>
 </footer>
