@@ -1,6 +1,6 @@
 function dc_plotEventHistogram(EEG,varargin)
 % Function that plots histogram of all events in the EEG.event structure
-% 
+%
 %Arguments:
 %   cfg.eventtype: Restrict the histogram to a specific eventtype
 %
@@ -31,13 +31,20 @@ figure,
 for k = 1:length(VarNames)
     subplot(1,length(VarNames),k)
     data = t2{:,strcmp(t2.Properties.VariableNames,VarNames{k})};
+    if iscell(data)
+        data =data(cellfun(@(x)~isempty(x),data));
+        if all(cellfun(@(x)isnumeric(x),data))
+            data = cell2mat(data);
+        end
+    end
+    
     if ~isnumeric(data)
         data = categorical(data);
         [xcounts,centers] = hist(data);
         centersBar = 1:length(unique(centers));
         bar(centersBar,xcounts,'EdgeColor','none','FaceColor',[0 .5 .5])
         set(gca,'XTickLabel',centers)
-    else 
+    else
         
         [xcounts,centersBar] = hist(data,20); % when numeric, we cann add how many bins
         [f,xi] = ksdensity(data);

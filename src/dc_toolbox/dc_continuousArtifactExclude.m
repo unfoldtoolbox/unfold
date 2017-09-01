@@ -20,6 +20,7 @@ function EEG = dc_continuousArtifactExclude(EEG,varargin)
 
 cfg = finputcheck(varargin,...
     {'winrej',   'integer', [], [];...
+    'zerodata','boolean', [],[];...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
@@ -31,5 +32,9 @@ end
 
 fprintf('\nremoving %.1f%% from design matrix (fill it with zeros) \n',length(unique(rej))/size(EEG.deconv.dcX,1)*100)
 EEG.deconv.dcX(round(rej),:) = 0;
+
+if cfg.zerodata
+EEG.data(:,round(rej)) = 0;
+end
 
 end

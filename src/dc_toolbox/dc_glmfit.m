@@ -99,7 +99,7 @@ if strcmp(cfg.method,'lsmr')
         if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
         end
-        fprintf('... took %.1fs',toc(t))
+        fprintf('... %i iterations, took %.1fs',ITN,toc(t))
         %beta(:,e) =
         %lsqr(EEG.deconv.dcX,sparse(double(EEG.data(e,:)')),[],30);
         
