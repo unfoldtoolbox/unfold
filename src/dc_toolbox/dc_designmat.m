@@ -196,6 +196,12 @@ cfg.spline = [cfg.spline spl];
 cfg.categorical = [cfg.categorical cellfun(@(x)x{1},cat,'UniformOutput',0)];
 f2= regexprep(cfg.formula, catRegexp,'$1');
 f2= regexprep(f2,['(\+|\*)[\s]*?' splRegexp],'');
+
+% We need to replace the term before the ~ by something that matlab sorts
+% after the variables e.g. 'zzz_response'
+f2 = regexprep(f2,'.+~','zzz_response~');
+% This hack will not be necessary anymore as soon as we have our own parser
+
 cfg.formula = f2;
 %%
 
@@ -301,7 +307,7 @@ if isempty(F.Terms)% no variables selected, maybe only splines?
     %predType = [];
 else
     
-    t_clean.y = zeros(size(t_clean,1),1); % needs to be last to use the designmatrix function
+    t_clean.zzz_response = zeros(size(t_clean,1),1); % needs to be last to use the designmatrix function
     
     
     categorical = ismember(F.VariableNames,cfg.categorical);
@@ -320,7 +326,7 @@ else
     [X,terms,a,cols2variableNames,colnames] = ...
         classreg.regr.modelutils.designmatrix(t_clean,'Model',F.Terms,...
         'CategoricalVars',categorical,...
-        'PredictorVars',F.PredictorNames,'ResponseVar','y',...
+        'PredictorVars',F.PredictorNames,'ResponseVar','zzz_response',...
         'DummyVarCoding',cfg.codingschema);
     %temp = {'continuous','categorical'};
     %predType = {temp{categorical+1}};
