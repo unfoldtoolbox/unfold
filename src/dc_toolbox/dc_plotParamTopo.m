@@ -13,7 +13,7 @@ function [varargout] = dc_plotParamTopo(unfold,varargin)
 %               the 'pure' effect of a independent variable is plotted but
 %               more of an ERP-like plot is generated
 %
-% 'chan' : plot only a subset of channels
+% 'channel' : plot only a subset of channels
 %
 % 'caxis' ('same',default:[]) if 'same', generates the same coloraxis based
 %       on the 95% percentile of the selected beta-values. can be
@@ -39,11 +39,14 @@ if(ischar(cfg)); error(cfg);end
 
 if cfg.add_intercept
     error('not supported yet')
-    % TODO: combine the preprocessing of dc_plotParam with this funciton
-    % here and plotParam2D
+    
 end
 % data_bsl = bsxfun(@minus,unfold.data,mean(unfold.data(:,unfold.times<-0.1,:),2));
 % plot_topobutter(data_bsl(1:64,:,:),unfold.times,unfold.chanlocs(1:64))
+betaSetName = 'beta'
+if any(strcmp(unfold.deconv.variableType,'spline')) && size(unfold.(betaSetName),3) > size(unfold.deconv.predictorSplines{1}.spline2val,2)
+    unfold = dc_getParam(unfold,cfg);
+end
 
 if isempty(cfg.channel)
    cfg.channel = 1:size(unfold.beta,1);
@@ -61,6 +64,7 @@ if ischar(cfg.caxis) && strcmp(cfg.caxis,'same')
 end
 
 cfg.butterfly = 'no';
+
 ax = plot_topobutter(unfold.beta,unfold.times,unfold.chanlocs(cfg.channel),cfg);
 
 
