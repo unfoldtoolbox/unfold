@@ -3,7 +3,7 @@ function EEG = dc_continuousArtifactExclude(EEG,varargin)
 % This function inputs a rejection vector and excludes the content from
 % being modeled in the design matrix. That means it sets all predictor
 % values at the given times to 0.
-% 
+%
 %Arguments:
 %   cfg.winrej (integer): A (2xn) array with n from-to pairs of samples to be excluded from further processing
 %
@@ -20,7 +20,7 @@ function EEG = dc_continuousArtifactExclude(EEG,varargin)
 
 cfg = finputcheck(varargin,...
     {'winrej',   'integer', [], [];...
-    'zerodata','boolean', [],[];...
+    'zerodata','boolean', [],0;... % undocumented, also removes portions in EEG.data. This is useful sometimes because e.g. the stopping-criterion of the LSMR iterative solver depends on the data. With huge outliers, strange criterions can exist
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
