@@ -8,6 +8,7 @@ function dc_tests()
 %separate tests
 test_continuousArtifact
 test_imputeMissing
+test_designmat
 
 % Multi-Test
 cfg = struct();

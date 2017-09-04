@@ -333,16 +333,38 @@ else
 end
 variableNames = F.VariableNames(1:end-1);
 has_intercept = any(strcmp(colnames,'(Intercept)'));
-if has_intercept
-    variableNames = ['(Intercept)' variableNames];
-end
+
 if isempty(colnames)
     error('did you specify y~ -1? You need at least a single column in your designmatrix')
 end
 is_interaction = cellfun(@(x)any(x),strfind(colnames,':'));
 
 if sum(is_interaction)>0
+    %check whether main effects were modeled, if not remove them from
+    %variableNames
+
+    removeList = []
+    
+    for int = find(is_interaction)
+        predInInteraction = terms(int,:);
+        for mainEffectIX = find(predInInteraction)
+            % columsn where the maineffect is used
+            co = find(terms(:,mainEffectIX));
+            if ~any(sum(terms(co,:),2) == 1)
+                % we do not have the main effect
+                % and remove it
+                removeList = [removeList mainEffectIX];
+            end
+        end
+    end
+    % Also add the interaction to the variableName List
     variableNames(end+1:(end+sum(is_interaction))) = colnames(is_interaction);
+    variableNames(removeList) = [];
+    categorical(removeList) = [];
+end
+
+if has_intercept
+    variableNames = ['(Intercept)' variableNames];
 end
 % cols2variableNames = cols2variableNames - 1; % -1 to remove the intercept which we do not cary explictly in the variableNames (only in the X-colnames)
 
@@ -447,7 +469,7 @@ if ~isempty(cfg.spline)
         EEG.deconv.predictorSplines{end+1} = spl;
     end
 end
-
+%%
 % We need to kick out all events that we are not interested in, but keep
 % the general event matrix structur the same (e.g. we can still use
 % EEG.event(25) and have the entries in EEG.deconv.X(25,:) matching!
