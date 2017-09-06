@@ -120,7 +120,7 @@ switch cfg.method
             
             shiftvec = [1:cfg.windowlength] + cfg.timelimits(1)*EEG.srate -1;
             for k = 1:length(shiftvec) %for each time-point in the window
-                idx = currow>0;
+                idx = currow~=0; %should be "floating" safe, as matrix is instanciated using "zeros"
                 
                 indcol = repmat(k+(l-1)*cfg.windowlength,1,sum(idx));
                 
