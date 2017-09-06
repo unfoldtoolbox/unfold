@@ -32,4 +32,16 @@ assert(size(EEG2.deconv.X,2) == 4);
 % jumbles things
 EEG2 = dc_designmat(EEGsim,'eventtype','stimulus2','formula','y~conditionA:continuousA');
 
+
 assert(strcmp(EEG2.deconv.variableNames{EEG2.deconv.cols2variableNames(end)},'conditionA:continuousA'))
+
+%% check higher order interactions
+EEG2 = EEGsim;
+for e =1:length(EEG.event)
+    EEG2.event(e).conditionB = randi(2,1);
+end
+EEG2.event = rmfield(EEG2.event,{'splineA','splineB'});
+EEG2 = dc_designmat(EEG2,'eventtype','stimulus2','formula','y~conditionB*conditionA:continuousA');
+
+assert(size(EEG2.deconv.X,2) == 4)
+assert(strcmp(EEG2.deconv.variableNames{EEG2.deconv.cols2variableNames(end)},'conditionA:conditionB:continuousA'))
