@@ -57,8 +57,7 @@ fprintf('\ndc_glmfit(): Fitting deconvolution model...');
 
 
 cfg = finputcheck(varargin,...
-    { 'save_memory_or_time', 'string',{'memory','time','deprecated'}, 'deprecated';
-    'method', 'string',{'par-lsmr','lsmr','matlab','pinv','glmnet'}, 'lsmr';
+    {'method', 'string',{'par-lsmr','lsmr','matlab','pinv','glmnet'}, 'lsmr';
     'glmnetalpha','real',[],1;... # used for glmnet
     'channel','integer',[],1:EEG.nbchan;
     'debug','boolean',[],0;
@@ -66,26 +65,46 @@ cfg = finputcheck(varargin,...
 if(ischar(cfg)); error(cfg);end
 
 
-% Backwards compatibility
-switch cfg.save_memory_or_time
-    case 'deprecated'
-    case 'memory'
-        warning('save_memory_or_time is deprecated and should be replaced by ''method''')
-        cfg.method = 'lsmr';
-    case 'time'
-        warning('save_memory_or_time is deprecated and should be replaced by ''method''')
-        cfg.method = 'matlab';
-end
+
 
 assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated, you could input it as EEG.data(:,:)')
 assert(size(EEG.deconv.dcX,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.deconv.dcX),size(EEG.data))
 
 
-    X = EEG.deconv.dcX;
+X = EEG.deconv.dcX;
 
 disp('solving the equation system');
 t = tic;
 beta = nan(size(EEG.deconv.dcX,2),EEG.nbchan);
+data = EEG.data;
+
+%% Remove data that is unnecessary for the fit
+% this helps calculating better tolerances for lsmr
+emptyRows = sum(abs(X),2) == 0;
+X(emptyRows,:)  = [];
+data(:,emptyRows) = [];
+
+% % normalize data
+% READ THIS
+% this is uncommented because it doesn't actually solve the problem I
+% wanted to solve. nevertheless it might be helpful to normalize data
+% before the fits. We hav eto check the methods, some do this automatically
+% (glmnet). Others might (matlab?). Pinv should benefit from this, lsmr - I
+% don't really know.
+%
+% if any(strcmp(cfg.method,{'lsmr','par-lsmr'}))
+%     % I don't do mean/median subtraction yet, because I'm not actually sure
+%     % how to undo it again? I don't have a total-EEG signal Intercept.
+%     % Maybe I could just do it and not undo it again?
+%
+%     normalize = struct();
+%     %     normalize.median = nanmedian(data,2);
+%     normalize.mad = mad(data')';
+%     %     data = bsxfun(@minus,data,normalize.median);
+%     data = bsxfun(@rdivide,data,normalize.mad);
+% end
+
+
 
 if strcmp(cfg.method,'lsmr')
     
@@ -95,7 +114,7 @@ if strcmp(cfg.method,'lsmr')
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         
         % use iterative solver for least-squares problems (lsmr)
-        [beta(:,e),ISTOP,ITN] = lsmr(EEG.deconv.dcX,sparse(double(EEG.data(e,:)')),[],10^-8,10^-8,[],200); % ISTOP = reason why algorithm has terminated, ITN = iterations
+        [beta(:,e),ISTOP,ITN] = lsmr(X,sparse(double(data(e,:)')),[],10^-8,10^-8,[],200); % ISTOP = reason why algorithm has terminated, ITN = iterations
         if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
         end
@@ -114,9 +133,9 @@ elseif strcmp(cfg.method,'par-lsmr')
     end
     fprintf('done\n')
     addpath('../lib/lsmr/')
-    beta = nan(size(EEG.deconv.dcX,2),EEG.nbchan);
-    dcX = EEG.deconv.dcX;
-    data = sparse(double(EEG.data'));
+    beta = nan(size(X,2),EEG.nbchan);
+    dcX = X;
+    data = sparse(double(data'));
     % go tru channels
     fprintf('starting parallel loop')
     parfor e = cfg.channel
@@ -143,36 +162,41 @@ elseif strcmp(cfg.method,'matlab') % save time
         spparms('spumoni',2)
     end
     
-    beta(:,cfg.channel) = EEG.deconv.dcX \ sparse(double(EEG.data(cfg.channel,:)'));
+    beta(:,cfg.channel) = X \ sparse(double(data(cfg.channel,:)'));
     
 elseif strcmp(cfg.method,'pinv')
     Xinv = pinv(full(X));
-    beta = calc_beta(EEG,Xinv,cfg.channel);
+    beta = calc_beta(data,EEG.nbchan,Xinv,cfg.channel);
     
     
 elseif strcmp(cfg.method,'glmnet')
-    beta = nan(size(EEG.deconv.dcX,2)+1,EEG.nbchan); %plus one, because glmnet adds a intercept
+    beta = nan(size(X,2)+1,EEG.nbchan); %plus one, because glmnet adds a intercept
     for e = cfg.channel
         t = tic;
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         %glmnet needs double precision
-        fit = cvglmnet(X,(double(EEG.data(e,:)')),'gaussian',struct('alpha',cfg.glmnetalpha));
+        fit = cvglmnet(X,(double(data(e,:)')),'gaussian',struct('alpha',cfg.glmnetalpha));
         
         %find best cv-lambda coefficients
         beta(:,e) = cvglmnetCoef(fit,'lambda_1se')';
         
         fprintf('... took %.1fs',toc(t))
-
+        
     end
     beta = beta([2:end 1],:); %put the dc-intercept last
-    EEG = dc_designmat_addcol(EEG,ones(1,length(EEG.deconv.dcX)),'glmnet-DC-Correction');
-
+    EEG = dc_designmat_addcol(EEG,ones(1,size(X,1)),'glmnet-DC-Correction');
+    
     
     
 end
 fprintf('\n LMfit finished \n')
 beta = beta'; % I prefer channels X betas (easier to multiply things to)
 
+% Unnormalize data
+% if any(strcmp(cfg.method,{'lsmr','par-lsmr'}))
+%    beta = bsxfun(@times,beta,normalize.mad);
+%
+% end
 
 % We need to remove customrows, as they were not timeexpanded.
 eventcell = cellfun(@(x)iscell(x(1)),EEG.deconv.eventtype)*1;
@@ -186,16 +210,16 @@ betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.deconv.dc
 
 EEG.deconv.dcBeta = betaOut;
 if length(eventnan)>0
-%     EEG.betaCustomrow = beta(end+1-length(eventnan):end);
+    %     EEG.betaCustomrow = beta(end+1-length(eventnan):end);
     EEG.deconv.dcBetaCustomrow = beta(:,end+1-length(eventnan):end);
 end
 EEG.deconv.channel = cfg.channel;
 
 end
 
-function [beta] = calc_beta(EEG,Xinv,channel)
-beta = nan(size(Xinv,1),EEG.nbchan);
+function [beta] = calc_beta(data,nbchan,Xinv,channel)
+beta = nan(size(Xinv,1),nbchan);
 for c = channel
-    beta(:,c)= (Xinv*squeeze(EEG.data(c,:,:))');
+    beta(:,c)= (Xinv*squeeze(data(c,:,:))');
 end
 end

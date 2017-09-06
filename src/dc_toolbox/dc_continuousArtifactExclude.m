@@ -20,7 +20,6 @@ function EEG = dc_continuousArtifactExclude(EEG,varargin)
 
 cfg = finputcheck(varargin,...
     {'winrej',   'integer', [], [];...
-    'zerodata','boolean', [],0;... % undocumented, also removes portions in EEG.data. This is useful sometimes because e.g. the stopping-criterion of the LSMR iterative solver depends on the data. With huge outliers, strange criterions can exist
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
@@ -33,8 +32,5 @@ end
 fprintf('\nremoving %.1f%% from design matrix (fill it with zeros) \n',length(unique(rej))/size(EEG.deconv.dcX,1)*100)
 EEG.deconv.dcX(round(rej),:) = 0;
 
-if cfg.zerodata
-EEG.data(:,round(rej)) = 0;
-end
 
 end
