@@ -142,7 +142,7 @@ end
 %name + event are later used to split up columns
 
 name = paramList;
-event = cellfun(@(y)strjoin(y,'+'),{unfold.epoch(paramIdx).event},'UniformOutput',0);
+event = cellfun(@(y)strjoin_custom(y,'+'),{unfold.epoch(paramIdx).event},'UniformOutput',0);
 
 % value, this is necessary for continuous + spline
 value = [unfold.epoch(paramIdx).value];

@@ -54,7 +54,7 @@ end
 if isempty(cfg.plotParam)
     param = 1:length(unfold.epoch);
 else
-    param = find(ismember(cfg.plotParam,{unfold.epoch(:).name}));
+    param = find(ismember({unfold.epoch(:).name},cfg.plotParam));
 end
 
 unfold.beta = unfold.beta(cfg.channel,:,param);
@@ -74,7 +74,7 @@ for k = 1:length(param)
     if isnan(val)
        val = []; 
     end
-    t = text(ax.topo.topo{k}.image{1},0,1.1,10,sprintf('[%s]: %s: %g',strjoin(unfold.epoch(param(k)).event),unfold.epoch(param(k)).name,val),'Units','normalized','HorizontalAlignment','left');
+    t = text(ax.topo.topo{k}.image{1},0,1.1,10,sprintf('[%s]: %s: %g',strjoin_custom(unfold.epoch(param(k)).event),unfold.epoch(param(k)).name,val),'Units','normalized','HorizontalAlignment','left');
     uistack(t,'top')
     t.Interpreter = 'none';
 end
