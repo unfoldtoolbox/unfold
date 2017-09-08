@@ -50,9 +50,9 @@ for p = 1:length(paramIdx)
         % get eventtname of current predictor
         evtType =  unfold.deconv.col2eventtype(paramIdx);
         % combine it in case we have multiple events
-        evtType = strjoin(unfold.deconv.eventtype{evtType},'+');
+        evtType = strjoin_custom(unfold.deconv.eventtype{evtType},'+');
         % find the events in unfold.epoch
-        epochStr = cellfun(@(x)strjoin(x,'+'),{unfold.epoch(:).event},'UniformOutput',0);
+        epochStr = cellfun(@(x)strjoin_custom(x,'+'),{unfold.epoch(:).event},'UniformOutput',0);
         % check the event to be the same & that it is an intercept
         interceptIdx = strcmp(evtType,epochStr) & strcmp('(Intercept)',{unfold.epoch(:).name});
         
