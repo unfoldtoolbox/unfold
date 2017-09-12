@@ -15,9 +15,13 @@ function [varargout] = dc_plotParamTopo(unfold,varargin)
 %
 % 'channel' : plot only a subset of channels
 %
+% 'baseline' (2 integers): default none; Performs a baseline corrections on the interval (in seconds = unfold.times units) given.
+%
 % 'caxis' ('same',default:[]) if 'same', generates the same coloraxis based
 %       on the 95% percentile of the selected beta-values. can be
-%       customized to whichever caxis
+%       customized to whichever caxis e.g. [-3 5]
+% 'betaSetName'   : Default 'beta'. Can be any field of the unfold-struct
+%
 % 'figure'    : plot in new figure (1) or old (0), default: (1)
 %
 %Returns:
@@ -31,6 +35,8 @@ cfg = finputcheck(varargin,...
     {'pred_value','cell',[],{{'',[]}};
     'add_intercept','boolean',[],0;
     'plotParam','cell',[],{};
+    'baseline','real',[min(unfold.times) max(unfold.times)],[];...
+    'betaSetName','string',fieldnames(unfold),'beta';
     'channel','integer',[],[];
     'caxis','',[],'same';
     'figure','boolean',[0 1],1;
@@ -41,15 +47,16 @@ if cfg.add_intercept
     error('not supported yet')
     
 end
-% data_bsl = bsxfun(@minus,unfold.data,mean(unfold.data(:,unfold.times<-0.1,:),2));
-% plot_topobutter(data_bsl(1:64,:,:),unfold.times,unfold.chanlocs(1:64))
-betaSetName = 'beta'
-if any(strcmp(unfold.deconv.variableType,'spline')) && size(unfold.(betaSetName),3) > size(unfold.deconv.predictorSplines{1}.spline2val,2)
+
+% XXX Todo: Make this more versatile
+if any(strcmp(unfold.deconv.variableType,'spline')) && size(unfold.(cfg.betaSetName),3) > size(unfold.deconv.predictorSplines{1}.spline2val,2)
     unfold = dc_getParam(unfold,cfg);
 end
 
+data = unfold.(cfg.betaSetName);
+
 if isempty(cfg.channel)
-   cfg.channel = 1:size(unfold.beta,1);
+   cfg.channel = 1:size(data,1);
 end
 if isempty(cfg.plotParam)
     param = 1:length(unfold.epoch);
@@ -57,31 +64,42 @@ else
     param = find(ismember({unfold.epoch(:).name},cfg.plotParam));
 end
 
-unfold.beta = unfold.beta(cfg.channel,:,param);
+data = data(cfg.channel,:,param);
+
+% Baseline Correction
+if ~isempty(cfg.baseline)
+   data= bsxfun(@minus,data ,mean(data(:,(unfold.times>=cfg.baseline(1))& (unfold.times<cfg.baseline(2)),:),1));
+end
+
+% caculate common coloraxis
 if ischar(cfg.caxis) && strcmp(cfg.caxis,'same')
-    cfg.caxis = prctile(unfold.beta(:),[1 99]);
+    cfg.caxis = prctile(data(:),[1 99]);
     cfg.caxis = [-max(abs(cfg.caxis)) max(abs(cfg.caxis))];
 end
 
+% plot the topoplots
 cfg.butterfly = 'no';
+ax = plot_topobutter(data,unfold.times,unfold.chanlocs(cfg.channel),cfg);
 
-ax = plot_topobutter(unfold.beta,unfold.times,unfold.chanlocs(cfg.channel),cfg);
-
-
+% plot row-names
 for k = 1:length(param)
     ax.topo.topo{k}.image{1}.Units = 'normalized';
+    % get the values for the rowname
     val = round(unfold.epoch(param(k)).value,2,'significant');
+    
     if isnan(val)
        val = []; 
     end
-    t = text(ax.topo.topo{k}.image{1},0,1.1,10,sprintf('[%s]: %s: %g',strjoin_custom(unfold.epoch(param(k)).event),unfold.epoch(param(k)).name,val),'Units','normalized','HorizontalAlignment','left');
+    text = sprintf('[%s]: %s: %g',strjoin_custom(unfold.epoch(param(k)).event),unfold.epoch(param(k)).name,val);
+    t = text(ax.topo.topo{k}.image{1},0,1.1,10,text,'Units','normalized','HorizontalAlignment','left');
+    
+    % we want them on top, else they can be behind the topos
     uistack(t,'top')
-    t.Interpreter = 'none';
+    t.Interpreter = 'none'; % no interpretation
 end
 
-% plot time-axis at the bottom
 
-
+%% plot time-axis at the bottom
 %% Define Plotting time and get an idea of what plot_topo is doing
 n_topo = size(ax.topo.topo{1}.image,2);
 

@@ -23,7 +23,7 @@
 %    'add_intercept' (boolean): Add the intercept/constant to each subplot.
 %      This will give ERP-plots that are commonly used. Without add_intercepts the factors (if they are categorical) could be interpretet as difference or sometimes main effect plots (if effects-coding is used)
 %
-%    'baseline' (2 integers): default none; Performs a baseline corrections on the interval (in seconds) given.
+%    'baseline' (2 integers): default none; Performs a baseline corrections on the interval (in seconds = unfold.times units) given.
 %
 %    'include_intercept' (boolean) : default 0; useful with "add_intercept", will add the constant/intercept to each subplot
 %
