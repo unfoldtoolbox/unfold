@@ -764,10 +764,12 @@ returned</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>'cfg.Parameter'</strong> &#8211; name of the parameter AS IT OCCURS IN THE TABLE, currently
-no search is supported to find the spline number directly.</li>
-<li><strong>'cfg.add_intercept'</strong> &#8211; add the intercept to the plot, default 1</li>
-<li><strong>'cfg.type'</strong> &#8211; subset of the type variable</li>
+<li><strong>'plotParam'</strong> &#8211; Name of parameter to be plotted. can be empty to plot
+all splines/continuous parameters</li>
+<li><strong>'add_intercept'</strong> &#8211; add the intercept to the plot, default 0</li>
+<li><strong>'channel'</strong> &#8211; Specify which channel-idx to plot</li>
+<li><strong>'betaSetName'</strong> &#8211; Default &#8216;beta&#8217;. Can be any field of the unfold-struct</li>
+<li><strong>'caxis'</strong> &#8211; Default [], specify coloraxis</li>
 </ul>
 </td>
 </tr>
@@ -793,10 +795,12 @@ from min to max (see code for more info)</li>
 <li><strong>'add_intercept'</strong> &#8211; (not yet supported) whether to add the intercept to each curve (thus not
 the &#8216;pure&#8217; effect of a independent variable is plotted but
 more of an ERP-like plot is generated</li>
-<li><strong>'chan'</strong> &#8211; plot only a subset of channels</li>
+<li><strong>'channel'</strong> &#8211; plot only a subset of channels</li>
+<li><strong>'baseline'</strong> (<em>2 integers</em>) &#8211; default none; Performs a baseline corrections on the interval (in seconds = unfold.times units) given.</li>
 <li><strong>('same',default</strong> (<em>'caxis'</em>) &#8211; []) if &#8216;same&#8217;, generates the same coloraxis based
 on the 95% percentile of the selected beta-values. can be
-customized to whichever caxis</li>
+customized to whichever caxis e.g. [-3 5]</li>
+<li><strong>'betaSetName'</strong> &#8211; Default &#8216;beta&#8217;. Can be any field of the unfold-struct</li>
 <li><strong>'figure'</strong> &#8211; plot in new figure (1) or old (0), default: (1)</li>
 </ul>
 </td>
@@ -936,7 +940,7 @@ gets one column</p>
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Aug 25, 2017.<br/>
+      Last updated on Sep 26, 2017.<br/>
     </p>
   </div>
 </footer>
