@@ -55,7 +55,7 @@ test_fit(EEG,'lsmr')
 try
 test_fit(EEG,'par-lsmr')
 catch
-    warning('parallel code had an error, no parallel toolbox?'
+    warning('parallel code had an error, no parallel toolbox?')
 end
 test_fit(EEG,'pinv')
 test_fit(EEG,'matlab')
