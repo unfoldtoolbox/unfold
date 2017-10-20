@@ -154,7 +154,8 @@ value(isnan(value)) = 0; %categorical variables are nan, we need to convert
 % linetype = ones(1,size(data,3));
 plotData = []; plotLinestyle = {}; plotColLabel = [];plotName = [];plotEvent=[];plotValue = [];
 for bName =betaSetName
-    data = squeeze(unfold.(bName{1})(cfg.channel,:,paramIdx));
+    data = permute(unfold.(bName{1})(cfg.channel,:,paramIdx),[2 3 1]); % squeeze transposes, if paramIDX and channel is 1
+
     if ~isempty(cfg.baseline)
         fprintf('performing baseline correction \n')
         data = bsxfun(@minus,data,mean(data((unfold.times>=cfg.baseline(1))& (unfold.times<cfg.baseline(2)),:),1));
