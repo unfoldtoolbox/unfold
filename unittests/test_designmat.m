@@ -37,7 +37,7 @@ assert(strcmp(EEG2.deconv.variableNames{EEG2.deconv.cols2variableNames(end)},'co
 
 %% check higher order interactions
 EEG2 = EEGsim;
-for e =1:length(EEG.event)
+for e =1:length(EEG2.event)
     EEG2.event(e).conditionB = randi(2,1);
 end
 EEG2.event = rmfield(EEG2.event,{'splineA','splineB'});

@@ -10,6 +10,7 @@ test_continuousArtifact
 test_imputeMissing
 test_designmat
 test_glmfit
+test_timeexpandDesignmat
 
 % Multi-Test
 cfg = struct();
