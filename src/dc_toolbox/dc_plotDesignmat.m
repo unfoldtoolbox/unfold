@@ -29,9 +29,9 @@ cfg = finputcheck(varargin,...
 
 if cfg.timeexpand
     yAxisLabel = 'time [s]';
-
+    
     time_lim = EEG.times(ceil(end/2)) + [-100,100] * 1000;
-    if EEG.xmin > time_lim(1) || EEG.xmax <time_lim(2)
+    if min(EEG.times) > time_lim(1) || max(EEG.times) <time_lim(2)
         warning('the design-matrix is too large to display, we show only the middle 1000 seconds.')
     end
     time_ix = EEG.times < time_lim(2) & EEG.times > time_lim(1);
@@ -43,7 +43,7 @@ else
     X = EEG.deconv.X;
     yAxis = 1:size(X,1);
     shiftByOne = 1;  % shift the XTicks by one
-
+    
 end
 if cfg.logColor
     X = log(X);
@@ -82,37 +82,42 @@ end
 if cfg.timeexpand && cfg.addContData
     subplot(1,20,1)
     plot(EEG.data(1,:),EEG.times/1000)
-%     zoom yon
-%     zoom(length(yAxis)./(size(EEG.deconv.dcBasis,1)*25))
-%     pan yon
+    %     zoom yon
+    %     zoom(length(yAxis)./(size(EEG.deconv.dcBasis,1)*25))
+    %     pan yon
     set(gca,'YTickLabel','','XTickLabel','')
     linkaxes([ax,gca],'y' )
-
+    
 end
 
 if cfg.timeexpand
-%     warning('auto-zoom to useful resolution (25x the stimulus-window)')
-%     warning('XXX could be dimension 2 for splines?')
+    set(ax,'YDir','reverse') % time flows from top to bottom
 
-%     zoom yon
-%     zoom(length(yAxis)./(size(EEG.deconv.dcBasis,1)*25))
+    %     warning('auto-zoom to useful resolution (25x the stimulus-window)')
+    %     warning('XXX could be dimension 2 for splines?')
+    
+    %     zoom yon
+    %     zoom(length(yAxis)./(size(EEG.deconv.dcBasis,1)*25))
     axes(ax)
     pan yon
-    allTypes = {EEG.event(:).type};
-    lat = [EEG.event(:).latency]/EEG.srate*1000;  %in ms
-
-    latix = (lat< (time_lim(2))) & (lat > (time_lim(1)));
-    if sum(latix)>0 && sum(latix)<1000 % it starts to get really buggy after 1000 lines
-
-        % plot all event onsets as horizontal lines with different colors per event
-        [un,~,c] = unique(allTypes(latix));
-        colorList = repmat({{'r','g','b','c','m','y','k','w'}},ceil(length(un)/8),1); % ugly and lazy... but who has more than that different types...
-        colorList = [colorList{:}];
-        hline(lat(latix)/1000,colorList(c))
-    end
-
-
-    % Zoom to an event that is exactly in the middle of the cut data
+    if isfield(EEG,'event')
+        allTypes = {EEG.event(:).type};
+        lat = [EEG.event(:).latency]/EEG.srate*1000;  %in ms
+        
+        latix = (lat< (time_lim(2))) & (lat > (time_lim(1)));
+        if sum(latix)>0 && sum(latix)<1000 % it starts to get really buggy after 1000 lines
+            
+            % plot all event onsets as horizontal lines with different colors per event
+            [un,~,c] = unique(allTypes(latix));
+            colorList = repmat({{'r','g','b','c','m','y','k','w'}},ceil(length(un)/8),1); % ugly and lazy... but who has more than that different types...
+            colorList = [colorList{:}];
+            hline(lat(latix)/1000,colorList(c))
+        end
+            % Zoom to an event that is exactly in the middle of the cut data
     latTmp = lat(latix);
     ylim([latTmp(ceil(end/2))/1000-3 latTmp(ceil(end/2))/1000+3])
+    end
+    
+    
+
 end
