@@ -179,12 +179,13 @@ elseif strcmp(cfg.method,'glmnet')
         
         %find best cv-lambda coefficients
         beta(:,e) = cvglmnetCoef(fit,'lambda_1se')';
-        
+        fit.glmnet_fit = [];
+        EEG.deconv.glmnet(e) = fit;
         fprintf('... took %.1fs',toc(t))
         
     end
     beta = beta([2:end 1],:); %put the dc-intercept last
-    EEG = dc_designmat_addcol(EEG,ones(1,size(X,1)),'glmnet-DC-Correction');
+    EEG = dc_designmat_addcol(EEG,ones(1,size(EEG.deconv.dcX,1)),'glmnet-DC-Correction');
     
     
     
