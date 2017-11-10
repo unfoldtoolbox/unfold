@@ -15,23 +15,59 @@ function [EEG] = dc_glmfit_nodc(EEG,varargin)
 %
 
 
-'';
-% Stub, maybe will be used in the future
-% cfg = finputcheck(cfg,...
-%     {'type',   'string', {'multiple'}, 'multiple';...
-%     },'mode','ignore');
-% if(ischar(cfg)); error(cfg);end
+cfg = finputcheck(varargin,...
+    {'method',   'string', {'glmnet','pinv','matlab'}, 'pinv';...
+    'glmnetalpha','real',[],1;... # used for glmnet
+    'debug','boolean',[],0;...
 
+    'channel','integer',[],1:size(EEG.data,1);
+    },'mode','ignore');
+if(ischar(cfg)); error(cfg);end
 
 X = EEG.deconv.X;
 
-Xinv = pinv(X);
+if strcmp(cfg.method,'pinv')
+    
+    Xinv = pinv(X);
+    beta = calc_beta(EEG,Xinv);
+    
+elseif strcmp(cfg.method,'matlab') % save time
+    
+    beta = nan(size(X,2),size(EEG.data,2),size(EEG.data,1)); %plus one, because glmnet adds a intercept
+    if cfg.debug
+        spparms('spumoni',2)
+    end
+    for c = cfg.channel
+     beta(:,:,c) = X \ squeeze(EEG.data(c,:,:))';
+    end
+    beta =     permute(beta,[3 2 1]);
+    
+elseif strcmp(cfg.method,'glmnet')
+    
+    beta = nan(size(X,2)+1,size(EEG.data,2),size(EEG.data,3)); %plus one, because glmnet adds a intercept
+    for time = 1:size(EEG.data,2)
+        for e = cfg.channel
+            t = tic;
+            fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
+            %glmnet needs double precision
+             fit = cvglmnet(X,(double(squeeze(EEG.data(e,time,:))')),'gaussian',struct('alpha',cfg.glmnetalpha));
+            
+            %find best cv-lambda coefficients
+            beta(:,e,time) = cvglmnetCoef(fit,'lambda_1se')';
+            
+            fprintf('... took %.1fs',toc(t))
+            
+        end
+    end
+    beta = beta([2:end 1],:,:); %put the dc-intercept last
+    
+    
+    
+    
+end
 
-beta = calc_beta(EEG,Xinv);
 EEG.deconv.XBeta = beta;
 EEG.deconv.dcBasistime = EEG.times/1000; %because seconds is better than ms!
-
-
 
 
 
@@ -50,13 +86,13 @@ for c = 1:EEG.nbchan
     
     %reshape instead of squeeze to keep the mxn matrix even when m or n is 1
     if ~isfield(EEG.deconv,'dcBasis')
-       warning('deconvolution time-basis not found, assuming stick-functions / full') 
+        warning('deconvolution time-basis not found, assuming stick-functions / full')
         beta(c,:,:)= (Xinv*(reshape(EEG.data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
     else
-    
+        
         beta(c,:,:)= (Xinv*(EEG.deconv.dcBasis*reshape(EEG.data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
     end
-%     beta(c,:,:)= (Xinv*(reshape(EEG.data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
+    %     beta(c,:,:)= (Xinv*(reshape(EEG.data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
 end
 
 end
