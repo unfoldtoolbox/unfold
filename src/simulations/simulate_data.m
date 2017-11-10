@@ -12,6 +12,7 @@ function [EEG] = simulate_data2(signals,varargin)
 simCFG= finputcheck(varargin,...
     {'datalength','integer',[],10*60;
     'noise','boolean',[],1;
+    'srate','integer',[],10;
     'basis','string',{'box','hanning','dirac'},'box'
     },'mode','ignore');
 
@@ -19,7 +20,7 @@ assert(~ischar(simCFG),simCFG)
 
 % mean interstimulus interval
 cfg = [];
-cfg.srate = 10;%Hz
+cfg.srate = simCFG.srate;%Hz
 cfg.pnts= simCFG.datalength*cfg.srate; % default: 10 times 60s, thus 10minute of data
 cfg.noise = simCFG.noise;
 
