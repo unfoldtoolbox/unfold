@@ -24,7 +24,7 @@ splIdxListAll = [];
 paramList = 1:numParam;
 
 
-splineVar = EEG.deconv.cols2variableNames(strcmp(EEG.deconv.variableType,'spline'));
+splineVar = find(strcmp(EEG.deconv.variableType,'spline'));
 splineCol = EEG.deconv.cols2variableNames;
 splineCol(~ismember(EEG.deconv.cols2variableNames,splineVar)) = 0;
 
