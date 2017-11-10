@@ -12,7 +12,7 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %    very memory efficient, but is a lot slower than the 'time' option
 %    because each electrode has to be solved independently. The LSMR
 %    algorithm is used for sparse iterative solving.
-
+%   
 %    * "par-lsmr"  same as lsmr, but uses parfor with ncpu-1.
 %
 %    * "matlab"    , uses matlabs native A/b solver. For moderate to big
@@ -31,6 +31,9 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %    compared to the fit of the model). We use the glmnet recommended
 %    'lambda_1se', i.e. minimum lambda + 1SE buffer towards more strict
 %    regularisation.
+%
+%   cfg.lsmriterations: (default 200), defines how many steps the iterative
+%                   solver should search for a solution. 
 %
 %   cfg.glmnetalpha: (default 1), can be 0 for L2 norm, 1 for L1-norm or
 %                    something inbetween for elastic net
@@ -58,8 +61,9 @@ fprintf('\ndc_glmfit(): Fitting deconvolution model...');
 
 cfg = finputcheck(varargin,...
     {'method', 'string',{'par-lsmr','lsmr','matlab','pinv','glmnet'}, 'lsmr';
+    'lsmriterations','integer',[],200;
     'glmnetalpha','real',[],1;... # used for glmnet
-    'channel','integer',[],1:EEG.nbchan;
+    'channel','integer',[],1:size(EEG.data,1);
     'debug','boolean',[],0;
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
@@ -114,7 +118,7 @@ if strcmp(cfg.method,'lsmr')
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         
         % use iterative solver for least-squares problems (lsmr)
-        [beta(:,e),ISTOP,ITN] = lsmr(X,sparse(double(data(e,:)')),[],10^-8,10^-8,[],200); % ISTOP = reason why algorithm has terminated, ITN = iterations
+        [beta(:,e),ISTOP,ITN] = lsmr(X,sparse(double(data(e,:)')),[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
         if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
         end
