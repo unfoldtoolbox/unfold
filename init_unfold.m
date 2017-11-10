@@ -11,7 +11,7 @@ addpath(fullfile(projectFolder,'lib','gramm'))
 addpath(fullfile(projectFolder,'lib','lsmr'))
 addpath(fullfile(projectFolder,'lib','luong_bruno'))
 addpath(fullfile(projectFolder,'lib','ept_TFCE','TFCE','Dependencies'))
-addpath(fullfile(projectFolder,'lib','eegvis','topo_butter'))
+addpath(genpath(fullfile(projectFolder,'lib','eegvis','topo_butter')))
 
 addpath(fullfile(projectFolder,'lib','glmnet_matlab'))
 
