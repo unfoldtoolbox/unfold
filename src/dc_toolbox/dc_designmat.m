@@ -175,26 +175,32 @@ fprintf('Modeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
 catRegexp = 'cat\((.+?)\)';
 splRegexp = 'spl\((.+?)(,.+?)+?\)';
 
+% remove all whitespace
+cfg.formula = regexprep(cfg.formula,'[\s]','');
 
 splInteraction= [ regexp(cfg.formula,['2(\*|\:)[\s]*?' splRegexp]) regexp(cfg.formula,[splRegexp '[\s]*?(\*|\:)'])];
 if ~isempty(splInteraction)
     error('Spline-Interactions are not supported')
 end
 
-
-
-
-splRegexp = 'spl\((.+?)(,.+?)+?\)';
 cat  = regexp(cfg.formula,catRegexp,'tokens');
 spl = regexp(cfg.formula,splRegexp,'tokens');
 
 for s = 1:length(spl)
+    if length(spl{s})~=2 
+        error('error while parsing formula. wrongly defined spline in: %s. Needs to be: spl(your_eventname,10)',cfg.formula)
+    end
     spl{s}{2} = str2num(strrep(spl{s}{2},',',''));
+    
 end
 cfg.spline = [cfg.spline spl];
 
 cfg.categorical = [cfg.categorical cellfun(@(x)x{1},cat,'UniformOutput',0)];
+
+% remove the 'cat()' from cat(eventA) so that only 'eventA' remains
 f2= regexprep(cfg.formula, catRegexp,'$1');
+
+% remove the spl(splineA) completly
 f2= regexprep(f2,['(\+|\*)[\s]*?' splRegexp],'');
 
 % We need to replace the term before the ~ by something that matlab sorts
