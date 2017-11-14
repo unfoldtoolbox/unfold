@@ -4,9 +4,9 @@ function output = dc_beta2unfold(EEG,varargin)
 %plotting functions
 %
 %Arguments:
-%   EEG(struct): A Struct containing EEG.deconv.dcBeta
-%   cfg.deconv (integer): 1, use EEG.deconv.dcBeta, the deconvolved betas
-%                         0, use EEG.deconv.XBeta, betas without
+%   EEG(struct): A Struct containing EEG.deconv.beta_dc
+%   cfg.deconv (integer): 1, use EEG.deconv.beta_dc, the deconvolved betas
+%                         0, use EEG.deconv.beta_nodc, betas without
 %                         deconvolution
 %                         -1 (default), autocheck which fields are avaiable
 %                         and returns both
@@ -40,10 +40,10 @@ function output = dc_beta2unfold(EEG,varargin)
 % * event: event of the variable, e.g.: 'eventA'
 
 
-if isfield(EEG.deconv,'XBeta')
-    nchan = size(EEG.deconv.XBeta,1);
-elseif isfield(EEG.deconv,'dcBeta')
-    nchan = size(EEG.deconv.dcBeta,1);
+if isfield(EEG.deconv,'beta_nodc')
+    nchan = size(EEG.deconv.beta_nodc,1);
+elseif isfield(EEG.deconv,'beta_dc')
+    nchan = size(EEG.deconv.beta_dc,1);
 end
     
 cfg = finputcheck(varargin,...
@@ -58,23 +58,23 @@ if isfield(EEG,'nbchan')
     assert(all(ismember(cfg.channel,1:nchan)))
 end
 
-dcBetaExists   = isfield(EEG.deconv,'dcBeta')&& isnumeric(EEG.deconv.dcBeta);
-nodcBetaExists = isfield(EEG.deconv,'XBeta') && isnumeric(EEG.deconv.XBeta);
+beta_dcExists   = isfield(EEG.deconv,'beta_dc')&& isnumeric(EEG.deconv.beta_dc);
+beta_nodcExists = isfield(EEG.deconv,'beta_nodc') && isnumeric(EEG.deconv.beta_nodc);
 
 if cfg.deconv == 1
-    assert(dcBetaExists,'dcBeta missing or not numeric')
+    assert(beta_dcExists,'beta_dc missing or not numeric')
 elseif cfg.deconv == 0
-    assert(nodcBetaExists,'XBeta missing or not numeric')
+    assert(beta_nodcExists,'beta_nodc missing or not numeric')
 elseif cfg.deconv == -1 % auto detect, recursive call
-    assert(dcBetaExists | nodcBetaExists,'either dcBeta or nodcBeta need to exist. Did you fit the model already?')
+    assert(beta_dcExists | beta_nodcExists,'either beta_dc or beta_nodc need to exist. Did you fit the model already?')
     %-------------- Recursive part
-    if dcBetaExists && nodcBetaExists
+    if beta_dcExists && beta_nodcExists
         output1 = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',1,'convertSplines',cfg.convertSplines);
         output2 = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',0,'convertSplines',cfg.convertSplines);
 
         output = output1;
         output.beta_nodc = output2.beta_nodc;
-    elseif dcBetaExists
+    elseif beta_dcExists
         output = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',1,'convertSplines',cfg.convertSplines);
     else
         output = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',0,'convertSplines',cfg.convertSplines);
@@ -101,8 +101,8 @@ if ~cfg.convertSplines
 end
 
 
-signal = nan(length(cfg.channel),length(EEG.deconv.dcBasistime),length(paramList) + nSplineBetas);
-times = EEG.deconv.dcBasistime;
+signal = nan(length(cfg.channel),length(EEG.deconv.times),length(paramList) + nSplineBetas);
+times = EEG.deconv.times;
 
 value = nan(1,size(signal,3));
 name = cell(1,size(signal,3));
@@ -139,9 +139,9 @@ for pred = paramList
 
     else
         if cfg.deconv
-            signal(:,:,loopRunner) = EEG.deconv.dcBeta(cfg.channel,:,pred)*EEG.deconv.dcBasis;
+            signal(:,:,loopRunner) = EEG.deconv.beta_dc(cfg.channel,:,pred)*EEG.deconv.timebasis;
         else
-            signal(:,:,loopRunner) = EEG.deconv.XBeta(cfg.channel,:,pred)*pinv(EEG.deconv.dcBasis)';
+            signal(:,:,loopRunner) = EEG.deconv.beta_nodc(cfg.channel,:,pred)*pinv(EEG.deconv.timebasis)';
         end
 
         % change name incase of spline and no conversion

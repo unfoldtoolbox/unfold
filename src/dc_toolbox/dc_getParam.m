@@ -36,15 +36,15 @@ cfg = finputcheck(varargin,...
 if(ischar(cfg)); error(cfg);end
 
 
-dcBetaExists   = isfield(unfold,'beta')&& isnumeric(unfold.beta);
-nodcBetaExists = isfield(unfold,'beta_nodc') && isnumeric(unfold.beta_nodc);
+beta_dcExists   = isfield(unfold,'beta')&& isnumeric(unfold.beta);
+beta_nodcExists = isfield(unfold,'beta_nodc') && isnumeric(unfold.beta_nodc);
 
 if cfg.deconv == 1
-    assert(dcBetaExists,'dcBeta missing or not numeric')
+    assert(beta_dcExists,'beta_dc missing or not numeric')
     
     
 elseif cfg.deconv == 0
-    assert(nodcBetaExists,'XBeta missing or not numeric')
+    assert(beta_nodcExists,'beta_nodc missing or not numeric')
     
     
 elseif cfg.deconv == -1 % auto detect, recursive call

@@ -20,10 +20,10 @@ function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
 %       to convolve. In case of 'full', the parameter is not used.
 %
 %Returns:
-%   * EEG.deconv.dcX - the designmatrix for all time points
-%   * EEG.deconv.dcBasis - the basis set for splines / fourier. This is used later to recover the values in the time-domain, not the basis-function domain
+%   * EEG.deconv.Xdc - the designmatrix for all time points
+%   * EEG.deconv.timebasis - the basis set for splines / fourier. This is used later to recover the values in the time-domain, not the basis-function domain
 %   * EEG.deconv.basisTime - the time of the deconv-window in seconds
-%   * EEG.dcX_termidx - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor
+%   * EEG.Xdc_terms2cols - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor
 %
 %*Example:*
 %       EEG = dc_timeexpandDesignmat(EEG,'method','splines','windowlength',128,'timeexpandparam',30)
@@ -70,7 +70,7 @@ assert(isfield(EEG.deconv,'X'),'Could not find the designmatrix: EEG.deconv.X')
 
 % empty out the EEG.deconv field
 
-rmList = {'beta','dcBeta','XBeta','dcBetaCustomrow'};
+rmList = {'beta','beta_dc','beta_nodc','beta_dcCustomrow'};
 rmList = rmList(ismember(rmList,fieldnames(EEG.deconv)));
 EEG.deconv = rmfield(EEG.deconv,rmList);
 
@@ -145,7 +145,7 @@ switch cfg.method
         % We need the floor on the indices because there can be very small floating point
         % errors in the multiplication more upstream
         
-        dcX = sparse(round(indrow_all(~removeIdx)),round(indcol_all(~removeIdx)),val_all(~removeIdx),dimFullX(1),dimFullX(2));
+        Xdc = sparse(round(indrow_all(~removeIdx)),round(indcol_all(~removeIdx)),val_all(~removeIdx),dimFullX(1),dimFullX(2));
         
         basis = eye(cfg.windowlength);
         
@@ -231,9 +231,9 @@ switch cfg.method
             val_all  = [];
             indcol_all = [];
             indrow_all = [];
-            %dcX = sparse(size(basis,1)*size(eventvec,1),size(eventvec,2));
+            %Xdc = sparse(size(basis,1)*size(eventvec,1),size(eventvec,2));
         else % nonsparse
-            dcX = zeros(size(eventvec,2),size(basis,1)*size(eventvec,1));
+            Xdc = zeros(size(eventvec,2),size(basis,1)*size(eventvec,1));
         end
         
         
@@ -276,10 +276,10 @@ switch cfg.method
                     indcol_all = [indcol_all indcol];
                     indrow_all = [indrow_all indrow];
                     val_all = [val_all tmpconv(idx)];
-                    %dcX(:,) = conv(eventvec(l,:),basis(e,:),'same');
+                    %Xdc(:,) = conv(eventvec(l,:),basis(e,:),'same');
                 else
                     
-                    dcX(:,e+(l-1)*size(basis,1)) = tmpconv;
+                    Xdc(:,e+(l-1)*size(basis,1)) = tmpconv;
                     
                 end
             end
@@ -289,7 +289,7 @@ switch cfg.method
             
         end
         if cfg.sparse
-            dcX = sparse(indrow_all,indcol_all,val_all,size(eventvec,2),size(basis,1)*size(eventvec,1));
+            Xdc = sparse(indrow_all,indcol_all,val_all,size(eventvec,2),size(basis,1)*size(eventvec,1));
         end
         
         
@@ -299,9 +299,9 @@ end
 
 
 
-EEG.deconv.dcX = dcX;
-EEG.deconv.dcBasis = basis;
-EEG.deconv.dcBasistime = cfg.windowtimes; % in s, this is different to eeglab, but makes more sense
-EEG.deconv.dcX_termidx = sort(repmat(1:length(EEG.deconv.colnames),1,size(EEG.deconv.dcBasis,1)));
+EEG.deconv.Xdc = Xdc;
+EEG.deconv.timebasis = basis;
+EEG.deconv.times = cfg.windowtimes; % in s, this is different to eeglab, but makes more sense
+EEG.deconv.Xdc_terms2cols = sort(repmat(1:length(EEG.deconv.colnames),1,size(EEG.deconv.timebasis,1)));
 fprintf('...done\n')
 end
