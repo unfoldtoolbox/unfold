@@ -2,7 +2,7 @@ function ax = dc_plot2nd(d2nd,varargin)
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[];
     'baseline','real',[],[];
-    'plotParam','real',[],{};
+    'plotParam','cell',[],{};
     'bootci','boolean',[],1;
     'singlesubjects','boolean',[],1;
     
