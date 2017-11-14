@@ -16,7 +16,8 @@ function [EEG] = dc_glmfit_nodc(EEG,varargin)
 
 
 cfg = finputcheck(varargin,...
-    {'method',   'string', {'glmnet','pinv','matlab'}, 'pinv';...
+    {'method',   'string', {'glmnet','pinv','matlab','lsmr'}, 'pinv';...
+    'lsmriterations','integer',[],200;...
     'glmnetalpha','real',[],1;... # used for glmnet
     'debug','boolean',[],0;...
 
@@ -27,12 +28,12 @@ if(ischar(cfg)); error(cfg);end
 X = EEG.deconv.X;
 
 if strcmp(cfg.method,'pinv')
-    
+%% Pseudoinverse    
     Xinv = pinv(X);
     beta = calc_beta(EEG,Xinv);
     
 elseif strcmp(cfg.method,'matlab') % save time
-    
+%% Matlab internal solver
     beta = nan(size(X,2),size(EEG.data,2),size(EEG.data,1)); %plus one, because glmnet adds a intercept
     if cfg.debug
         spparms('spumoni',2)
@@ -43,8 +44,9 @@ elseif strcmp(cfg.method,'matlab') % save time
     beta =     permute(beta,[3 2 1]);
     
 elseif strcmp(cfg.method,'glmnet')
+%% GLMNET
+     beta = nan(size(EEG.data,1),size(EEG.data,2),size(X,2)+1); %plus one, because glmnet adds a intercept
     
-    beta = nan(size(X,2)+1,size(EEG.data,2),size(EEG.data,3)); %plus one, because glmnet adds a intercept
     for time = 1:size(EEG.data,2)
         for e = cfg.channel
             t = tic;
@@ -53,16 +55,37 @@ elseif strcmp(cfg.method,'glmnet')
              fit = cvglmnet(X,(double(squeeze(EEG.data(e,time,:))')),'gaussian',struct('alpha',cfg.glmnetalpha));
             
             %find best cv-lambda coefficients
-            beta(:,e,time) = cvglmnetCoef(fit,'lambda_1se')';
+            beta(e,time,:) = cvglmnetCoef(fit,'lambda_1se')';
             
             fprintf('... took %.1fs',toc(t))
             
         end
     end
     beta = beta([2:end 1],:,:); %put the dc-intercept last
+
     
-    
-    
+elseif strcmp(cfg.method,'lsmr')
+    % go tru channels
+         beta = nan(size(EEG.data,1),size(EEG.data,2),size(X,2)); %plus one, because glmnet adds a intercept
+
+    for time = 1:size(EEG.data,2)
+        for e = cfg.channel
+            t = tic;
+            fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
+            
+            % use iterative solver for least-squares problems (lsmr)
+            data = squeeze(double(EEG.data(e,time,:)));
+            [beta(e,time,:),ISTOP,ITN] = lsmr(X,data,[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
+            if ISTOP == 7
+                warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
+            end
+            fprintf('... %i iterations, took %.1fs',ITN,toc(t))
+        
+        
+        end
+    end
+
+    %% LSMR
     
 end
 
