@@ -99,7 +99,7 @@ if cfg.convertSplines == 1
         ix = find(spl(2)== unfold.deconv.cols2variableNames,1,'first');
         ix = find(ix == paramList);
         NsplineVal = length(unfold.deconv.predictorSplines{spl(1)}.spline2val);
-        NsplinePred = size(unfold.deconv.predictorSplines{1}.X,2);
+        NsplinePred = size(unfold.deconv.predictorSplines{spl(1)}.X,2);
         paramListSpline(ix+1:end) = paramListSpline(ix+1:end)+ NsplineVal - NsplinePred;
 %         paramListSpline
     end
