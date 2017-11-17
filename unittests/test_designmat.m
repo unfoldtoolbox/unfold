@@ -14,6 +14,8 @@ cfgDesign.eventtype = {'stimulus1', 'stimulus2',                       'stimulus
 
 
 dc_designmat(EEGsim,cfgDesign);
+
+
 %%
 % test some bugs that crashed the function (e.g. #4)
 cfgDesign.formula{1} = 'xyz ~1';
@@ -45,3 +47,17 @@ EEG2 = dc_designmat(EEG2,'eventtype','stimulus2','formula','y~conditionB*conditi
 
 assert(size(EEG2.deconv.X,2) == 4)
 assert(strcmp(EEG2.deconv.variableNames{EEG2.deconv.cols2variableNames(end)},'conditionA:conditionB:continuousA'))
+%%
+cfgDesign = [];
+cfgDesign.coding = 'dummy';
+cfgDesign.formula   = {'y~1+spl(splineA,3)+conditionA',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
+cfgDesign.eventtype = {'stimulus1', 'stimulus2',                       'stimulus3'};
+
+EEGtmp = dc_designmat(EEGsim,cfgDesign);
+assert(strcmp(EEGtmp.deconv.variableNames{4},'2_(Intercept)'))
+assert(strcmp(EEGtmp.deconv.variableNames{5},'2_conditionA'))
+assert(strcmp(EEGtmp.deconv.variableNames{6},'continuousA'))
+assert(strcmp(EEGtmp.deconv.variableNames{8},'3_(Intercept)'))
+assert(strcmp(EEGtmp.deconv.variableNames{9},'3_continuousA'))
+assert(strcmp(EEGtmp.deconv.variableNames{10},'3_splineA'))
+assert(strcmp(EEGtmp.deconv.variableNames{11},'splineB'))
