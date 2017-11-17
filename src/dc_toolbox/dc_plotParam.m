@@ -176,7 +176,7 @@ for bName =betaSetName
         for e  = unique(event)
             %is there an intercept?
             eventIdx =  strcmp(event,e);
-            interceptIdx = strcmp({unfold.epoch(paramIdx).name},'(Intercept)');
+            interceptIdx = cellfun(@(x)~isempty(x),strfind({unfold.epoch(paramIdx).name},'(Intercept)'));
             if sum(interceptIdx) == 0
                 continue
             end

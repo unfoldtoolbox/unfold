@@ -130,10 +130,40 @@ if iscell(cfg.formula)
             %do the summersault
             
             EEG2 = dc_designmat(EEG,cfgSingle);
+            
             if k == 1
                 
                 deconvAll = EEG2.deconv;
             else
+                %% First check for unique variableNames
+                
+                % to have unique variable names
+                setA = deconvAll.variableNames;
+                setB = EEG2.deconv.variableNames;
+                samename = ismember(setB,setA);
+                if any(samename)
+                    warning('event with same name found: %s. Renaming... \n',setB{samename})
+                    % rename them
+                    EEG2.deconv.variableNames(samename) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.variableNames(samename),'UniformOutput',0);
+                    samenamecol = ismember(EEG2.deconv.cols2variableNames,find(samename));
+                    EEG2.deconv.colnames(samenamecol) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.colnames(samenamecol),'UniformOutput',0);
+                    if ~isempty(EEG2.deconv.predictorSplines)
+                        splineIX =  strcmp(EEG2.deconv.variableType,'spline');
+                        samenamespline =find(splineIX & samename);
+                        if ~isempty(samenamespline)
+                            samenamesplineIX = cumsum(splineIX);
+                            samenamesplineIX = samenamesplineIX(samenamespline);
+                            for s = samenamesplineIX
+                                EEG2.deconv.predictorSplines{s}.name = sprintf('%i_%s',k,EEG2.deconv.predictorSplines{s}.name);
+                                EEG2.deconv.predictorSplines{s}.colnames = cellfun(@(y)sprintf('%i_%s',k,y),EEG2.deconv.predictorSplines{s}.colnames,'UniformOutput',0);
+                            end
+                        end
+                    end
+                    
+                end
+                
+                
+            
                 deconvAll.X(:,(end+1):(end+size(EEG2.deconv.X,2))) = EEG2.deconv.X;
                 deconvAll.colnames = [deconvAll.colnames,EEG2.deconv.colnames];
                 deconvAll.formula = [deconvAll.formula EEG2.deconv.formula];
@@ -257,7 +287,7 @@ end
 
 % Check everything necessary is there
 tf = ismember(F.PredictorNames,t.Properties.VariableNames);
-assert(all(tf),'Could not find all variables specificed in formula in the data frame generated from the event structure (%s)',sprintf('%s,',F.PredictorNames{~tf}));
+assert(isempty(tf)||all(tf),'Could not find all variables specificed in formula in the data frame generated from the event structure (%s)',sprintf('%s,',F.PredictorNames{~tf}));
 
 
 % Remove every variable we dont need
