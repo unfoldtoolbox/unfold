@@ -10,9 +10,25 @@ check_nan(dc_imputeMissing(EEG,'method','mean'))
 check_nan(dc_imputeMissing(EEG,'method','median'))
 check_nan(dc_imputeMissing(EEG,'method','marginal'))
 check_nan(dc_imputeMissing(EEG,'method','drop'))
+EEG2 = dc_imputeMissing(EEG,'method','drop');
+
+
+%% Test that glmfit crashes when nans are there
+
+try
+    EEG = dc_timeexpandDesignmat(EEG,'timelimits',[0 1]);
+    error('this should have thrown an error')
+catch
+    EEG2 = dc_timeexpandDesignmat(EEG2,'timelimits',[0 1]);
+end
+
+try
+    dc_glmfit(EEG2,'method','lsmr');
+    error('this should have thrown an error')
+catch
+end
 
 display('imputation methods tests without error')
-
 end
 
 
