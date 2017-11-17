@@ -72,6 +72,6 @@ test_fit(EEG,'lsmr')
 
 function test_fit(EEG,method)
 EEG = dc_glmfit(EEG,'method',method);
-deviance = sum(sum(abs(squeeze(EEG.deconv.dcBeta(:,find(EEG.deconv.dcBasistime>0,1),:)) - [3 2.5 -1.5; 3 2.5 -1.5])));
+deviance = sum(sum(abs(squeeze(EEG.deconv.beta_dc(:,find(EEG.deconv.times>0,1),:)) - [3 2.5 -1.5; 3 2.5 -1.5])));
 fprintf('deviance of %f for method %s \n',deviance,method)
 assert(deviance<10^-5,'problem recovery beta values accurately enough')
