@@ -52,7 +52,15 @@ end
 % beginning and the end.
 knots = [repmat(knots(1),1,3) knots repmat(knots(end),1,3)];
 spl.knots = knots;
-paramValuesSpline = Bernstein(spl.paramValues,knots,[],4); % 4 is the order
+
+
+% This functino always removes either first or last spline. We therefore
+% need to recover it by running it twice and concatenating
+a = Bernstein(spl.paramValues,spl.knots,[],4,[],0);
+b = Bernstein(spl.paramValues,spl.knots,[],4,[],1);
+
+paramValuesSpline = a;
+paramValuesSpline(b(:)==1) = 1; 
 
 
 %%
@@ -74,7 +82,7 @@ end
 %             killThisSpline = 1;
 %         end
 paramValuesSpline(:,killThisSpline) = [];
-
+spl.removedSplineIdx = killThisSpline;
 spl.X= paramValuesSpline;
 spl.X(nanlist,:) = 0; % remove the nans
 spl.nSplines = size(spl.X,2);
