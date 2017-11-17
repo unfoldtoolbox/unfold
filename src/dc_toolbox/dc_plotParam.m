@@ -156,10 +156,27 @@ for bName =betaSetName
     plotValue = [plotValue value];
     if cfg.add_average
         for e = unique(event)
-            for p = paramList
+            % check if predictor and event combination exists
+            eventIdx = find(strcmp(e,event));
+            eventParam = paramList(eventIdx);
+            for p = unique(eventParam)
+                % Find the names & types of the other parameters
+                currEvent = eventIdx(strcmp(p,eventParam));
+                otherEvents = setdiff(eventIdx,currEvent);
+                otherParamNames = unique(paramList(otherEvents));
+                unfoldavg_ix = [];
+                for pOther = otherParamNames
+                    unfoldavg_ix(end+1) = find(strcmp(pOther{1},{unfold_avg.epoch.name}));
+                end
+                % exclude all categoricals.
+                % they should be covered by the effects/dummy coding schema
+                % already ?!
+                removeix = strcmp('categorical',{unfold_avg.epoch(unfoldavg_ix).type});
+                unfoldavg_ix(removeix) = [];
+                % calculate the marginal over all other predictors
+                average_otherEffects = squeeze(sum(unfold_avg.(bName{1})(1,:,unfoldavg_ix),3));
                 
-                thisPredictor = eventIdx
-%                 average_otherEffects =
+                % add this marginal to the current predictor                
                 data(:,addToIdx) = data(:,addToIdx) + average_otherEffects;
                 
             end
