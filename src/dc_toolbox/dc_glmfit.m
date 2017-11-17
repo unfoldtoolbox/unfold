@@ -71,7 +71,7 @@ if(ischar(cfg)); error(cfg);end
 
 
 
-assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated, you could input it as EEG.data(:,:)')
+assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
 assert(size(EEG.deconv.dcX,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.deconv.dcX),size(EEG.data))
 
 
