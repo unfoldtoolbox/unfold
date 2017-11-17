@@ -28,7 +28,7 @@ function output = dc_getParam(unfold,varargin)
 cfg = finputcheck(varargin,...
     {'pred_value','cell',[],{{'',[]}};
     'deconv','integer',[-1,0,1],-1;
-    'auto_method','string',{'quantile','linear'},'quantile';
+    'auto_method','string',{'quantile','linear','average'},'quantile';
     'auto_n','integer',[],10;
     },'mode','ignore');
 
@@ -231,5 +231,8 @@ switch cfg.auto_method
         contValueSelect = linspace(contmin+0.05*ran,contmax-0.05*ran,cfg.auto_n);
     case 'quantile'
         contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
+    case 'average'
+        contValueSelect = nanmean(predVal);
 end
 end
+
