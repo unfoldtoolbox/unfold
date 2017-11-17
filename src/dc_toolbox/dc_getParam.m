@@ -28,7 +28,6 @@ function output = dc_getParam(unfold,varargin)
 cfg = finputcheck(varargin,...
     {'pred_value','cell',[],{{'',[]}};
     'deconv','integer',[-1,0,1],-1;
-    'convertSplines','integer',[],1;
     'auto_method','string',{'quantile','linear'},'quantile';
     'auto_n','integer',[],10;
     },'mode','ignore');
@@ -93,26 +92,7 @@ end
 % Array of the sorts: {{'parName',linspace(0,10,5)},{'parname2',1:5}}
 predValueSelectList = cfg.pred_value;
 predNameList = cellfun(@(x)x{1},predValueSelectList,'UniformOutput',0);
-% if cfg.convertSplines == 1
-%      unfold = dc_beta2unfold(unfold,'convertSplines',1);
-% end
-% if cfg.convertSplines == 1
-[splIdxList,paramList] = dc_getSplineidx(unfold);
-% paramListSpline = paramList;
-%
-%     splineList = strcmp(unfold.deconv.variableType,'spline');
-%     for spl = [1:sum(splineList);find(splineList)]
-%         ix = find(spl(2)== unfold.deconv.cols2variableNames,1,'first');
-%         ix = find(ix == paramList);
-%         NsplinePred = size(unfold.deconv.predictorSplines{spl(1)}.X,2);
-%         paramListSpline(ix+1:end) = paramListSpline(ix+1:end)+ NsplinePred;
-% %         paramListSpline
-%     end
-% %
-% else
-%     paramList = 1: size(unfold.deconv.X,2);
-%     paramListSpline = paramList;
-% end
+[~,paramList] = dc_getSplineidx(unfold);
 if cfg.deconv == 1
     beta = unfold.beta;
 elseif cfg.deconv == 0
@@ -139,7 +119,7 @@ for currPred= 1:length(paramList)
     
     e = unfold.epoch(predIDX);
     
-    if cfg.convertSplines && variableIdx ~=0 && strcmp(unfold.deconv.variableType{variableIdx},'spline')
+    if strcmp(unfold.deconv.variableType{variableIdx},'spline')
         
         splName = cellfun(@(x)x.name,unfold.deconv.predictorSplines,'UniformOutput',0);
         splIdx = find(strcmp(splName,unfold.deconv.variableNames{variableIdx}));
@@ -188,7 +168,7 @@ for currPred= 1:length(paramList)
             epochNew(end+1) = eNew;
         end
         
-    elseif variableIdx ~=0 && strcmp(unfold.deconv.variableType{variableIdx},'continuous')
+    elseif strcmp(unfold.deconv.variableType{variableIdx},'continuous')
         % we have either a categorical or a continuous predictor here
         customContValue = strcmp(predNameList,unfold.deconv.colnames(predIDX(1)));
         if any(customContValue)
@@ -198,9 +178,10 @@ for currPred= 1:length(paramList)
             values = unfold.deconv.X(:,predIDX(1));
             % we do not have access at this point to which 'X' entry belongs to that event.
             % Thus we discard every 0 value and hope a bit, that it does not matter because 0 is the intercept anyway.
-            % This is supoptimal and I'm sorry if it creats inconveniences.
+            % This is supoptimal and I'm sorry if it creates inconveniences.
             % We would need to introduce a whole new field to carry around
             % to compensate for this.
+            warning('auto spacing for continuous variables exlcudes all zeros. Specfiy manually if necessary using ''pred_value''')
             contValueSelect = auto_spacing(cfg,values(values~=0));
         end
         
