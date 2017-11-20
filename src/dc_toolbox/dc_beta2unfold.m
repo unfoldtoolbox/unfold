@@ -36,7 +36,7 @@ function output = dc_beta2unfold(EEG,varargin)
 %* value: value of the predictor, e.g. '50'
 % * event: event of the variable, e.g.: 'eventA'
 
-
+assert(isfield(EEG.deconv,'beta_nodc')|isfield(EEG.deconv,'beta_dc'),'Input Error: Could not find beta-estimates. Did you run dc_glmfit?')
 if isfield(EEG.deconv,'beta_nodc')
     nchan = size(EEG.deconv.beta_nodc,1);
 elseif isfield(EEG.deconv,'beta_dc')
