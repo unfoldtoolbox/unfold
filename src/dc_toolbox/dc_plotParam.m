@@ -97,7 +97,7 @@ else
     
 end
 
-if ~isempty(cfg.pred_value)
+if ~isempty(cfg.pred_value{1}{1})
     fprintf('Evaluating parameters at auto or specified values');
     unfold = dc_getParam(unfold,cfg);
 end
