@@ -44,7 +44,7 @@ The key insight in how deconvolution using LMs works is, that each sample of the
 
 In practice this works by timeexpanding our designmatrix. For the following example, the designmatrix was a design with two columns/predictors. One for the stimulus-kernel and one for the saccade-kernel.
 
-.. image:: ../../docs/tutorials/deconvolutionExplanaion.png
+.. image:: ../../docs/tutorials/deconvolutionExplanation.png
 
 Time is on the x-axis. A beta-parameter needs to be estimated for each row with blocks of the designmatrix (the red/green blocks). The sample (blue) is assumed to be the linear sum of (in the dashed example) three events with different betas associated (they are different also for the same event *green*, because the distance to the event is different). After constructing this matrix and expanding the designmatrix in time, we can again invert it and solve for all unknown betas. It might be interesting to note that the influence of an event can also be modeled in the past. For example motor potentials are usually visible before the keypress. In practice one defines a window around each event, e.g. [-0.5 to 1s] and the toolbox takes care of the rest.
 

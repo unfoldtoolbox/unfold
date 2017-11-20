@@ -185,15 +185,12 @@ plotting functions</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>EEG</strong> (<em>struct</em>) &#8211; A Struct containing EEG.deconv.dcBeta</li>
-<li><strong>cfg.deconv</strong> (<em>integer</em>) &#8211; 1, use EEG.deconv.dcBeta, the deconvolved betas
-0, use EEG.deconv.XBeta, betas without
+<li><strong>EEG</strong> (<em>struct</em>) &#8211; A Struct containing EEG.deconv.beta_dc</li>
+<li><strong>cfg.deconv</strong> (<em>integer</em>) &#8211; 1, use EEG.deconv.beta_dc, the deconvolved betas
+0, use EEG.deconv.beta_nodc, betas without
 deconvolution
 -1 (default), autocheck which fields are avaiable
 and returns both</li>
-<li><strong>cfg.convertSplines</strong> (<em>boolean</em>) &#8211; (default 1) Should the splines be converted back to the
-continuous input domain? might result in big
-matrices if many splines are available.</li>
 <li><strong>cfg.channel</strong> (<em>array</em>) &#8211; Restrict the beta-output to a subset of
 channels. Default is all channels</li>
 <li><strong>cfg.pred_value</strong> (<em>cell</em>) &#8211; Only necessary if splines are used. One entry per parameter:
@@ -206,7 +203,7 @@ parameterdomain</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">unfold.beta= (nchans x time x parameters)
 unfold.beta_nodc = (nchans x time x parameters) (only if deconv=0 or -1)
-unfold.epoch = (struct size: parameters) each field contains the values of the respective parameter.
+unfold.param = (struct size: parameters) each field contains the values of the respective parameter.
 unfold.deconv = EEG.deconv
 unfold.times = EEG.times
 unfold.chanlocs = EEG.chanlocs</p>
@@ -216,7 +213,7 @@ unfold.chanlocs = EEG.chanlocs</p>
 </table>
 <p><strong>Example:</strong></p>
 <p>unfold = dc_beta2unfold(EEG)</p>
-<p>unfold.epoch(X):</p>
+<p>unfold.param(X):</p>
 <ul class="simple">
 <li>name: name of the variable, e.g.: &#8216;continuousA&#8217;</li>
 <li>value: value of the predictor, e.g. &#8216;50&#8217;</li>
@@ -392,7 +389,7 @@ Reference coding is also known as treatment coding</li>
 <li>colnames:     For each column of &#8216;X&#8217;, which predictor it represents</li>
 <li>formula:    The original cfg.formula</li>
 <li>event:      the cfg.eventtype</li>
-<li>col2eventtype:   For each column of &#8216;X&#8217; which event it represents</li>
+<li>cols2eventtype:   For each column of &#8216;X&#8217; which event it represents</li>
 </ul>
 </p>
 </td>
@@ -429,24 +426,34 @@ contains a constant (y~1).</div>
 <dl class="function">
 <dt id="src.dc_toolbox.dc_designmat_addcol">
 <code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_designmat_addcol</code><span class="sig-paren">(</span><em>EEG</em>, <em>newrow</em>, <em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_designmat_addcol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a single custom column to the deconv-Designmat &#8220;dcX&#8221;</p>
+<dd><p>Adds a single custom column to the deconv-Designmat &#8220;Xdc&#8221;</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>newrow</strong> (<em>array</em>) &#8211; The column to add to the dcX designmat</li>
+<li><strong>newrow</strong> (<em>array</em>) &#8211; The column to add to the Xdc designmat</li>
 <li><strong>label</strong> (<em>string</em>) &#8211; The label/identifier of the column</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">EEG-Struct
-* deconv.dcX added column
+* deconv.Xdc added column
 * deconv.colnames added label</p>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.dc_toolbox.dc_designmat_spline">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_designmat_spline</code><span class="sig-paren">(</span><em>t</em>, <em>splinecfg</em>, <em>cfg</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_designmat_spline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function to generate spline-part of designmatrix</p>
+<p>splinecfg{1}  = &#8216;splineName&#8217;
+splinecfg{2}  = numberOfSplines</p>
+<p>cfg.splinespacing
+cfg.codingschema</p>
 </dd></dl>
 
 <dl class="function">
@@ -466,7 +473,7 @@ from deconv.X that were removed during epoching.</dd>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>cfg.winrej</strong> (<em>integer</em>) &#8211; A (2xn) array with n from-to pairs of samples to be excluded from further processing</li>
 <li><strong>cfg.timelimits</strong> (<em>float</em>) &#8211; min+max of the epoch in seconds</li>
-<li><strong>EEG</strong> (<em>eeglab</em>) &#8211; the EEG set, need to have EEG.deconv.dcX compatible with the size of EEG.data</li>
+<li><strong>EEG</strong> (<em>eeglab</em>) &#8211; the EEG set, need to have EEG.deconv.Xdc compatible with the size of EEG.data</li>
 </ul>
 </td>
 </tr>
@@ -505,7 +512,8 @@ Default behaviour: evaluates 7 linearly spaced values between the min + max. of 
 parameterdomain</li>
 <li><strong>cfg.auto_method</strong> (<em>string</em>) &#8211; &#8216;quantile&#8217; (default) or &#8216;linear&#8217;.
 &#8216;quantile&#8217; - the auto_n values are placed on the quantile of the predictor
-&#8216;linear&#8217;   - the auto_n</li>
+&#8216;linear&#8217;   - the auto_n values are placed linearly over the range of the predictor
+&#8216;average&#8217;  - only evaluates at the average of the predictor</li>
 <li><strong>cfg.auto_n</strong> (<em>integer</em>) &#8211; default 7; the number of automatically evaluated values</li>
 </ul>
 </td>
@@ -574,9 +582,9 @@ take quite a lot of memory.</dd>
 </ul>
 <p>very memory efficient, but is a lot slower than the &#8216;time&#8217; option
 because each electrode has to be solved independently. The LSMR
-algorithm is used for sparse iterative solving.
-* &#8220;par-lsmr&#8221;  same as lsmr, but uses parfor with ncpu-1.</p>
+algorithm is used for sparse iterative solving.</p>
 <ul>
+<li>&#8220;par-lsmr&#8221;  same as lsmr, but uses parfor with ncpu-1.</li>
 <li>&#8220;matlab&#8221;    , uses matlabs native A/b solver. For moderate to big</li>
 </ul>
 <p>design-matrices it will need <em>a lot</em> of memory (40-60GB is easily
@@ -597,6 +605,8 @@ compared to the fit of the model). We use the glmnet recommended
 &#8216;lambda_1se&#8217;, i.e. minimum lambda + 1SE buffer towards more strict
 regularisation.</p>
 </li>
+<li><strong>cfg.lsmriterations</strong> &#8211; (default 200), defines how many steps the iterative
+solver should search for a solution.</li>
 <li><strong>cfg.glmnetalpha</strong> &#8211; (default 1), can be 0 for L2 norm, 1 for L1-norm or
 something inbetween for elastic net</li>
 <li><strong>cfg.channel</strong> (<em>array</em>) &#8211; Restrict the beta-calculation to a subset of
@@ -604,7 +614,7 @@ channels. Default is all channels</li>
 <li><strong>cfg.debug</strong> (<em>boolean</em>) &#8211; 0, only with method:matlab, outputs additional
 details from the solver used</li>
 <li><strong>save_memory_or_time</strong> &#8211; Deprecated, has been renamed to &#8216;method&#8217; EEG:  the</li>
-<li><strong>set, need to have EEG.deconv.dcX compatible with</strong> (<em>EEG</em>) &#8211; the size of EEG.data</li>
+<li><strong>set, need to have EEG.deconv.Xdc compatible with</strong> (<em>EEG</em>) &#8211; the size of EEG.data</li>
 </ul>
 </td>
 </tr>
@@ -684,7 +694,7 @@ correlations between predictors (c.f. Horton &amp; Kleinmann 2007)</dd>
 <dt id="src.dc_toolbox.dc_plotDesignmat">
 <code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_plotDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_plotDesignmat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the designmatrix
-If the matrix is very large (the timeexpanded/dcX matrix) we do not plot
+If the matrix is very large (the timeexpanded/Xdc matrix) we do not plot
 everything, but only the middle 1000s. We also try to zoom in
 automatically, but this fails sometimes</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -693,7 +703,7 @@ automatically, but this fails sometimes</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>cfg.timeexpand'</strong> (<em>boolean</em>) &#8211; 0: Plots EEG.deconv.X (default)
-1: Plots EEG.deconv.dcX</li>
+1: Plots EEG.deconv.Xdc</li>
 <li><strong>cfg.logColor</strong> (<em>boolean</em>) &#8211; plot the color on logscale (default 0)</li>
 <li><strong>cfg.sort</strong> (<em>boolean</em>) &#8211; Sort the designmatrix</li>
 <li><strong>cfg.figure</strong> (<em>1/0</em>) &#8211; Open a new figure (default 1)</li>
@@ -749,6 +759,62 @@ returned</li>
 <dl class="docutils">
 <dt><em>Example:</em></dt>
 <dd>dc_plotEventHistogram(EEG,&#8217;eventA&#8217;)</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.dc_toolbox.dc_plotParam">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_plotParam</code><span class="sig-paren">(</span><em>unfold</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_plotParam" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Plots time vs. Voltage in separate plots for each predictor, where there</dt>
+<dd><p class="first">are multiple lines for each predictor</p>
+<p>&#8216;unfold&#8217; needs to have the &#8216;unfold&#8217; structure, the output from
+&#8220;dc_beta2unfold&#8221;</p>
+<p class="last">Uses the &#8216;gramm&#8217;-toolbox for plotting</p>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>'channel'</strong> (<em>integer</em>) &#8211; Which channel to plot</li>
+<li><strong>'pred_value'</strong> (<em>cell</em>) &#8211; a cell of cell arrays, e.g. {{&#8216;parName&#8217;,linspace(0,10,5)},{&#8216;parname2&#8217;,1:5}}
+This splits up the parName-predictor into 5 bins from
+0 to 10, so 5 lines would be plotted. Default are 7 lines
+from min to max</li>
+<li><strong>'deconv'</strong> (<em>[-1 0 1]</em>) &#8211; default: -1; whether to plot unfold.beta (1) or
+unfold.beta_nodc(0) or everything/autodetect (-1). Autodetect would
+also detect same-shaped other predictors. If e.g. you want to compare
+multiple runs from different algorithms or similar</li>
+<li><strong>'add_intercept'</strong> (<em>boolean</em>) &#8211; Add the intercept/constant to each subplot.
+This will give ERP-plots that are commonly used. Without add_intercepts the factors (if they are categorical) could be interpretet as difference or sometimes main effect plots (if effects-coding is used)</li>
+<li><strong>'baseline'</strong> (<em>2 integers</em>) &#8211; default none; Performs a baseline corrections on the interval (in seconds = unfold.times units) given.</li>
+<li><strong>'include_intercept'</strong> (<em>boolean</em>) &#8211; default 0; useful with &#8220;add_intercept&#8221;, will add the constant/intercept to each subplot</li>
+<li><strong>'plotSeparate'</strong> (<em>'all','event','none'</em>) &#8211; Each predictor will be
+plotted in a separate figure (&#8216;all&#8217;), plotted in an event-specific
+figure (&#8216;event&#8217;) or all subplots are in the same figure (&#8216;none&#8217;, default)</li>
+<li><strong>'plotParam'</strong> (<em>string/cell of strings</em>) &#8211; Defines which parameters are to be plotted</li>
+<li><strong>'sameyaxis'</strong> (<em>'all','row','independent'</em>) &#8211; Force the same y-axis
+(default &#8216;all&#8217;)</li>
+<li><strong>'gramm'</strong> &#8211; (gramm-object) plots the current data ontop of the last gramm-object. This is
+useful to plot multiple subjects in a single figure.</li>
+<li><strong>'figure'</strong> (<em>boolean</em>) &#8211; Generate a new figure? (default 1)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">All &#8216;subplot&#8217; axes that were generated</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">allAxesInFigure</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Example</dt>
+<dd>dc_plotParam(unfold,&#8217;channel&#8217;,1)
+parse inputs</dd>
 </dl>
 </dd></dl>
 
@@ -832,7 +898,7 @@ customized to whichever caxis e.g. [-3 5]</li>
 <li><strong>'channel'</strong> &#8211; Evaluate for specific channel (default all)</li>
 <li><strong>'time'</strong> &#8211; Evaluate for specific points in time only (default all)</li>
 <li><strong>'spline_value'</strong> &#8211; Specify at which values the spline should be evaluated</li>
-<li><strong>'deconv'</strong> &#8211; Specifies whether to use dcBeta (default, deconv=1) or Xbeta
+<li><strong>'deconv'</strong> &#8211; Specifies whether to use beta_dc (default, deconv=1) or beta_nodc
 (the non-deconvoluted)</li>
 </ul>
 </td>
@@ -879,10 +945,10 @@ to convolve. In case of &#8216;full&#8217;, the parameter is not used.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li>EEG.deconv.dcX - the designmatrix for all time points</li>
-<li>EEG.deconv.dcBasis - the basis set for splines / fourier. This is used later to recover the values in the time-domain, not the basis-function domain</li>
+<li>EEG.deconv.Xdc - the designmatrix for all time points</li>
+<li>EEG.deconv.timebasis - the basis set for splines / fourier. This is used later to recover the values in the time-domain, not the basis-function domain</li>
 <li>EEG.deconv.basisTime - the time of the deconv-window in seconds</li>
-<li>EEG.dcX_termidx - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor</li>
+<li>EEG.Xdc_terms2cols - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor</li>
 </ul>
 </p>
 </td>
@@ -907,8 +973,8 @@ to convolve. In case of &#8216;full&#8217;, the parameter is not used.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cfg.deconv</strong> (<em>boolean</em>) &#8211; Use the deconv betas (deconv.dcBeta) or the
-no-deconv betas(deconv.XBeta)</li>
+<li><strong>cfg.deconv</strong> (<em>boolean</em>) &#8211; Use the deconv betas (deconv.beta_dc) or the
+no-deconv betas(deconv.beta_nodc)</li>
 <li><strong>cfg.channel</strong> (<em>integer</em>) &#8211; (Default: All channels) Limit to a list of specific channels</li>
 <li><strong>cfg.filename</strong> &#8211; filename for the csv file. if empty, only returns table</li>
 </ul>
@@ -923,6 +989,12 @@ gets one column</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.dc_toolbox.dc_updateFileformat">
+<code class="descclassname">src.dc_toolbox.</code><code class="descname">dc_updateFileformat</code><span class="sig-paren">(</span><em>unfold</em><span class="sig-paren">)</span><a class="headerlink" href="#src.dc_toolbox.dc_updateFileformat" title="Permalink to this definition">¶</a></dt>
+<dd><p>updates the unfold file struct to some changes in variable names</p>
 </dd></dl>
 
 </div>
@@ -940,7 +1012,7 @@ gets one column</p>
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Sep 26, 2017.<br/>
+      Last updated on Nov 20, 2017.<br/>
     </p>
   </div>
 </footer>

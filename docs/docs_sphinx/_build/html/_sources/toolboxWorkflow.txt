@@ -99,7 +99,7 @@ colnames: {1×10 cell}
 cols2variableNames
   A list connecting the columns of `X` with the variables. A 0 means that the intercept is meant.
 
-col2eventtype
+cols2eventtype
   A list connecting the colums of `X` with the event. Multiple events can be modeled but they are not separable based on `X` alone.
 
 eventtype
