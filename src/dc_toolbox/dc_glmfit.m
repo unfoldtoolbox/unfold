@@ -73,7 +73,7 @@ if(ischar(cfg)); error(cfg);end
 
 assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
 assert(size(EEG.deconv.Xdc,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.deconv.Xdc),size(EEG.data))
-
+assert(~any(isnan(EEG.deconv.Xdc(:))),'Warning NAN values found in designmatrix. will not continue')
 
 X = EEG.deconv.Xdc;
 

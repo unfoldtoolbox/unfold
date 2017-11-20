@@ -10,9 +10,9 @@ function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
 %        * 'splines'    We use cubic splines (number = TimeexpandPARAM) to approximate the signal. This makes sense as neighbouring timepoints are very likely correlated.
 %        * 'fourier'    We use a fourier set (up to the first TimeexpandPARAM frequencies) to model the signal.
 %
-%  cfg.windowlength (2 integer):     defines over how many samples the timeexpand should go, this is
+%  cfg.timelimits (2 integer):     defines over what time the timeexpand should go, this is
 %       analog to the epoch-size. This should be as long, as you think
-%       overlap can happen in your data.
+%       overlap can happen in your data (in seconds.
 %
 %  cfg.timeexpandparam (integer):    depending on whether cfg.method is splines or fourier defines how
 %       many splines or fourier frequencies (in case of fourier, the
@@ -43,7 +43,7 @@ if strcmp(cfg.method,'spline')
 end
 
 assert(cfg.timelimits(1)<cfg.timelimits(2),'Timelimits are not ordered correctly or are equal')
-
+assert(~any(isnan(EEG.deconv.X(:))),'Warning NAN values found in designmatrix. will not continue')
 
 
 % Taken and modified from the epoch-eeglab function
