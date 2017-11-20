@@ -15,7 +15,8 @@ function output = dc_getParam(unfold,varargin)
 %       parameterdomain
 %   cfg.auto_method(string): 'quantile' (default) or 'linear'.
 %       'quantile' - the auto_n values are placed on the quantile of the predictor
-%       'linear'   - the auto_n
+%       'linear'   - the auto_n values are placed linearly over the range of the predictor
+%       'average'  - only evaluates at the average of the predictor
 %   cfg.auto_n (integer) : default 7; the number of automatically evaluated values
 %
 %Return:
