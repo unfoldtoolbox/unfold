@@ -65,14 +65,14 @@ paramValuesSpline(b(:)==1) = 1;
 
 %%
 if strcmp(cfg.codingschema,'effects')
-    warning('For splines only effects coding is implemented. The intercept will represent the value at the spline most closely to the mean')
+    
     minix = get_min(nanmean(spl.paramValues),spl.paramValues);
     [~,killThisSpline] = max(paramValuesSpline(minix,:));
     
     [~,tmp] = max(paramValuesSpline(:,killThisSpline));
     peakAt = spl.paramValues(tmp);
     fprintf('Due to collinearity, removing the spline for the effect %s has its peak at %f\n',spl.name,peakAt)
-    fprintf('This does not mean that the model-intercept necessarily represents this value!')
+    fprintf('This does not mean that the model-intercept represents this value!')
 else
     killThisSpline = 1;
 end

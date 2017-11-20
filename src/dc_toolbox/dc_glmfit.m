@@ -209,7 +209,7 @@ eventnan = cellfun(@(x)isnan(x(1)),EEG.deconv.eventtype(~eventcell));
 eventnan = find(~eventcell);
 
 
-betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.deconv.timebasis,1),sum(~ismember(EEG.deconv.col2eventtype,eventnan)));
+betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.deconv.timebasis,1),sum(~ismember(EEG.deconv.cols2eventtype,eventnan)));
 
 
 

@@ -45,13 +45,13 @@ nchan = size(data,1);
 ntime = size(data,2);
 npred = size(data,3);
 
-predName= repmat({unfold.epoch(:).name}',1,ntime,nchan);
+predName= repmat({unfold.param(:).name}',1,ntime,nchan);
 predName= permute(predName,[3 2 1]);
 
-predValue= repmat([unfold.epoch(:).value]',1,ntime,nchan);
+predValue= repmat([unfold.param(:).value]',1,ntime,nchan);
 predValue= permute(predValue,[3 2 1]);
 
-predEvent= repmat({unfold.epoch(:).event}',1,ntime,nchan);
+predEvent= repmat({unfold.param(:).event}',1,ntime,nchan);
 predEvent= permute(predEvent,[3 2 1]);
 predEvent = cellfun(@(x)strjoin(x),predEvent,'UniformOutput',0);
 

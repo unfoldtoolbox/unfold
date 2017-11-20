@@ -67,7 +67,7 @@ function [EEG] = dc_designmat(EEG,varargin)
 %     * colnames:     For each column of 'X', which predictor it represents
 %     * formula:    The original cfg.formula
 %     * event:      the cfg.eventtype
-%     * col2eventtype:   For each column of 'X' which event it represents
+%     * cols2eventtype:   For each column of 'X' which event it represents
 %
 %*Example:*
 %   A classical 2x2 factorial design with interaction
@@ -168,7 +168,7 @@ if iscell(cfg.formula)
                 deconvAll.colnames = [deconvAll.colnames,EEG2.deconv.colnames];
                 deconvAll.formula = [deconvAll.formula EEG2.deconv.formula];
                 deconvAll.eventtype = [deconvAll.eventtype EEG2.deconv.eventtype];
-                deconvAll.col2eventtype = [deconvAll.col2eventtype EEG2.deconv.col2eventtype+max(deconvAll.col2eventtype)];
+                deconvAll.cols2eventtype = [deconvAll.cols2eventtype EEG2.deconv.cols2eventtype+max(deconvAll.cols2eventtype)];
                 deconvAll.variableNames = [deconvAll.variableNames EEG2.deconv.variableNames];
                 deconvAll.variableType = [deconvAll.variableType EEG2.deconv.variableType];
                 deconvAll.predictorSplines = [deconvAll.predictorSplines EEG2.deconv.predictorSplines];
@@ -463,7 +463,7 @@ EEG.deconv.cols2variableNames= cols2variableNames;
 
 
 
-EEG.deconv.col2eventtype = ones(1,size(X,2)); % This looks odd, but the function is recursively called if multiple events are detected. This number is the fixed in the recursive call to represent the actual col2eventtype
+EEG.deconv.cols2eventtype = ones(1,size(X,2)); % This looks odd, but the function is recursively called if multiple events are detected. This number is the fixed in the recursive call to represent the actual cols2eventtype
 EEG.deconv.eventtype = {cfg.eventtype};
 
 

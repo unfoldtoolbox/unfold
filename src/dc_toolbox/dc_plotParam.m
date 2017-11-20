@@ -31,7 +31,8 @@ function [varargout] = dc_plotParam(unfold,varargin)
 %      plotted in a separate figure ('all'), plotted in an event-specific
 %      figure ('event') or all subplots are in the same figure ('none', default)
 %
-%    'plotParam' (cell): Defines which parameters are to be plotted
+%    'plotParam' (string/cell of strings): Defines which parameters are to be plotted
+%
 %    'sameyaxis' ('all','row','independent'): Force the same y-axis
 %      (default 'all')
 %
@@ -54,7 +55,7 @@ cfg = finputcheck(varargin,...
     'add_intercept','boolean',[],0;
     'add_average', 'boolean', [],0;
     'include_intercept','boolean',[],0;
-    'plotParam','cell',[],{};
+    'plotParam','',[],'';
     'plotSeparate','string',{'all','event','none'},'none';
     'sameyaxis','string',{'all','row','independent'},'all';
     'baseline','real',[min(unfold.times) max(unfold.times)],[];...
@@ -102,16 +103,20 @@ end
 
 if isempty(cfg.plotParam)
     display('plotting all parameters')
-    paramList = {unfold.epoch.name};
-    paramIdx = 1:length(unfold.epoch);
+    paramList = {unfold.param.name};
+    paramIdx = 1:length(unfold.param);
 else
     display('plotting selected parameters')
     paramIdx = [];
+    if isstr(cfg.plotParam)
+        % if only a single parameter is requested
+        cfg.plotParam = {cfg.plotParam};
+    end
     paramList = {};
     for c = cfg.plotParam
-        hits = find(strcmp(c, {unfold.epoch.name}));
+        hits = find(strcmp(c, {unfold.param.name}));
         paramIdx = [paramIdx hits];
-        paramList = [paramList {unfold.epoch(hits).name}];
+        paramList = [paramList {unfold.param(hits).name}];
     end
     
 end
@@ -120,10 +125,10 @@ end
 %name + event are later used to split up columns
 
 name = paramList;
-event = cellfun(@(y)strjoin_custom(y,'+'),{unfold.epoch(paramIdx).event},'UniformOutput',0);
+event = cellfun(@(y)strjoin_custom(y,'+'),{unfold.param(paramIdx).event},'UniformOutput',0);
 
 % value, this is necessary for continuous + spline
-value = [unfold.epoch(paramIdx).value];
+value = [unfold.param(paramIdx).value];
 value(isnan(value)) = 0; %categorical variables are nan, we need to convert
 
 
@@ -158,6 +163,9 @@ for bName =betaSetName
         for e = unique(event)
             % check if predictor and event combination exists
             eventIdx = find(strcmp(e,event));
+            if length(eventIdx) == 1
+                continue
+            end
             eventParam = paramList(eventIdx);
             for p = unique(eventParam)
                 % Find the names & types of the other parameters
@@ -166,18 +174,18 @@ for bName =betaSetName
                 otherParamNames = unique(paramList(otherEvents));
                 unfoldavg_ix = [];
                 for pOther = otherParamNames
-                    unfoldavg_ix(end+1) = find(strcmp(pOther{1},{unfold_avg.epoch.name}));
+                    unfoldavg_ix(end+1) = find(strcmp(pOther{1},{unfold_avg.param.name}));
                 end
                 % exclude all categoricals.
                 % they should be covered by the effects/dummy coding schema
                 % already ?!
-                removeix = strcmp('categorical',{unfold_avg.epoch(unfoldavg_ix).type});
+                removeix = strcmp('categorical',{unfold_avg.param(unfoldavg_ix).type});
                 unfoldavg_ix(removeix) = [];
                 % calculate the marginal over all other predictors
                 average_otherEffects = squeeze(sum(unfold_avg.(bName{1})(1,:,unfoldavg_ix),3));
                 
                 % add this marginal to the current predictor                
-                data(:,addToIdx) = data(:,addToIdx) + average_otherEffects;
+                data(:,currEvent) = data(:,currEvent) + average_otherEffects';
                 
             end
         end
@@ -188,7 +196,7 @@ for bName =betaSetName
             %is there an intercept?
             eventIdx =  strcmp(event,e);
 
-            interceptIdx = cellfun(@(x)~isempty(x),strfind({unfold.epoch(paramIdx).name},'(Intercept)'));
+            interceptIdx = cellfun(@(x)~isempty(x),strfind({unfold.param(paramIdx).name},'(Intercept)'));
             if sum(interceptIdx) == 0
                 warning('no intercept found, did you select a parameter but not the intercepts?')
                 continue

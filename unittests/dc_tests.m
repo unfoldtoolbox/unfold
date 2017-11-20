@@ -15,14 +15,15 @@ test_timeexpandDesignmat
 % Multi-Test
 cfg = struct();
 cfg.designmat.coding = {'dummy','reference'};
-cfg.designmat.splinespacing = {'linear','log','quantile','logreverse'};
+cfg.designmat.splinespacing = {'linear','quantile'};
 cfg.timeexpandDesignmat.timelimits = {[-0.5,1.5],[-0.5,-0.1],[1 2]};
 cfg.timeexpandDesignmat.method = {'full','splines','fourier'};
 cfg.timeexpandDesignmat.timeexpandparam = [3, 5,10,35];
 cfg.timeexpandDesignmat.sparse = [0,1];
 cfg.glmfit.method={'lsmr','matlab','pinv'};
 cfg.glmfit.channel = 1;
-cfg.beta2EEG.convertSplines = [0,1];
+% cfg.beta2EEG.convertSplines = [0,1]; % deprecated with the new spline
+% implementation
 cfg.beta2EEG.deconv = [-1,0,1];
 cfg.beta2EEG.channel = 1;
 
@@ -69,18 +70,18 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
                     
                     for b = beta2EEG'
                         EEGb = EEGg;
-                        if b{2} == 0
+                        if b{1} == 0
                             EEGb = dc_epoch(EEGb,'timelimits',t{1});
                             EEGb = dc_glmfit_nodc(EEGb);
                         end
-                        unfold = dc_beta2unfold(EEGb,'convertSplines',b{1},'deconv',b{2},'channel',b{3});
+                        unfold = dc_beta2unfold(EEGb,'deconv',b{1},'channel',b{2});
                         if strcmp(t{2},'full') && testCase==14 && b{2} == 1 && all(t{1} == [-0.5,1.5])
                             if ~isfield(EEGb,'urevent') || isempty(EEG.urevent)
                                 EEGb.urevent = EEG.event; % this field is populated in dc_epoch
                             end
                             multWith = ones(1,size(EEGb.deconv.X,2));
                             for col = 1:size(EEGb.deconv.X,2)
-                                ix = ismember({EEGb.urevent.type},EEGb.deconv.eventtype{EEGb.deconv.col2eventtype(col)});
+                                ix = ismember({EEGb.urevent.type},EEGb.deconv.eventtype{EEGb.deconv.cols2eventtype(col)});
                                 multWith(col) = mean(EEGb.deconv.X(ix,col),1);
                             end
                             beta = bsxfun(@times,squeeze(unfold.beta),multWith);
@@ -152,7 +153,7 @@ end
 %
 %     multWith = ones(1,size(EEG.deconv.X,2));
 %     for col = 1:size(EEG.deconv.X,2)
-%         ix = ismember({EEG.urevent.type},EEG.deconv.eventtype{EEG.deconv.col2eventtype(col)});
+%         ix = ismember({EEG.urevent.type},EEG.deconv.eventtype{EEG.deconv.cols2eventtype(col)});
 %         multWith(col) = mean(EEG.deconv.X(ix,col),1);
 %     end
 %     unfold.beta*multWith;

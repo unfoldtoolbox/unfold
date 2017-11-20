@@ -19,4 +19,4 @@ EEG.deconv.Xdc(:,end+1) = newrow;
 EEG.deconv.colnames(end+1) = {label};
 EEG.deconv.Xdc_terms2cols(end+1) = length(EEG.deconv.colnames);
 EEG.deconv.eventtype(end+1) = {nan};
-EEG.deconv.col2eventtype(end+1) = length(EEG.deconv.eventtype);
+EEG.deconv.cols2eventtype(end+1) = length(EEG.deconv.eventtype);
