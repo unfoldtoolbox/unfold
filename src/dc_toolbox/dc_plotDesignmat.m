@@ -42,13 +42,14 @@ if cfg.timeexpand
     % time_lim = EEG.times(ceil(end/2)) + [-100,100] * 1000;
     
     TOTALPLOTWIN_SEC = 60; % total width of default (maximum) plotting window (in sec.)
-    time_lim    = midEventLat + round([-TOTALPLOTWIN_SEC/2,TOTALPLOTWIN_SEC/2])*1000;
+    time_lim    = midEventLat + round([-TOTALPLOTWIN_SEC/2,TOTALPLOTWIN_SEC/2]);
     
     if min(EEG.times) > time_lim(1) || max(EEG.times) < time_lim(2)
-        warning('the design-matrix is too large to display, we show only the middle 1000 seconds.') % THIS MSG SEEMS WRONG
+        warning('the design-matrix is too large to display, we show only the middle 60 seconds.') % THIS MSG SEEMS WRONG
     end
+    
     time_ix = find(EEG.times > time_lim(1) & EEG.times < time_lim(2));
-    yAxis = EEG.times(time_ix)/1000;
+    yAxis = EEG.times(time_ix);
     X = EEG.deconv.Xdc(time_ix,:);
     shiftByOne = 0; % dont shift the XTicks by one
 
@@ -116,7 +117,7 @@ if cfg.timeexpand
     pan yon
     if isfield(EEG,'event')
         allTypes = {EEG.event(:).type};
-        lat = [EEG.event(:).latency]/EEG.srate*1000; % in ms
+        lat = [EEG.event(:).latency]/EEG.srate; % in s
         
         % look for event latencies of events in the plotted region
         latix = (lat < (time_lim(2))) & (lat > (time_lim(1)));
