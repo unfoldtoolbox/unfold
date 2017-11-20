@@ -133,7 +133,7 @@ elseif strcmp(cfg.method,'par-lsmr')
     pools = gcp('nocreate');
     cpus = feature('numCores');
     if size(pools) == 0
-        parpool(cpus-1);
+        pool = parpool(cpus-1);
     end
     fprintf('done\n')
     addpath('../lib/lsmr/')
@@ -142,12 +142,14 @@ elseif strcmp(cfg.method,'par-lsmr')
     data = sparse(double(data'));
     % go tru channels
     fprintf('starting parallel loop')
+    parXdc = parallel.pool.Constant(Xdc);
+    parData= parallel.pool.Constant(data);
     parfor e = cfg.channel
         t = tic;
         
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         % use iterative solver for least-squares problems (lsmr)
-        [beta(:,e),ISTOP,ITN] = lsmr(Xdc,data(:,e),[],10^-10,10^-10,[],200); % ISTOP = reason why algorithm has terminated, ITN = iterations
+        [beta(:,e),ISTOP,ITN] = lsmr(parXdc.Value,parData.Value(:,e),[],10^-10,10^-10,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
         if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
         end
