@@ -97,7 +97,10 @@ else
     
 end
 
-
+if ~isempty(cfg.pred_value)
+    fprintf('Evaluating parameters at auto or specified values');
+    unfold = dc_getParam(unfold,cfg);
+end
 %% Prepare data
 % select parameters to plot, or else plot all available
 
