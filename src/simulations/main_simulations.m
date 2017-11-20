@@ -24,10 +24,10 @@
 % 13   	- Three events, one intercept, one 1x2 and one continuos, no overlap
 % 14   	- Three events, one intercept, one 1x2 and one continuos, with overlap
 
-testCase = 4
+testCase = 15
 
 
-EEG = simulate_test_case(testCase,'noise',1,'basis','hanning');
+EEG = simulate_test_case(testCase,'noise',0,'basis','hanning');
 
 cfgDesign = [];
 cfgDesign.eventtype = {'stimulusA'};
@@ -70,11 +70,11 @@ EEG = dc_epoch(EEG,'timelimits',timelimits);
 EEG = dc_glmfit_nodc(EEG); %does not overwrite
 
 %%
-unfold = dc_beta2unfold(EEG,'convertSplines',0);
+unfold = dc_beta2unfold(EEG);
 
 multWith = ones(1,size(EEG.deconv.X,2));
 for col = 1:size(EEG.deconv.X,2)
-    ix = ismember({EEG.urevent.type},EEG.deconv.eventtype{EEG.deconv.col2eventtype(col)});
+    ix = ismember({EEG.urevent.type},EEG.deconv.eventtype{EEG.deconv.cols2eventtype(col)});
     multWith(col) = mean(EEG.deconv.X(ix,col),1);
 end
 %%
@@ -92,7 +92,7 @@ plot(unfold.times,bsxfun(@times,squeeze(unfold.beta_nodc),multWith),'-x'),hold a
 plot(EEG.sim.sig.time,EEG.sim.separateSignal','-ok')
 title('epoched vs. orig')
 %%
-unfold = dc_beta2unfold(EEG,'convertSplines',1);
+unfold = dc_beta2unfold(EEG);
 
 cfg = [];
 cfg.auto_method = 'linear'; %default quantile
@@ -104,10 +104,9 @@ unfold = dc_getParam(unfold,cfg);
 
 cfg = [];
 cfg.channel = 1;
-cfg.add_intercept = 1;
-cfg.include_intercept = 1;
 cfg.sameyaxis = 'all';
-cfg.deconv = -1;
+cfg.deconv = 1;
 cfg.plotSeparate = 'event';
-
+cfg.plotParam = {'3_(Intercept)','3_continuousA','splineA','splineB'};
+cfg.add_average = 0;
 ax = dc_plotParam(unfold,cfg);

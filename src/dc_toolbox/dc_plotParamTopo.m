@@ -59,9 +59,9 @@ if isempty(cfg.channel)
    cfg.channel = 1:size(data,1);
 end
 if isempty(cfg.plotParam)
-    param = 1:length(unfold.epoch);
+    param = 1:length(unfold.param);
 else
-    param = find(ismember({unfold.epoch(:).name},cfg.plotParam));
+    param = find(ismember({unfold.param(:).name},cfg.plotParam));
 end
 
 data = data(cfg.channel,:,param);
@@ -85,12 +85,12 @@ ax = plot_topobutter(data,unfold.times,unfold.chanlocs(cfg.channel),cfg);
 for k = 1:length(param)
     ax.topo.topo{k}.image{1}.Units = 'normalized';
     % get the values for the rowname
-    val = round(unfold.epoch(param(k)).value,2,'significant');
+    val = round(unfold.param(param(k)).value,2,'significant');
     
     if isnan(val)
        val = []; 
     end
-    text = sprintf('[%s]: %s: %g',strjoin_custom(unfold.epoch(param(k)).event),unfold.epoch(param(k)).name,val);
+    text = sprintf('[%s]: %s: %g',strjoin_custom(unfold.param(param(k)).event),unfold.param(param(k)).name,val);
     t = text(ax.topo.topo{k}.image{1},0,1.1,10,text,'Units','normalized','HorizontalAlignment','left');
     
     % we want them on top, else they can be behind the topos

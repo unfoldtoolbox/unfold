@@ -34,8 +34,8 @@ end
 
 for pred = missingColumn
     nanIDX = isnan(EEG.deconv.X(:,pred));
-    col2eventtype = EEG.deconv.col2eventtype(pred);
-    eventrows = strcmp(EEG.deconv.eventtype{col2eventtype},{EEG.event(:).type}); % bugfix proposal by OD: field "EEG.deconv.event" does not exist
+    cols2eventtype = EEG.deconv.cols2eventtype(pred);
+    eventrows = strcmp(EEG.deconv.eventtype{cols2eventtype},{EEG.event(:).type}); % bugfix proposal by OD: field "EEG.deconv.event" does not exist
     X_pred = EEG.deconv.X(eventrows'&~nanIDX,pred);
     
     

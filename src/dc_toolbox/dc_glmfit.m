@@ -45,7 +45,7 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %                  details from the solver used
 %
 %   save_memory_or_time: Deprecated, has been renamed to 'method' EEG:  the
-%   EEG set, need to have EEG.deconv.dcX compatible with
+%   EEG set, need to have EEG.deconv.Xdc compatible with
 %         the size of EEG.data
 %
 %Return:
@@ -72,14 +72,14 @@ if(ischar(cfg)); error(cfg);end
 
 
 assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
-assert(size(EEG.deconv.dcX,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.deconv.dcX),size(EEG.data))
+assert(size(EEG.deconv.Xdc,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.deconv.Xdc),size(EEG.data))
 
 
-X = EEG.deconv.dcX;
+X = EEG.deconv.Xdc;
 
 disp('solving the equation system');
 t = tic;
-beta = nan(size(EEG.deconv.dcX,2),EEG.nbchan);
+beta = nan(size(EEG.deconv.Xdc,2),EEG.nbchan);
 data = EEG.data;
 
 %% Remove data that is unnecessary for the fit
@@ -124,7 +124,7 @@ if strcmp(cfg.method,'lsmr')
         end
         fprintf('... %i iterations, took %.1fs',ITN,toc(t))
         %beta(:,e) =
-        %lsqr(EEG.deconv.dcX,sparse(double(EEG.data(e,:)')),[],30);
+        %lsqr(EEG.deconv.Xdc,sparse(double(EEG.data(e,:)')),[],30);
         
     end
     
@@ -138,7 +138,7 @@ elseif strcmp(cfg.method,'par-lsmr')
     fprintf('done\n')
     addpath('../lib/lsmr/')
     beta = nan(size(X,2),EEG.nbchan);
-    dcX = X;
+    Xdc = X;
     data = sparse(double(data'));
     % go tru channels
     fprintf('starting parallel loop')
@@ -147,14 +147,14 @@ elseif strcmp(cfg.method,'par-lsmr')
         
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         % use iterative solver for least-squares problems (lsmr)
-        [beta(:,e),ISTOP,ITN] = lsmr(dcX,data(:,e),[],10^-10,10^-10,[],200); % ISTOP = reason why algorithm has terminated, ITN = iterations
+        [beta(:,e),ISTOP,ITN] = lsmr(Xdc,data(:,e),[],10^-10,10^-10,[],200); % ISTOP = reason why algorithm has terminated, ITN = iterations
         if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
         end
         fprintf('... took %.1fs',toc(t))
         
         %beta(:,e) =
-        %lsqr(EEG.deconv.dcX,sparse(double(EEG.data(e,:)')),[],30);
+        %lsqr(EEG.deconv.Xdc,sparse(double(EEG.data(e,:)')),[],30);
         
     end
     
@@ -189,7 +189,7 @@ elseif strcmp(cfg.method,'glmnet')
         
     end
     beta = beta([2:end 1],:); %put the dc-intercept last
-    EEG = dc_designmat_addcol(EEG,ones(1,size(EEG.deconv.dcX,1)),'glmnet-DC-Correction');
+    EEG = dc_designmat_addcol(EEG,ones(1,size(EEG.deconv.Xdc,1)),'glmnet-DC-Correction');
     
     
     
@@ -209,14 +209,14 @@ eventnan = cellfun(@(x)isnan(x(1)),EEG.deconv.eventtype(~eventcell));
 eventnan = find(~eventcell);
 
 
-betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.deconv.dcBasis,1),sum(~ismember(EEG.deconv.col2eventtype,eventnan)));
+betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.deconv.timebasis,1),sum(~ismember(EEG.deconv.cols2eventtype,eventnan)));
 
 
 
-EEG.deconv.dcBeta = betaOut;
+EEG.deconv.beta_dc = betaOut;
 if length(eventnan)>0
     %     EEG.betaCustomrow = beta(end+1-length(eventnan):end);
-    EEG.deconv.dcBetaCustomrow = beta(:,end+1-length(eventnan):end);
+    EEG.deconv.beta_dcCustomrow = beta(:,end+1-length(eventnan):end);
 end
 EEG.deconv.channel = cfg.channel;
 

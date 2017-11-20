@@ -16,7 +16,7 @@ function output = dc_getParam(unfold,varargin)
 %   cfg.auto_method(string): 'quantile' (default) or 'linear'.
 %       'quantile' - the auto_n values are placed on the quantile of the predictor
 %       'linear'   - the auto_n
-%   cfg.auto_n (integer) : default 7; the number of automatically evaluated values 
+%   cfg.auto_n (integer) : default 7; the number of automatically evaluated values
 %
 %Return:
 %   Result-Betas with evaluated betas at specified continuous values.
@@ -28,23 +28,28 @@ function output = dc_getParam(unfold,varargin)
 cfg = finputcheck(varargin,...
     {'pred_value','cell',[],{{'',[]}};
     'deconv','integer',[-1,0,1],-1;
-    'convertSplines','integer',[],1;
-    'auto_method','string',{'quantile','linear'},'quantile';
+    'auto_method','string',{'quantile','linear','average'},'quantile';
     'auto_n','integer',[],10;
     },'mode','ignore');
 
 if(ischar(cfg)); error(cfg);end
 
+% check if function has been run before
+% this will lead to mistakes and errors because some betas will not be the betas we expect anymore - don't allow that!
+if any(cellfun(@(x)~isempty(x),strfind({unfold.param.type},'converted')))
+    error('cannot run dc_getParam twice. Run dc_beta2unfold again first')
+end
 
-dcBetaExists   = isfield(unfold,'beta')&& isnumeric(unfold.beta);
-nodcBetaExists = isfield(unfold,'beta_nodc') && isnumeric(unfold.beta_nodc);
+
+beta_dcExists   = isfield(unfold,'beta')&& isnumeric(unfold.beta);
+beta_nodcExists = isfield(unfold,'beta_nodc') && isnumeric(unfold.beta_nodc);
 
 if cfg.deconv == 1
-    assert(dcBetaExists,'dcBeta missing or not numeric')
+    assert(beta_dcExists,'beta_dc missing or not numeric')
     
     
 elseif cfg.deconv == 0
-    assert(nodcBetaExists,'XBeta missing or not numeric')
+    assert(beta_nodcExists,'beta_nodc missing or not numeric')
     
     
 elseif cfg.deconv == -1 % auto detect, recursive call
@@ -87,27 +92,7 @@ end
 % Array of the sorts: {{'parName',linspace(0,10,5)},{'parname2',1:5}}
 predValueSelectList = cfg.pred_value;
 predNameList = cellfun(@(x)x{1},predValueSelectList,'UniformOutput',0);
-% if cfg.convertSplines == 1
-%      unfold = dc_beta2unfold(unfold,'convertSplines',1);
-% end
-if cfg.convertSplines == 1
-    [splIdxList,paramList] = dc_getSplineidx(unfold);
-    paramListSpline = paramList;
-    
-    splineList = strcmp(unfold.deconv.variableType,'spline');
-    for spl = [1:sum(splineList);find(splineList)]
-        ix = find(spl(2)== unfold.deconv.cols2variableNames,1,'first');
-        ix = find(ix == paramList);
-        NsplineVal = length(unfold.deconv.predictorSplines{spl(1)}.spline2val);
-        NsplinePred = size(unfold.deconv.predictorSplines{spl(1)}.X,2);
-        paramListSpline(ix+1:end) = paramListSpline(ix+1:end)+ NsplineVal - NsplinePred;
-%         paramListSpline
-    end
-    
-else
-    paramList = 1: size(unfold.deconv.X,2);
-    paramListSpline = paramList;
-end
+[~,paramList] = dc_getSplineidx(unfold);
 if cfg.deconv == 1
     beta = unfold.beta;
 elseif cfg.deconv == 0
@@ -116,15 +101,25 @@ elseif cfg.deconv == 0
 end
 
 betaNew = [];
-epochNew = unfold.epoch(1); %needs to be removed
-for predIDX = [paramList;paramListSpline]
-    variableIdx = unfold.deconv.cols2variableNames(predIDX(1));
+epochNew = unfold.param(1); %needs to be removed
+for currPred= 1:length(paramList)
+    predIDX = paramList(currPred);
     
-    b = beta(:,:,predIDX(2));
+    % if we are at the last predictor, this one goes to the end of the
+    % designmatrix
+    if currPred == length(paramList)
+        predIDX_next = size(unfold.deconv.X,2);
+    else
+        %else it goes to the next predictor
+        predIDX_next = paramList(currPred+1)-1;
+    end
+    variableIdx = unfold.deconv.cols2variableNames(predIDX);
     
-    e = unfold.epoch(predIDX(2));
+    b = beta(:,:,predIDX:predIDX_next);
     
-    if cfg.convertSplines && variableIdx ~=0 && strcmp(unfold.deconv.variableType{variableIdx},'spline')
+    e = unfold.param(predIDX);
+    
+    if strcmp(unfold.deconv.variableType{variableIdx},'spline')
         
         splName = cellfun(@(x)x.name,unfold.deconv.predictorSplines,'UniformOutput',0);
         splIdx = find(strcmp(splName,unfold.deconv.variableNames{variableIdx}));
@@ -141,27 +136,39 @@ for predIDX = [paramList;paramListSpline]
         end
         
         
-        % all betas of the spline
-        ix = strcmp({unfold.epoch.name},spl.name);
-        if sum(ix) ~= length(spl.spline2val)
-            error('something went wrong, maybe you did not convert the splines (''convertSplines'') while calling beta2unfold, or you ran dc_getParam already?')
-        end
+        % This functino always removes either first or last spline. We therefore
+        % need to recover it by running it twice and concatenating
+        % this is nearly identical to the code in dc_designmat_spline
+        % possibly put both in a common function?!
+        basisL = Bernstein(splValueSelect,spl.knots,[],4,[],0);
+        basisR = Bernstein(splValueSelect,spl.knots,[],4,[],1);
         
-        indexList = find(ix);
-        for c = splValueSelect
-            thisBetaIx = get_min(c,[unfold.epoch(ix).value]);
-            thisBetaIx = indexList(thisBetaIx);
+        paramValuesSpline = basisL;
+        paramValuesSpline(basisR(:)==1) = 1;
+        paramValuesSpline(:,spl.removedSplineIdx) = [];
+        
+        for c = 1:length(splValueSelect)
+            % we have a [channel x time x beta] * [beta x 1] vector product
+            % to calculate => loop over channel
+            for chan = 1:size(b,1)
+                result = squeeze(b(chan,:,:))*paramValuesSpline(c,:)';
+                if chan == 1
+                    betaNew(chan,:,end+1) =result;
+                else
+                    betaNew(chan,:,end) =result;
+                end
+            end
+            % the event is already saved in 'e' (unfold.param(predIDX))
             
-            betaNew(:,:,end+1) =beta(:,:,thisBetaIx);
-            eNew = unfold.epoch(thisBetaIx);
-%             eNew.value = c;
-%             eNew.name = spl.name;
-%             eNew.event = unfold.deconv.eventtype{variableIdx};
+            eNew = e;
+            eNew.value = splValueSelect(c);
+            eNew.name = spl.name;
+            eNew.type = 'spline_converted';
+            
             epochNew(end+1) = eNew;
         end
         
-        %         t(strcmp(t.parameter,spl.name)& ~ismember(t.paramvalue,,:) = [];
-    elseif variableIdx ~=0 && strcmp(unfold.deconv.variableType{variableIdx},'continuous')
+    elseif strcmp(unfold.deconv.variableType{variableIdx},'continuous')
         % we have either a categorical or a continuous predictor here
         customContValue = strcmp(predNameList,unfold.deconv.colnames(predIDX(1)));
         if any(customContValue)
@@ -169,11 +176,12 @@ for predIDX = [paramList;paramListSpline]
             
         else
             values = unfold.deconv.X(:,predIDX(1));
-            % we do not have access at this point to which 'X' entry belongs to that event. 
+            % we do not have access at this point to which 'X' entry belongs to that event.
             % Thus we discard every 0 value and hope a bit, that it does not matter because 0 is the intercept anyway.
-            % This is supoptimal and I'm sorry if it creats inconveniences.
+            % This is supoptimal and I'm sorry if it creates inconveniences.
             % We would need to introduce a whole new field to carry around
             % to compensate for this.
+            warning('auto spacing for continuous variables exlcudes all zeros. Specfiy manually if necessary using ''pred_value''')
             contValueSelect = auto_spacing(cfg,values(values~=0));
         end
         
@@ -181,6 +189,7 @@ for predIDX = [paramList;paramListSpline]
             betaNew(:,:,end+1) = b.*c;
             eNew = e;
             eNew.value = c;
+            eNew.type = 'continuous_converted';
             epochNew(end+1) = eNew;
         end
         
@@ -191,7 +200,7 @@ for predIDX = [paramList;paramListSpline]
     end
     
 end
- epochNew(1) = [];
+epochNew(1) = [];
 betaNew(:,:,1) = [];
 
 if cfg.deconv
@@ -199,7 +208,7 @@ if cfg.deconv
 else
     unfold.beta_nodc = betaNew;
 end
-unfold.epoch = epochNew;
+unfold.param = epochNew;
 output = unfold;
 
 end
@@ -222,5 +231,8 @@ switch cfg.auto_method
         contValueSelect = linspace(contmin+0.05*ran,contmax-0.05*ran,cfg.auto_n);
     case 'quantile'
         contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
+    case 'average'
+        contValueSelect = nanmean(predVal);
 end
 end
+
