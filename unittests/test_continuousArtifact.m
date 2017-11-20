@@ -26,8 +26,8 @@ EEG = dc_timeexpandDesignmat(EEG,'timelimits',[-1,2]);
 % now we delete it based on the continous design matrix
 EEG2 = dc_continuousArtifactExclude(EEG,'winrej',winrej);
 
-t1 = ~all(all(EEG2.deconv.dcX(winrej(1,1):winrej(1,2),:)==0));
-t2 = ~all(all(EEG2.deconv.dcX(winrej(2,1):winrej(2,2),:)==0));
+t1 = ~all(all(EEG2.deconv.Xdc(winrej(1,1):winrej(1,2),:)==0));
+t2 = ~all(all(EEG2.deconv.Xdc(winrej(2,1):winrej(2,2),:)==0));
 if t1 || t2
     error('problems with continuous artefact rejection')
 end

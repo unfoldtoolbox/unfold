@@ -11,7 +11,7 @@ function [resAll] = dc_spl2continuous(EEG,varargin)
 %
 %    'spline_value': Specify at which values the spline should be evaluated
 %
-%    'deconv': Specifies whether to use dcBeta (default, deconv=1) or Xbeta
+%    'deconv': Specifies whether to use beta_dc (default, deconv=1) or beta_nodc
 %      (the non-deconvoluted)
 %
 %Return:
@@ -22,17 +22,17 @@ function [resAll] = dc_spl2continuous(EEG,varargin)
 
 
 
-if isfield(EEG.deconv,'XBeta')
-    nchan = size(EEG.deconv.XBeta,1);
-elseif isfield(EEG.deconv,'dcBeta')
-    nchan = size(EEG.deconv.dcBeta,1);
+if isfield(EEG.deconv,'beta_nodc')
+    nchan = size(EEG.deconv.beta_nodc,1);
+elseif isfield(EEG.deconv,'beta_dc')
+    nchan = size(EEG.deconv.beta_dc,1);
 end
 
 
 cfg = finputcheck(varargin,...
     {'spline_idx','integer',[],[]; %this is mandatory, which one do you want to evaluate?
     'channel','integer',[],1:nchan; % subselect channels
-    'time','integer',[],[min(EEG.deconv.dcBasistime);max(EEG.deconv.dcBasistime)]; %take all time-points by default
+    'time','integer',[],[min(EEG.deconv.times);max(EEG.deconv.times)]; %take all time-points by default
     'spline_value','real',[],[]; %take all values defined in spline2valby default
     'deconv','boolean',[],1;
     },'mode','ignore');
@@ -40,10 +40,10 @@ if(ischar(cfg)); error(cfg);end
 
 
 assert(cfg.spline_idx<=length(EEG.deconv.predictorSplines),'splineIdx could not be found in EEG.deconv')
-assert(cfg.time(1)>=min(EEG.deconv.dcBasistime),'specified time is to small')
-assert(cfg.time(2)<=max(EEG.deconv.dcBasistime),'specified time is to large')
+assert(cfg.time(1)>=min(EEG.deconv.times),'specified time is to small')
+assert(cfg.time(2)<=max(EEG.deconv.times),'specified time is to large')
 
-cfg.time_selection = EEG.deconv.dcBasistime>=cfg.time(1) & EEG.deconv.dcBasistime<=cfg.time(2);
+cfg.time_selection = EEG.deconv.times>=cfg.time(1) & EEG.deconv.times<=cfg.time(2);
 predictorSplines = EEG.deconv.predictorSplines{cfg.spline_idx};
 
 if isempty(cfg.spline_value)
@@ -58,9 +58,9 @@ betaIX = EEG.deconv.cols2variableNames ==  find(strcmp(EEG.deconv.variableNames,
 % betaIX = ismember(EEG.deconv.colnames,predictorSplines.name);
 
 if cfg.deconv
-    b = EEG.deconv.dcBeta(cfg.channel,:,betaIX);
+    b = EEG.deconv.beta_dc(cfg.channel,:,betaIX);
 else
-    b = EEG.deconv.XBeta(cfg.channel,:,betaIX);
+    b = EEG.deconv.beta_nodc(cfg.channel,:,betaIX);
 end
 
 
@@ -74,16 +74,16 @@ tic
 dat = nan(size(b,1),length(cfg.time_selection),size(b,3));
 for chan = 1:size(b,1)
     if cfg.deconv
-        dat(chan,:,:) =      EEG.deconv.dcBasis(:,cfg.time_selection)' * permute(b(chan,:,:),[2 3 1]); %permute instead of squeeze to keep order if chan = 1
+        dat(chan,:,:) =      EEG.deconv.timebasis(:,cfg.time_selection)' * permute(b(chan,:,:),[2 3 1]); %permute instead of squeeze to keep order if chan = 1
     else
-        dat(chan,:,:) = pinv(EEG.deconv.dcBasis(:,cfg.time_selection)) * permute(b(chan,:,:),[2 3 1]); %permute instead of squeeze to keep order if chan = 1
+        dat(chan,:,:) = pinv(EEG.deconv.timebasis(:,cfg.time_selection)) * permute(b(chan,:,:),[2 3 1]); %permute instead of squeeze to keep order if chan = 1
     end
 
 end
 
 
 % Push it in the value-domain (get rid of spline-predictors)
-resAll = nan(size(b,1),size(EEG.deconv.dcBasis,2),length(cfg.spline_value_selection));
+resAll = nan(size(b,1),size(EEG.deconv.timebasis,2),length(cfg.spline_value_selection));
 for chan = 1:size(b,1)
     resAll(chan,:,:) = permute(dat(chan,:,:),[2 3 1]) * predictorSplines.basis(cfg.spline_value_selection,:)'; %permute instead of squeeze to keep order if chan = 1
 end

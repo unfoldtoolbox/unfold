@@ -8,7 +8,7 @@ function EEG_epoch = dc_epoch(EEG,varargin)
 %Arguments:
 %   cfg.winrej (integer): A (2xn) array with n from-to pairs of samples to be excluded from further processing
 %   cfg.timelimits (float): min+max of the epoch in seconds
-%   EEG (eeglab): the EEG set, need to have EEG.deconv.dcX compatible with the size of EEG.data
+%   EEG (eeglab): the EEG set, need to have EEG.deconv.Xdc compatible with the size of EEG.data
 %
 %Returns:
 %   Epoched EEG file to cfg.timelimits

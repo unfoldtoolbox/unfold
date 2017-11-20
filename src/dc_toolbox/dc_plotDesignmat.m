@@ -1,13 +1,13 @@
 function dc_plotDesignmat(EEG,varargin)
 %Plots the designmatrix
-%If the matrix is very large (the timeexpanded/dcX matrix) we do not plot
+%If the matrix is very large (the timeexpanded/Xdc matrix) we do not plot
 %everything, but only the middle 1000s. We also try to zoom in
 %automatically, but this fails sometimes
 %
 %Arguments:
 %   cfg.timeexpand' (boolean):
 %        0: Plots EEG.deconv.X (default)
-%        1: Plots EEG.deconv.dcX
+%        1: Plots EEG.deconv.Xdc
 %   cfg.logColor(boolean): plot the color on logscale (default 0)
 %   cfg.sort(boolean): Sort the designmatrix
 %   cfg.figure (1/0): Open a new figure (default 1)
@@ -49,7 +49,7 @@ if cfg.timeexpand
     end
     time_ix = find(EEG.times > time_lim(1) & EEG.times < time_lim(2));
     yAxis = EEG.times(time_ix)/1000;
-    X = EEG.deconv.dcX(time_ix,:);
+    X = EEG.deconv.Xdc(time_ix,:);
     shiftByOne = 0; % dont shift the XTicks by one
 
 else
@@ -98,7 +98,7 @@ if cfg.timeexpand && cfg.addContData
     subplot(1,20,1)
     plot(EEG.data(1,:),EEG.times/1000)
     %     zoom yon
-    %     zoom(length(yAxis)./(size(EEG.deconv.dcBasis,1)*25))
+    %     zoom(length(yAxis)./(size(EEG.deconv.timebasis,1)*25))
     %     pan yon
     set(gca,'YTickLabel','','XTickLabel','')
     linkaxes([ax,gca],'y' )
@@ -110,7 +110,7 @@ if cfg.timeexpand
     % warning('auto-zoom to useful resolution (25x the stimulus-window)')
     % warning('XXX could be dimension 2 for splines?')
     % zoom yon
-    % zoom(length(yAxis)./(size(EEG.deconv.dcBasis,1)*25))
+    % zoom(length(yAxis)./(size(EEG.deconv.timebasis,1)*25))
     
     axes(ax)
     pan yon

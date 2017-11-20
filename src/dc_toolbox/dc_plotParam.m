@@ -1,4 +1,4 @@
-  function [varargout] = dc_plotParam(unfold,varargin)
+function [varargout] = dc_plotParam(unfold,varargin)
 % Plots time vs. Voltage in separate plots for each predictor, where there
 % are multiple lines for each predictor
 %
@@ -52,6 +52,7 @@ cfg = finputcheck(varargin,...
     'deconv','integer',[-1 0 1],-1;
     'channel','integer',[],[];
     'add_intercept','boolean',[],0;
+    'add_average', 'boolean', [],0;
     'include_intercept','boolean',[],0;
     'plotParam','cell',[],{};
     'plotSeparate','string',{'all','event','none'},'none';
@@ -64,13 +65,16 @@ if(ischar(cfg)); error(cfg);end
 
 assert(~isempty(cfg.channel)&& cfg.channel>0 &&length(cfg.channel) == 1,'error please select a single channel to plot')
 
+assert(~(cfg.add_average&&cfg.add_intercept),'cannot add average AND intercept (the former contains the latter')
 
+% Find out whether we want beta_dc, beta_nodc and if there are other fields
+% that have the same size that we should plot as columns.
 nBetaSets = 1;
 betaSetName = [];
 if cfg.deconv == -1
     assert(isfield(unfold,'beta')|isfield(unfold,'beta_nodc'),'error: to use autodetect at least the field unfold.beta  or unfold.beta_nodc needs to exist')
     fn = fieldnames(unfold);
-
+    
     if isfield(unfold,'beta')
         sizeBeta = size(unfold.beta);
     else
@@ -89,37 +93,11 @@ elseif cfg.deconv==0
     betaSetName = {'beta_nodc'};
 else
     betaSetName = {'beta'};
-
+    
 end
 
 
-% In this function we subselect points at which splines/continuous regressors are supposed to be plotted
-% First checks for splines, second checks whether the splines have been
-% converted to the value-domain. if not, we plot the spline beta as is
-% TODO: This has to be adapted that continuous variables can be plotted as
-% well evaluated at some parameter values. I think we should think about
-% this in general - when to convert beta-parameter estimates to actual
-% values?! Maybe only here? not in the beta2unfold?
-
-% TODO: Bug if different spline-numbers are used
-if any(strcmp(unfold.deconv.variableType,'spline')) && size(unfold.(betaSetName{1}),3) > size(unfold.deconv.predictorSplines{1}.spline2val,2)
-unfold = dc_getParam(unfold,cfg);
-end
-
-
-
-%% Make plot
-if cfg.figure && isempty(cfg.gramm)
-
-    if isfield(unfold,'chanlocs') && ~isempty(unfold.chanlocs)
-        channame = unfold.chanlocs(cfg.channel).labels;
-    else
-        channame = num2str(cfg.channel);
-    end
-    figure('name',sprintf('unfold-toolbox channel %s',channame))
-end
-clear g
-
+%% Prepare data
 % select parameters to plot, or else plot all available
 
 if isempty(cfg.plotParam)
@@ -132,10 +110,10 @@ else
     paramList = {};
     for c = cfg.plotParam
         hits = find(strcmp(c, {unfold.epoch.name}));
-       paramIdx = [paramIdx hits];
-       paramList = [paramList {unfold.epoch(hits).name}];
+        paramIdx = [paramIdx hits];
+        paramList = [paramList {unfold.epoch(hits).name}];
     end
-
+    
 end
 
 % add the variable names for the plot
@@ -149,13 +127,18 @@ value = [unfold.epoch(paramIdx).value];
 value(isnan(value)) = 0; %categorical variables are nan, we need to convert
 
 
+if cfg.add_average
+    unfold_new = dc_beta2unfold(unfold,'channel',cfg.channel);
+    unfold_avg = dc_getParam(unfold_new,'auto_method','average');            
+end
+
 %the linetype, it is used when the intercept is added to differentiate
 %between intercept and actual factor
 % linetype = ones(1,size(data,3));
 plotData = []; plotLinestyle = {}; plotColLabel = [];plotName = [];plotEvent=[];plotValue = [];
 for bName =betaSetName
     data = permute(unfold.(bName{1})(cfg.channel,:,paramIdx),[2 3 1]); % squeeze transposes, if paramIDX and channel is 1
-
+    
     if ~isempty(cfg.baseline)
         fprintf('performing baseline correction \n')
         data = bsxfun(@minus,data,mean(data((unfold.times>=cfg.baseline(1))& (unfold.times<cfg.baseline(2)),:),1));
@@ -163,21 +146,51 @@ for bName =betaSetName
     if length(size(unfold.(bName{1}))) == 2
         data = data';
     end
-
-
-
+    
+    
+    
     plotLinestyle = [plotLinestyle repmat({'Predictor'},1,size(data,2))];
     plotColLabel = [plotColLabel repmat(bName,1,size(data,2))];
     plotName = [plotName paramList];
     plotEvent = [plotEvent event];
     plotValue = [plotValue value];
-    if cfg.add_intercept || cfg.include_intercept
-
+    if cfg.add_average
+        for e = unique(event)
+            % check if predictor and event combination exists
+            eventIdx = find(strcmp(e,event));
+            eventParam = paramList(eventIdx);
+            for p = unique(eventParam)
+                % Find the names & types of the other parameters
+                currEvent = eventIdx(strcmp(p,eventParam));
+                otherEvents = setdiff(eventIdx,currEvent);
+                otherParamNames = unique(paramList(otherEvents));
+                unfoldavg_ix = [];
+                for pOther = otherParamNames
+                    unfoldavg_ix(end+1) = find(strcmp(pOther{1},{unfold_avg.epoch.name}));
+                end
+                % exclude all categoricals.
+                % they should be covered by the effects/dummy coding schema
+                % already ?!
+                removeix = strcmp('categorical',{unfold_avg.epoch(unfoldavg_ix).type});
+                unfoldavg_ix(removeix) = [];
+                % calculate the marginal over all other predictors
+                average_otherEffects = squeeze(sum(unfold_avg.(bName{1})(1,:,unfoldavg_ix),3));
+                
+                % add this marginal to the current predictor                
+                data(:,addToIdx) = data(:,addToIdx) + average_otherEffects;
+                
+            end
+        end
+    end
+    if cfg.add_intercept || cfg.include_intercept 
+        
         for e  = unique(event)
             %is there an intercept?
             eventIdx =  strcmp(event,e);
+
             interceptIdx = cellfun(@(x)~isempty(x),strfind({unfold.epoch(paramIdx).name},'(Intercept)'));
             if sum(interceptIdx) == 0
+                warning('no intercept found, did you select a parameter but not the intercepts?')
                 continue
             end
             if sum(eventIdx&interceptIdx)>1
@@ -185,10 +198,9 @@ for bName =betaSetName
             end
             %extract it
             betaIntercept = data(:,eventIdx&interceptIdx);
-
-            %on which betas do we have to add it?
+            
+            
             addToIdx = find(eventIdx&~interceptIdx);
-            %             add = size(data,2);
 
             if cfg.add_intercept
                 %add it
@@ -202,7 +214,8 @@ for bName =betaSetName
                 %                 end
             end
             if cfg.include_intercept
-
+                % This is mostly useful for categorical factors
+                
                 % we need another entry for each subplot, thus we copy
                 % everything over
                 plotLinestyle = [plotLinestyle repmat({'intercept'},1,length(addToIdx))];
@@ -210,28 +223,40 @@ for bName =betaSetName
                 plotEvent = [plotEvent event(addToIdx)];
                 plotValue = [plotValue zeros(1,length(addToIdx))];
                 plotColLabel= [plotColLabel repmat(bName,1,length(addToIdx))];
-
+                
                 % we add the data in the end
                 data(:,(end+1):(end+length(addToIdx))) =  repmat(betaIntercept,1,length(addToIdx));
-            
-
+                
+                
             end
         end
     end
-
+    
     plotData = cat(2,plotData,data);
-
+    
 end
 
+%% Make figure
+
+
+if cfg.figure && isempty(cfg.gramm)
+    
+    if isfield(unfold,'chanlocs') && ~isempty(unfold.chanlocs)
+        channame = unfold.chanlocs(cfg.channel).labels;
+    else
+        channame = num2str(cfg.channel);
+    end
+    figure('name',sprintf('unfold-toolbox channel %s',channame))
+end
+clear g
 
 
 
 % Combine name + event incase we plot everything in one plot
 plotLabel = cellfun(@(x,y)[x '@' y],plotName,plotEvent,'UniformOutput',0);
-
-
 rowName = plotLabel;
 
+% Should all axis be the same?
 switch cfg.sameyaxis
     case 'all'
         facet_scale = 'fixed';
@@ -241,12 +266,15 @@ switch cfg.sameyaxis
         facet_scale = 'independent';
 end
 
+% Generate gramm, update old one if it exists
 if isempty(cfg.gramm)
     g = gramm('x',unfold.times,'y',plotData','group',plotLabel,'color',plotValue,'linestyle',plotLinestyle);
 else
     g = cfg.gramm;
     update(g,'x',unfold.times,'y',plotData','group',plotLabel,'color',plotValue,'linestyle',plotLinestyle);
 end
+
+% which variables should be plotted in new figures?
 switch cfg.plotSeparate
     case 'all'
         g.fig(rowName);
@@ -256,11 +284,14 @@ switch cfg.plotSeparate
         rowName = plotName;
     case 'none'
         rowName = rowName;
-
+        
 end
 
+% the actuall plotting things
 facet_grid(g,plotColLabel,rowName,'scale',facet_scale);
-geom_line(g);%,'alpha',0.1);
+geom_line(g);
+
+% give us continuous colors!
 if length(unique(plotValue))>3
     set_continuous_color(g,'colormap','viridis');
 end

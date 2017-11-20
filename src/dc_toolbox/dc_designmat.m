@@ -94,7 +94,7 @@ cfg = finputcheck(varargin,...
     'formula','',[],[];...
     'eventtype','',[],[];...
     'spline','cell',[],{};...
-    'splinespacing','string',{'linear','log','quantile','logreverse'},'quantile';
+    'splinespacing','string',{'linear','quantile'},'quantile';
     'codingschema','string',{'effects','reference'},'reference';
     },'mode','ignore');
 
@@ -205,26 +205,32 @@ fprintf('Modeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
 catRegexp = 'cat\((.+?)\)';
 splRegexp = 'spl\((.+?)(,.+?)+?\)';
 
+% remove all whitespace
+cfg.formula = regexprep(cfg.formula,'[\s]','');
 
 splInteraction= [ regexp(cfg.formula,['2(\*|\:)[\s]*?' splRegexp]) regexp(cfg.formula,[splRegexp '[\s]*?(\*|\:)'])];
 if ~isempty(splInteraction)
     error('Spline-Interactions are not supported')
 end
 
-
-
-
-splRegexp = 'spl\((.+?)(,.+?)+?\)';
 cat  = regexp(cfg.formula,catRegexp,'tokens');
 spl = regexp(cfg.formula,splRegexp,'tokens');
 
 for s = 1:length(spl)
+    if length(spl{s})~=2 
+        error('error while parsing formula. wrongly defined spline in: %s. Needs to be: spl(your_eventname,10)',cfg.formula)
+    end
     spl{s}{2} = str2num(strrep(spl{s}{2},',',''));
+    
 end
 cfg.spline = [cfg.spline spl];
 
 cfg.categorical = [cfg.categorical cellfun(@(x)x{1},cat,'UniformOutput',0)];
+
+% remove the 'cat()' from cat(eventA) so that only 'eventA' remains
 f2= regexprep(cfg.formula, catRegexp,'$1');
+
+% remove the spl(splineA) completly
 f2= regexprep(f2,['(\+|\*)[\s]*?' splRegexp],'');
 
 % We need to replace the term before the ~ by something that matlab sorts
@@ -404,93 +410,17 @@ if any(cols2variableNames)<1
     % one level. I therefore added this check
     error('this error can occur if one of the predictors you specified had only one level/value')
 end
-%% Add the extra defined splines. In the end I want something like y ~ x1 + x2*x3 + s(x4) to be parsed correctly... but this is more difficult to implement
+%% Add the extra defined splines
 EEG.deconv.predictorSplines = [];
 if ~isempty(cfg.spline)
     
     for s = 1:length(cfg.spline)
-        spl = [];
-        spl.paramValues = t{:,cfg.spline{s}{1}};
-        spl.nSplines = cfg.spline{s}{2};
-        %spl.range = range(spl.paramValues);
-        spl.min = min(spl.paramValues);
-        spl.max= max(spl.paramValues);
-        spl.name = [cfg.spline{s}{1}];
-        % We find the smallest increase to get an idea of the resolution we
-        % need to define the splines
         
-        nanlist = [];
+        [spl,nanlist] = dc_designmat_spline(t,cfg.spline{s},cfg);
         
-        spl.spline2val = linspace(spl.min,spl.max,100*spl.nSplines);
-        %spl.spline2val = spl.min:min(b):spl.max;
-        for k = 1:length(spl.paramValues)
-            if isnan(spl.paramValues(k)) && ~isempty(t.type{k})
+        X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
+        X = [X spl.X]; % add spline columns
                 
-                warning('nan found @ %s, event:%i \n currently no support for nan-value in splines. setting it to 0.',cfg.spline{s}{1},k)
-                
-                nanlist = [nanlist k];
-                spl.spline2val_idx(k)=1; % this is only temporary, we will remove it after indexing again
-                continue
-            end
-            [~,spl.spline2val_idx(k)] = (min(abs(spl.spline2val- spl.paramValues(k))));
-        end
-        knots = [];
-        
-        
-        switch cfg.splinespacing
-            case 'linear'
-                knots = linspace(1,length(spl.spline2val),spl.nSplines-2);
-            case 'log'
-                knots = logspace(log10(1),log10(length(spl.spline2val)),spl.nSplines-2);
-            case 'logreverse'
-                knots = logspace(log10(1),log10(length(spl.spline2val)),spl.nSplines-2);
-                knots = sort(length(spl.spline2val) - (knots-1));
-            case 'quantile'
-                % here we are not working on 0 to X (e.g. X could be 1500 = nSplines*100) but we calculate the
-                % quantiles on the predictor data
-                knots = quantile(spl.paramValues,linspace(0,1,spl.nSplines-2));
-                % now we have to find where the quantiles are in the 0:X
-                % space.
-                for k = 1:length(knots)
-                    [~,knots(k)] = (min(abs(spl.spline2val- knots(k))));
-                end
-        end
-        % we add 3 knots (because cubic, 4th order splines) in the
-        % beginning and the end.
-        knots = [repmat(knots(1),1,3) knots repmat(knots(end),1,3)];
-        spl.basis = Bernstein(1:length(spl.spline2val),knots,[],4); % 4 is the order
-        spl.basis(end,end) = 1; % there seems to be a bug in the above function. The last entry should be 1 and not 0
-        
-        %%
-        if ~strcmp(cfg.codingschema,'effects')
-            warning('For splines only effects coding is implemented. The intercept will represent the value at the spline most closely to the mean')
-        end
-        [~,killThisSpline] = max(spl.basis(get_min(nanmean(spl.paramValues),spl.spline2val),:)); % we remove the spline that is closed to the mean value, thus it will kind of be like an effects coding?
-        fprintf('The intercept for the effect %s has its peak at %f\n',spl.name,nanmean(spl.paramValues))
-        %         else
-        %             killThisSpline = 1;
-        %         end
-        spl.basis(:,killThisSpline) = [];
-        
-        spl.X= spl.basis(spl.spline2val_idx,:);
-        spl.X(nanlist,:) = 0; % remove the nans
-        X(nanlist,:) = 0; % and remove them from the designmatrix (see warning above)
-        
-        spl.nSplines = size(spl.X,2); % knots might change due to the create_splines_linspace internal function
-        X = [X spl.X];
-        
-        
-        
-        rawColnames = repmat({spl.name},1,spl.nSplines);
-        % find the max of each spline (the value that best represents this
-        % predictor-term
-        [~,I] = max(spl.basis,[],1);
-        maxSplVal = spl.spline2val(I);
-        
-        % round to two significant digits:
-        tmpSplVal = 2-floor(log10(abs(maxSplVal)));
-        tmpSplVal(tmpSplVal<0) = 0;
-        spl.colnames = cellfun(@(x,signPoint,y)sprintf('%s_%.*f',x,signPoint,y),rawColnames,num2cell(tmpSplVal),num2cell(maxSplVal),'UniformOutput', 0);
         colnames = [colnames  spl.colnames]; % TODO change the name so that each column depicts the mean value of the spline in addition
         variableNames = [variableNames {spl.name}];
         

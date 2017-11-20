@@ -3,8 +3,8 @@ function varargout = dc_unfold2csv(unfold,varargin)
 % returns a data-table
 %
 %Arguments:
-%   cfg.deconv (boolean): Use the deconv betas (deconv.dcBeta) or the
-%                         no-deconv betas(deconv.XBeta)
+%   cfg.deconv (boolean): Use the deconv betas (deconv.beta_dc) or the
+%                         no-deconv betas(deconv.beta_nodc)
 %   cfg.channel (integer): (Default: All channels) Limit to a list of specific channels
 %
 %   cfg.filename: filename for the csv file. if empty, only returns table

@@ -23,6 +23,8 @@ dc_designmat(EEGsim,cfgDesign);
 cfgDesign.formula{1} = 'a ~1';
 dc_designmat(EEGsim,cfgDesign);
 
+cfgDesign.formula{3} = 'a ~1+  spl(splineA ,5)'; % #3
+dc_designmat(EEGsim,cfgDesign);
 %% test two events with same predictorName
 for e = 1:length(EEGsim.event)
    EEGsim.event(e).evt = e; 
