@@ -88,7 +88,7 @@ for e = 1:length(EEG.event)
         % Trigger is not in design
         continue
     end
-    s = ismember(EEG.deconv.col2eventtype,evtIx);
+    s = ismember(EEG.deconv.cols2eventtype,evtIx);
     
     % Copy over the correct columns at the right time
     eventvec(s,round(EEG.event(e).latency)) = EEG.deconv.X(e,s);

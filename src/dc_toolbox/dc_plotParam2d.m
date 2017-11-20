@@ -42,19 +42,19 @@ for p = 1:length(paramIdx)
     if ~isempty(cfg.plotParam) && sum(strcmp(varName,cfg.plotParam))==0
         continue
     end
-    ix = strcmp(varName,{unfold.epoch.name});
-    val = [unfold.epoch.value];
+    ix = strcmp(varName,{unfold.param.name});
+    val = [unfold.param.value];
     
     b = squeeze(unfold.(cfg.betaSetName)(cfg.channel,:,:));
     if cfg.add_intercept
         % get eventtname of current predictor
-        evtType =  unfold.deconv.col2eventtype(paramIdx);
+        evtType =  unfold.deconv.cols2eventtype(paramIdx);
         % combine it in case we have multiple events
         evtType = strjoin_custom(unfold.deconv.eventtype{evtType},'+');
-        % find the events in unfold.epoch
-        epochStr = cellfun(@(x)strjoin_custom(x,'+'),{unfold.epoch(:).event},'UniformOutput',0);
+        % find the events in unfold.param
+        epochStr = cellfun(@(x)strjoin_custom(x,'+'),{unfold.param(:).event},'UniformOutput',0);
         % check the event to be the same & that it is an intercept
-        interceptIdx = strcmp(evtType,epochStr) & strcmp('(Intercept)',{unfold.epoch(:).name});
+        interceptIdx = strcmp(evtType,epochStr) & strcmp('(Intercept)',{unfold.param(:).name});
         
         if sum(interceptIdx) ~= 1
             error('could not find the intercept you requested (predictor:%s',varName)

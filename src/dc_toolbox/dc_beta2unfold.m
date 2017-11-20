@@ -21,7 +21,7 @@ function output = dc_beta2unfold(EEG,varargin)
 %Return:
 %   unfold.beta= (nchans x time x parameters)
 %   unfold.beta_nodc = (nchans x time x parameters) (only if deconv=0 or -1)
-%   unfold.epoch = (struct size: parameters) each field contains the values of the respective parameter.
+%   unfold.param = (struct size: parameters) each field contains the values of the respective parameter.
 %   unfold.deconv = EEG.deconv
 %   unfold.times = EEG.times
 %   unfold.chanlocs = EEG.chanlocs
@@ -30,7 +30,7 @@ function output = dc_beta2unfold(EEG,varargin)
 %
 %unfold = dc_beta2unfold(EEG)
 %
-%unfold.epoch(X):
+%unfold.param(X):
 %
 %* name: name of the variable, e.g.: 'continuousA'
 %* value: value of the predictor, e.g. '50'
@@ -132,7 +132,7 @@ for pred = paramList
         value(loopRunner) = nan;
         name(loopRunner)= EEG.deconv.colnames(pred);
     end
-    event(loopRunner)= EEG.deconv.eventtype(EEG.deconv.col2eventtype(pred));
+    event(loopRunner)= EEG.deconv.eventtype(EEG.deconv.cols2eventtype(pred));
     type(loopRunner) = EEG.deconv.variableType(EEG.deconv.cols2variableNames(pred));
     loopRunner = loopRunner+1;
 %     end
@@ -152,7 +152,7 @@ if isfield(EEG,'chanlocs')
 else
     warning('no chanlocs found')
 end
-output.epoch = struct('value',num2cell(value),'name',name,'event',event,'type',type);
+output.param = struct('value',num2cell(value),'name',name,'event',event,'type',type);
 if isfield(EEG,'chanlocs')&&~isempty(EEG.chanlocs)
     output.chanlocs= EEG.chanlocs(cfg.channel);
 end

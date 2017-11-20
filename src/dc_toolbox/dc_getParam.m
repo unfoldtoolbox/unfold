@@ -15,7 +15,8 @@ function output = dc_getParam(unfold,varargin)
 %       parameterdomain
 %   cfg.auto_method(string): 'quantile' (default) or 'linear'.
 %       'quantile' - the auto_n values are placed on the quantile of the predictor
-%       'linear'   - the auto_n
+%       'linear'   - the auto_n values are placed linearly over the range of the predictor
+%       'average'  - only evaluates at the average of the predictor
 %   cfg.auto_n (integer) : default 7; the number of automatically evaluated values
 %
 %Return:
@@ -36,7 +37,7 @@ if(ischar(cfg)); error(cfg);end
 
 % check if function has been run before
 % this will lead to mistakes and errors because some betas will not be the betas we expect anymore - don't allow that!
-if any(cellfun(@(x)~isempty(x),strfind({unfold.epoch.type},'converted')))
+if any(cellfun(@(x)~isempty(x),strfind({unfold.param.type},'converted')))
     error('cannot run dc_getParam twice. Run dc_beta2unfold again first')
 end
 
@@ -101,7 +102,7 @@ elseif cfg.deconv == 0
 end
 
 betaNew = [];
-epochNew = unfold.epoch(1); %needs to be removed
+epochNew = unfold.param(1); %needs to be removed
 for currPred= 1:length(paramList)
     predIDX = paramList(currPred);
     
@@ -117,7 +118,7 @@ for currPred= 1:length(paramList)
     
     b = beta(:,:,predIDX:predIDX_next);
     
-    e = unfold.epoch(predIDX);
+    e = unfold.param(predIDX);
     
     if strcmp(unfold.deconv.variableType{variableIdx},'spline')
         
@@ -158,7 +159,7 @@ for currPred= 1:length(paramList)
                     betaNew(chan,:,end) =result;
                 end
             end
-            % the event is already saved in 'e' (unfold.epoch(predIDX))
+            % the event is already saved in 'e' (unfold.param(predIDX))
             
             eNew = e;
             eNew.value = splValueSelect(c);
@@ -208,7 +209,7 @@ if cfg.deconv
 else
     unfold.beta_nodc = betaNew;
 end
-unfold.epoch = epochNew;
+unfold.param = epochNew;
 output = unfold;
 
 end
