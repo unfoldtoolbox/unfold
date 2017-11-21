@@ -28,6 +28,7 @@ switch type
         EEG = simulate_data(signals,'srate',200,'basis','hanning');
         
         rng(sprev) % reset random generator to previous seed
+        EEG.times = []; 
         EEG = eeg_checkset(EEG);
         % renaming events for better interpretability
         for e = 1:length(EEG.event)
