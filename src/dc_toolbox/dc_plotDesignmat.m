@@ -26,6 +26,7 @@ cfg = finputcheck(varargin,...
     'addContData','boolean',[0,1],0;... %undocumented, adds y-data as a subplot
     },'mode','ignore');
 
+assert(~(cfg.timeexpand & cfg.sort),'cannot plot Xdc sorted')
 
 if cfg.timeexpand
     yAxisLabel = 'time [s]';
@@ -33,10 +34,13 @@ if cfg.timeexpand
     % center the plotting window around some event in middle of EEG.event
     % If we center instead around some fixed latency (e.g. middle of recording)
     % there may not be any experimental events around to see.
-    % [note: this does not guarantee that the "midEvent" is one that is 
-    % modeled in the linear model]
-    ix_midEvent = round(length(EEG.event)/2); % take "center" event
-    midEventSmp = EEG.event(ix_midEvent).latency;
+
+    
+    modeledEvents = [EEG.deconv.eventtype{:}];
+    eventstruct = EEG.event;
+    eventstruct(~ismember({eventstruct.type},modeledEvents)) = [];
+    ix_midEvent = round(length(eventstruct)/2); % take "center" event
+    midEventSmp = eventstruct(ix_midEvent).latency;
     midEventLat = EEG.times(midEventSmp); % in ms
     
     % time_lim = EEG.times(ceil(end/2)) + [-100,100] * 1000;
@@ -60,7 +64,10 @@ else
     
 end
 if cfg.logColor
-    X = log(X);
+    Xpos = X(:)>0;
+    Xneg = X(:)<0;
+    X(Xpos) = log(X(Xpos));
+    X(Xneg) = -log(-X(Xneg));
 end
 
 if cfg.sort
@@ -79,18 +86,41 @@ end
 ig = imagesc(1:nPred,yAxis,X);
 ax = get(ig,'parent');
 
+%custom colormap
+cmap = cbrewer('div','RdBu',100);
+cmap=cmap(end:-1:1,:); %to have blue negative, red pos
+colormap(cmap);
+
+%force symmetric colorscale
+cl = get(gca,'clim');
+cl = max(abs(cl));
+set(gca,'clim',[-cl cl])
+
 r = linspace(0,nPred,nPredTheory*2+1);
 set(ax,'XTick',r(2+shiftByOne:2:end))
-set(ax,'XTickLabel',EEG.deconv.colnames)
-set(ax,'TickLabelInterpreter','none')
-%set(ax,'YDir','normal')
+
+eventlabtmp = cellfun(@(x)['evt:' strjoin(x,'+')],EEG.deconv.eventtype,'UniformOutput',0);
+eventlabels = eventlabtmp(EEG.deconv.cols2eventtype);
+predlabels = EEG.deconv.colnames;
+
+% escape underscores
+escapeString = @(tStr)regexprep(tStr,'(_)','\\$1');
+
+% concatenate event and predictorlabel
+xlab = cellfun(@(pred,evt)[escapeString(evt) '\newline' escapeString(pred)],predlabels,eventlabels,'UniformOutput',0);
+
+
+set(ax,'XTickLabel',xlab)
+set(ax,'XTickLabelRotation',45);
 set(ax,'YDir','reverse') % event number or time flow from top to bottom in plotted design matrix
+set(ax,'box','off')
+
 ylabel(ax,yAxisLabel)
 
 colorbar
 
 if length(r)>3
-    vline(r(3+shiftByOne:2:end-1),'-r')
+    vline(r(3+shiftByOne:2:end-1),'-k')
 end
 
 
@@ -119,16 +149,48 @@ if cfg.timeexpand
         lat = [EEG.event(:).latency]/EEG.srate*1000; % in ms
         
         % look for event latencies of events in the plotted region
-        latix = (lat < (time_lim(2))) & (lat > (time_lim(1)));
+        latix = find((lat < (time_lim(2))) & (lat > (time_lim(1))));
                     
         % plot all event onsets as horizontal lines with different colors per event
-        if sum(latix) > 0 && sum(latix) < 1000 % only do this if less than 1000 events (otherwise buggy)
+        if ~isempty(latix) && length(latix) < 1000 % only do this if less than 1000 events (otherwise buggy)
             
             [un,~,c] = unique(allTypes(latix));
-            colorList = repmat({{'r','g','b','c','m','y','k','w'}},ceil(length(un)/8),1); % ugly and lazy... but who has more than that different types...
-            colorList = [colorList{:}];
-            hline(lat(latix)/1000,colorList(c))
+            makeGray = ~ismember(un,modeledEvents);
+            colorList = cbrewer('qual','Set1',length(un));
+            legendlist = {};
+            for ev = 1:length(un)
+                eventlat = lat(latix(c==ev))/1000;
+                if isempty(eventlat)
+                    continue
+                end
+                if ismember(ev,find(makeGray))
+                    col = [0.9 0.9 0.9];
+                else
+                    col = colorList(ev,:);
+                end
+                lineProp = {'color',col};
+                if length(eventlat) > 1
+                    lineProp = repmat({lineProp},length(eventlat),1);
+                end
+                
+                hh = hline(eventlat,'','',lineProp);
+                legendlist{end+1,1} = un{ev};
+                legendlist{end,2} = ismember(ev,find(makeGray));
+                legendlist{end,3} = hh(1);
+                
+                
+            end
+             if ~isempty(makeGray)
+            legendlist{end+1,1} = 'non-modeled';
+            legendlist{end,2} = 0;
+            legendlist{end,3} = legendlist{find([legendlist{:,2}],1),3};
+            legendlist(find([legendlist{:,2}]),:) = [];
+
+            
+             end
+        legend([legendlist{:,3}],[legendlist(:,1)])
         end
+       
         
         % change ylim to zoom in to the event that is in middle of cut data
         %latTmp = lat(latix);
