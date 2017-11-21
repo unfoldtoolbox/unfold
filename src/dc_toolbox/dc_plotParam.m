@@ -136,13 +136,13 @@ value(isnan(value)) = 0; %categorical variables are nan, we need to convert
 
 
 if cfg.add_average
+    % necessary to add the average of the splines, i.e. simulate a marginal plot
     unfold_new = dc_beta2unfold(unfold,'channel',cfg.channel);
-    unfold_avg = dc_getParam(unfold_new,'auto_method','average');            
+    unfold_avg = dc_getParam(unfold_new,'auto_method','average');
 end
 
-%the linetype, it is used when the intercept is added to differentiate
+%the linestyle, it is used when the intercept is added to differentiate
 %between intercept and actual factor
-% linetype = ones(1,size(data,3));
 plotData = []; plotLinestyle = {}; plotColLabel = [];plotName = [];plotEvent=[];plotValue = [];
 for bName =betaSetName
     data = permute(unfold.(bName{1})(cfg.channel,:,paramIdx),[2 3 1]); % squeeze transposes, if paramIDX and channel is 1
@@ -185,20 +185,20 @@ for bName =betaSetName
                 removeix = strcmp('categorical',{unfold_avg.param(unfoldavg_ix).type});
                 unfoldavg_ix(removeix) = [];
                 % calculate the marginal over all other predictors
-                average_otherEffects = squeeze(sum(unfold_avg.(bName{1})(1,:,unfoldavg_ix),3));
+                average_otherEffects = squeeze(sum(unfold_avg.(bName{1})(:,:,unfoldavg_ix),3));
                 
-                % add this marginal to the current predictor                
+                % add this marginal to the current predictor
                 data(:,currEvent) = data(:,currEvent) + average_otherEffects';
                 
             end
         end
     end
-    if cfg.add_intercept || cfg.include_intercept 
+    if cfg.add_intercept || cfg.include_intercept
         
         for e  = unique(event)
             %is there an intercept?
             eventIdx =  strcmp(event,e);
-
+            
             interceptIdx = cellfun(@(x)~isempty(x),strfind({unfold.param(paramIdx).name},'(Intercept)'));
             if sum(interceptIdx) == 0
                 warning('no intercept found, did you select a parameter but not the intercepts?')
@@ -212,21 +212,13 @@ for bName =betaSetName
             
             
             addToIdx = find(eventIdx&~interceptIdx);
-
+            
             if cfg.add_intercept
                 %add it
                 data(:,addToIdx) = bsxfun(@plus,data(:,addToIdx),betaIntercept);
-                %                 if cfg.deconv == -1
-                %                     % if we have two rows, (that means deconv and no-deconv), we
-                %                     % have to add the intercept also to the second row
-                %                     betaIntercept_nodeconv = data(:,:,find(interceptIdx)+add);
-                %
-                %                     data(:,:,addToIdx+size(unfold.beta,3)) = bsxfun(@plus,data(:,:,addToIdx+size(unfold.beta,3)),betaIntercept_nodeconv);
-                %                 end
             end
             if cfg.include_intercept
                 % This is mostly useful for categorical factors
-                
                 % we need another entry for each subplot, thus we copy
                 % everything over
                 plotLinestyle = [plotLinestyle repmat({'intercept'},1,length(addToIdx))];

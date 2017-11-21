@@ -2,7 +2,7 @@ function ax = dc_plot2nd(d2nd,varargin)
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[];
     'baseline','real',[],[];
-    'plotParam','cell',[],{};
+    'plotParam','',[],[];
     'bootci','boolean',[],1;
     'singlesubjects','boolean',[],1;
     
@@ -15,7 +15,7 @@ assert(isstruct(d2nd),'input need to be a struct of subjects')
 % assert(size(beta,4) ~= 1,'multiple subjects need to be present')
 
 % TODO: preselct by PlotParam
-if any(strcmp(d2nd.deconv.variableType,'spline'))
+if any(cellfun(@(x)~isempty(x),strfind({d2nd.param.type},'spline')))
     cfg.withSpline = 1;
 else
     cfg.withSpline = 0; %allows for faster method
@@ -98,5 +98,5 @@ d2nd2 = d2nd;
 d2nd2.beta = mean(d2nd2.beta(:,:,:,:),4);
 d2nd2.beta_nodc = mean(d2nd2.beta_nodc(:,:,:,:),4);
 
-g = dc_plotParam(d2nd2,cfgPlot);
+ax = dc_plotParam(d2nd2,cfgPlot);
 
