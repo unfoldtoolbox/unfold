@@ -20,7 +20,8 @@ Documentation
    :maxdepth: 4
 
    overview
-   tutorials
+   contenttutorials
+   toolboxtutorials
    documentation
 
 

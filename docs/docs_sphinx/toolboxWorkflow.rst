@@ -5,37 +5,36 @@ We start with continuous data with events that mark times in the data that are o
 
 
 Definition of the design (`dc_designmat`)
-  We first need to define which triggers (let's assume we have an event type 'stimulus' and one 'keypress') should be included in the deconvolution. Because each event could belong to a different condition, which again could be different for stimuli/keypresses, we can define a simple formula for each event. These formulas are commonly used in `R` and also matlab and are called Wilkinson-Formulas. They allow to easily specify very simple designs, e.g. 2x2 with only categorical, but also continuous variables, spline-based (additive models, GAM) and mixture between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as `X`) for your design-specifications.
+  We first need to define which event should be included in the deconvolution. Let's assume we have an event type 'stimulus' and one 'keypress'. We first define a formula for each event. These formulas are commonly used in `R` and also matlab and are called Wilkinson-Formulas. They allow to easily specify model-designs, e.g. 2x2 categorical linear model with interaction; continuous variables, spline-based (additive models, GAM) and mixtures between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as `X`) for your design-specifications.
 
 
-Timeexpand of the designmatrix (`dc_timeexpandDesignmat`)
+Timeexpansion of the designmatrix (`dc_timeexpandDesignmat`)
   In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated. The resulting timeexpanded/expanded designmatrix is denoted as `dcX`.
 
 
 Fitting the model (`dc_glmfit`)
-  There are multiple ways to fit the expanded designmatrix `dcX`. The unfold-toolbox offers a memory-friendly iterative least squares algorithm, default matlab pseudo-inverse and regularized glmnet (LASSO,ridge-regression and elastic-net).
+  There are multiple ways to fit the expanded designmatrix `dcX`. The unfold-toolbox offers a memory-friendly iterative least squares algorithm (lsmr), default matlab pseudo-inverse and regularized glmnet (LASSO,ridge-regression and elastic-net).
 
 
-Transforming parameters (dc_beta2unfold)
-  (optional) In some cases, e.g. using time-basis functions (splines/fourier) or when using spline-nonlinear predictors, it is helpful to transform the estimated parameters back to their native space. For example if we use 10 time-splines instead of 100 sample points, we receive 10 parameter-estimate (betas). In this case we want to transform the 10 betas back to the domain of 100 samples. This increases the interpretation. This step is also possible for continuous predictors, but because a slope is readily interpretable, not as necessary.
+Extracting parameters (dc_beta2unfold)
+  This step extracts the betas, transforms them if necessary, and returns a cleaned-up output structure. When using time-basis functions (splines/fourier) we need to transform the estimated betas back to their native time-space. For example if we use 10 time-splines instead of 100 sample points, we receive 10 parameter-estimate (betas). In this case we want to transform the 10 betas back to the domain of 100 samples.
 
 
 Plotting (e.g. `dc_plotParam`)
   The toolbox offers multiple functions to explore also quite complex designs. These functions work on 1D (ERP-like), 2D (erpimage-like) or as timeseries of topoplots.
 
 Group-Level Statistics
-  Most commonly users estimate the parameters for all subjects and then test the parameters against an H0 of no effect. If no prior knowledege on the time/location of the effect is known, we recommend to use cluster-permutation based statistics. We recommend the EPT-TFCE toolbox which we included in our toolbox for convenience. The toolbox currently does not have functions to do single-subject statistics.
+  Most commonly users estimate the parameters for all subjects and then test the parameters against an H0 of no effect. If no prior knowledege on the time/location of the effect is known, we recommend to use cluster-permutation based statistics. We recommend the EPT-TFCE toolbox. We focus on single subject beta-estimates and leave the statistics up to the user.
 
 Specification for Input-Data
 =============================
 Data need to be in continuous form. We use the default format of EEG.
 
-
 The minimal required fields (the usual EEGlab-structure) are:
 
 * EEG.data (chan x time)
 
-* EEG.times (vector of time points)
+* EEG.times (vector of time points in milliseconds)
 
 * EEG.srate (samplingrate in Hz)
 
@@ -75,8 +74,7 @@ Explanation of all variable fields
 Fields of `EEG.deconv`
 ----------------------
 
-effects_mean
-  In case of effects coding contains the mean of the designmatrix columns. We do not want to keep the original event structure around, thus we save this information here
+
 
 predictorSplines
   all information on the splines are saved in here (see below). Splines are a bit more involved to describe, additional information needs to be saved
@@ -105,26 +103,29 @@ cols2eventtype
 eventtype
   The names of the events that are modeled. Only interesting if multiple different events were modeled.
 
-dcX
+Xdc
   Timeexpanded designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of `dc_timeexpandDesignmat`. If you need to modify this, have a look at `dc_designmat_addcol` to see which fields should be modified.
 
-dcBasis
+timebasis
   The basis-function of the timeexpand for the deconvolution. This matrix could be the identity matrix in case of "stick"/dirac-functions. Useful only for splines/fourier time-basis functions
 
-dcBasistime: [1×20 double]
+times: [1×20 double]
   A vector containing the time in seconds over what range the timeexpand occured. This encodes the time of the resulting ERP
 
-dcX_termidx
-  A list connecting the columns of `dcX` with columns of `X`
+Xdc_terms2cols
+  A list connecting the columns of `Xdc` with columns of `X`
 
-dcBeta
+beta_dc
   deconvolved betas. Output of `dc_glmfit`. This is the main outcome of this toolbox
+
+beta_nodc
+    non-deconvolved betas. This is a massive univariate fit where each timepoint and each electrode were fitted independently. Output of `dc_glmfit_nodc`
 
 channel
   for which channel the deconvolved betas have been calculated
 
-XBeta
-  non-deconvolved betas. This is a massive univariate fit where each timepoint and each electrode were fitted independently. Output of `dc_glmfit_nodc`
+effects_mean
+    In case of effects coding contains the mean of the designmatrix columns
 
 
 Fields of `unfold`
@@ -140,42 +141,33 @@ times
 chanlocs
   same as EEG.chanlocs
 
-epoch
-  a structure defining for each beta-value to what event and predictor it belong. In case 'convertsplines' was activated in `dc_beta2unfold` the spline-betas were evaluated at specified values, then these values are also saved here.
+param
+  a structure defining for each beta-value which event, what predictor, which variable-type and what the corresponding value is.
 
 beta_nodc
   the betas without deconvolution [channel x time x predictors]
+
 beta
   the betas with deconvolution [channel x time x predictors]
 
 Fields of `deconv.predictorSplines`
 ------------------------------------
 paramValues
-  [5988×1 double]
-
+  the parameter values of each event, e.g. for saccade amplitude: [1.3, 2.3, 6, 1.2 ...]
 nSplines
-  9
+  the number of splines used for modelling
 
-min
-  : -7.9975
+knots
+  the knot sequence. This is necessary to evaluate splines at a later point in time
 
-max
-  : 7.9782
-
-spline2val
-  : [1×1000 double]
-
-spline2val_idx
-  : [1×5988 double]
-
-basis
-  : [1000×9 double]
+removedSplineIdx
+  The index of the spline which was removed during spline-generation. It is necessary to remove one spline in order to not have any collinearities. Depending on configuration either a middle or the first spline is removed.
 
 X
-  : [5988×9 double]
+  the entries of X times the spline (i.e. the subset of X)
 
 name
-  : 'splineA'
+  name of the spline
 
 colnames
-  : {1×9 cell}
+  column names that the spline will get in EEG.deconv.X

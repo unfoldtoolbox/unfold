@@ -10,3 +10,4 @@ Toolbox Tutorials
 	toolbox-tut03
 	toolbox-tut04
 	toolbox-tut05
+	toolbox-tut06

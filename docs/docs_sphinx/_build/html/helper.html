@@ -85,22 +85,20 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#why-deconvolution">Why deconvolution?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#how-does-deconvolution-work">How does deconvolution work?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#why-deconvolution">Why deconvolution?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#how-does-deconvolution-work">How does deconvolution work?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut02.html">Longstart: 2x2 ANOVA</a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut03.html">Non-Linear Predictors using splines</a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut04.html">with deconvolution vs. without deconvolution</a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut05.html">Time-Basis functions</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut02.html">Longstart: 2x2 ANOVA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut03.html">Non-Linear Predictors using splines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut04.html">With and without deconvolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut05.html">Time-Basis functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut06.html">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="documentation.html">Function-documentation</a><ul class="current">
@@ -122,7 +120,8 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Toolbox Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="documentation.html">Function-documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="unfold.html">Unfold function documentation</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">Helper Functions</a></li>
@@ -158,7 +157,8 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Toolbox Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="documentation.html">Function-documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="unfold.html">Unfold function documentation</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">Helper Functions</a></li>
@@ -214,6 +214,84 @@ the current axes, close to the line, which reads &#8220;The Answer&#8221;.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="src.helper.insertrows">
+<code class="descclassname">src.helper.</code><code class="descname">insertrows</code><span class="sig-paren">(</span><em>A</em>, <em>B</em>, <em>ind</em><span class="sig-paren">)</span><a class="headerlink" href="#src.helper.insertrows" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>INSERTROWS - Insert rows into a matrix at specific locations</dt>
+<dd><blockquote class="first">
+<div><p>C = INSERTROWS(A,B,IND) inserts the rows of matrix B into the matrix A at
+the positions IND. Row k of matrix B will be inserted <em>after</em> position IND(k)
+in the matrix A. If A is a N-by-X matrix and B is a M-by-X matrix, C will
+be a (N+M)-by-X matrix. IND can contain non-integers.</p>
+<p>If B is a 1-by-N matrix, B will be inserted for each insertion position
+specified by IND. If IND is a single value, the whole matrix B will be
+inserted at that position. If B is a single value, B is expanded to a row
+vector. In all other cases, the number of elements in IND should be equal to
+the number of rows in B, and the number of columns, planes etc should be the
+same for both matrices A and B.</p>
+<p>Values of IND smaller than one will cause the corresponding rows to be
+inserted in front of A. C = INSERTROWS(A,B) will simply append B to A.</p>
+<p>If any of the inputs are empty, C will return A. If A is sparse, C will
+be sparse as well.</p>
+<p>[C, RA, RB] = INSERTROWS(...) will return the row indices RA and RB for
+which C corresponds to the rows of either A and B.</p>
+<dl class="docutils">
+<dt>Examples:</dt>
+<dd><dl class="first last docutils">
+<dt>% the size of A,B, and IND all match</dt>
+<dd>C = insertrows(rand(5,2),zeros(2,2),[1.5 3])</dd>
+<dt>% the row vector B is inserted twice</dt>
+<dd>C = insertrows(ones(4,3),1:3,[1 Inf])</dd>
+<dt>% matrix B is expanded to a row vector and inserted twice (as in 2)</dt>
+<dd>C = insertrows(ones(5,3),999,[2 4])</dd>
+<dt>% the whole matrix B is inserted once</dt>
+<dd>C = insertrows(ones(5,3),zeros(2,3),2)</dd>
+<dt>% additional output arguments</dt>
+<dd>[c,ra,rb] = insertrows([1:4].&#8217;,99,[0 3])
+c.&#8217;     % -&gt; [99 1 2 3 99 4]
+c(ra).&#8217; % -&gt; [1 2 3 4]
+c(rb).&#8217; % -&gt; [99 99]</dd>
+</dl>
+</dd>
+</dl>
+<p>Using permute (or transpose) INSERTROWS can easily function to insert
+columns, planes, etc:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>% inserting columns, by using the transpose operator:</dt>
+<dd>A = zeros(2,3) ; B = ones(2,4) ;
+c = insertrows(A.&#8217;, B.&#8217;,[0 2 3 3]).&#8217;  % insert columns</dd>
+<dt>% inserting other dimensions, by using permute:</dt>
+<dd>A = ones(4,3,3) ; B = zeros(4,3,1) ;
+% set the dimension on which to operate in front
+C = insertrows(permute(A,[3 1 2]), permute(B,[3 1 2]),1) ;
+C = ipermute(C,[3 1 2])</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+<p class="last">See also HORZCAT, RESHAPE, CAT</p>
+</dd>
+</dl>
+<p>version 3.0 (may 2016)
+(c) Jos van der Geest
+email: <a class="reference external" href="mailto:samelinoa&#37;&#52;&#48;gmail&#46;com">samelinoa<span>&#64;</span>gmail<span>&#46;</span>com</a>
+History:
+1.0, feb 2006 - created
+2.0, may 2008 - incorporated some improvements after being selected as
+&#8220;Pick of the Week&#8221; by Jiro Doke, and reviews by Tim Davis &amp; Brett:</p>
+<blockquote>
+<div><ul class="simple">
+<li>horizontal concatenation when two arguments are provided</li>
+<li>added example of how to insert columns</li>
+<li>mention behavior of sparse inputs</li>
+<li>changed &#8220;if nargout&#8221; to &#8220;if nargout&gt;1&#8221; so that additional outputs are
+only calculated when requested for</li>
+</ul>
+</div></blockquote>
+<p>3.0, may 2016 - updated to R2016a</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="src.helper.sparseconv">
 <code class="descclassname">src.helper.</code><code class="descname">sparseconv</code><span class="sig-paren">(</span><em>x</em>, <em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#src.helper.sparseconv" title="Permalink to this definition">¶</a></dt>
 <dd><p>SPARSECONV Speedy convolution of sparse vectors</p>
@@ -262,7 +340,7 @@ the current axes, close to the line, which reads &#8220;The Answer&#8221;.</p>
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Nov 20, 2017.<br/>
+      Last updated on Nov 22, 2017.<br/>
     </p>
   </div>
 </footer>

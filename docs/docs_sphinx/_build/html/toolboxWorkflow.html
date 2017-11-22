@@ -32,7 +32,7 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="top" title="unfold  documentation" href="index.html" />
     <link rel="up" title="Toolbox Overview" href="overview.html" />
-    <link rel="next" title="Tutorials" href="tutorials.html" />
+    <link rel="next" title="Content Tutorials" href="contenttutorials.html" />
     <link rel="prev" title="Toolbox Overview" href="overview.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -86,22 +86,20 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#why-deconvolution">Why deconvolution?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#how-does-deconvolution-work">How does deconvolution work?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="contenttutorials.html#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#why-deconvolution">Why deconvolution?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#how-does-deconvolution-work">How does deconvolution work?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut02.html">Longstart: 2x2 ANOVA</a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut03.html">Non-Linear Predictors using splines</a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut04.html">with deconvolution vs. without deconvolution</a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolbox-tut05.html">Time-Basis functions</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut02.html">Longstart: 2x2 ANOVA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut03.html">Non-Linear Predictors using splines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut04.html">With and without deconvolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut05.html">Time-Basis functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolbox-tut06.html">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a><ul>
@@ -136,7 +134,8 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a></li>
 </ul>
 </ul>
@@ -181,7 +180,8 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a></li>
 </ul>
 
@@ -194,17 +194,17 @@
 <p>We start with continuous data with events that mark times in the data that are of interest. Usually these are stimulus onsets, buttonpresses etc.</p>
 <dl class="docutils">
 <dt>Definition of the design (<code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat()</span></code>)</dt>
-<dd>We first need to define which triggers (let&#8217;s assume we have an event type &#8216;stimulus&#8217; and one &#8216;keypress&#8217;) should be included in the deconvolution. Because each event could belong to a different condition, which again could be different for stimuli/keypresses, we can define a simple formula for each event. These formulas are commonly used in <code class="xref mat mat-func docutils literal"><span class="pre">R()</span></code> and also matlab and are called Wilkinson-Formulas. They allow to easily specify very simple designs, e.g. 2x2 with only categorical, but also continuous variables, spline-based (additive models, GAM) and mixture between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code>) for your design-specifications.</dd>
-<dt>Timeexpand of the designmatrix (<code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>)</dt>
+<dd>We first need to define which event should be included in the deconvolution. Let&#8217;s assume we have an event type &#8216;stimulus&#8217; and one &#8216;keypress&#8217;. We first define a formula for each event. These formulas are commonly used in <code class="xref mat mat-func docutils literal"><span class="pre">R()</span></code> and also matlab and are called Wilkinson-Formulas. They allow to easily specify model-designs, e.g. 2x2 categorical linear model with interaction; continuous variables, spline-based (additive models, GAM) and mixtures between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code>) for your design-specifications.</dd>
+<dt>Timeexpansion of the designmatrix (<code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>)</dt>
 <dd>In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated. The resulting timeexpanded/expanded designmatrix is denoted as <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code>.</dd>
 <dt>Fitting the model (<code class="xref mat mat-func docutils literal"><span class="pre">dc_glmfit()</span></code>)</dt>
-<dd>There are multiple ways to fit the expanded designmatrix <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code>. The unfold-toolbox offers a memory-friendly iterative least squares algorithm, default matlab pseudo-inverse and regularized glmnet (LASSO,ridge-regression and elastic-net).</dd>
-<dt>Transforming parameters (dc_beta2unfold)</dt>
-<dd>(optional) In some cases, e.g. using time-basis functions (splines/fourier) or when using spline-nonlinear predictors, it is helpful to transform the estimated parameters back to their native space. For example if we use 10 time-splines instead of 100 sample points, we receive 10 parameter-estimate (betas). In this case we want to transform the 10 betas back to the domain of 100 samples. This increases the interpretation. This step is also possible for continuous predictors, but because a slope is readily interpretable, not as necessary.</dd>
+<dd>There are multiple ways to fit the expanded designmatrix <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code>. The unfold-toolbox offers a memory-friendly iterative least squares algorithm (lsmr), default matlab pseudo-inverse and regularized glmnet (LASSO,ridge-regression and elastic-net).</dd>
+<dt>Extracting parameters (dc_beta2unfold)</dt>
+<dd>This step extracts the betas, transforms them if necessary, and returns a cleaned-up output structure. When using time-basis functions (splines/fourier) we need to transform the estimated betas back to their native time-space. For example if we use 10 time-splines instead of 100 sample points, we receive 10 parameter-estimate (betas). In this case we want to transform the 10 betas back to the domain of 100 samples.</dd>
 <dt>Plotting (e.g. <code class="xref mat mat-func docutils literal"><span class="pre">dc_plotParam()</span></code>)</dt>
 <dd>The toolbox offers multiple functions to explore also quite complex designs. These functions work on 1D (ERP-like), 2D (erpimage-like) or as timeseries of topoplots.</dd>
 <dt>Group-Level Statistics</dt>
-<dd>Most commonly users estimate the parameters for all subjects and then test the parameters against an H0 of no effect. If no prior knowledege on the time/location of the effect is known, we recommend to use cluster-permutation based statistics. We recommend the EPT-TFCE toolbox which we included in our toolbox for convenience. The toolbox currently does not have functions to do single-subject statistics.</dd>
+<dd>Most commonly users estimate the parameters for all subjects and then test the parameters against an H0 of no effect. If no prior knowledege on the time/location of the effect is known, we recommend to use cluster-permutation based statistics. We recommend the EPT-TFCE toolbox. We focus on single subject beta-estimates and leave the statistics up to the user.</dd>
 </dl>
 </div>
 <div class="section" id="specification-for-input-data">
@@ -213,7 +213,7 @@
 <p>The minimal required fields (the usual EEGlab-structure) are:</p>
 <ul class="simple">
 <li>EEG.data (chan x time)</li>
-<li>EEG.times (vector of time points)</li>
+<li>EEG.times (vector of time points in milliseconds)</li>
 <li>EEG.srate (samplingrate in Hz)</li>
 <li>EEG.event (structure of events, same structure as in EEGlab)<ul>
 <li>event.type (e.g. &#8216;stimulus&#8217; or &#8216;keypress&#8217;)</li>
@@ -243,15 +243,13 @@
 </div>
 <div class="section" id="comparison-between-deconvolved-and-non-deconvolved-classical">
 <h1>Comparison between deconvolved and non-deconvolved (classical)<a class="headerlink" href="#comparison-between-deconvolved-and-non-deconvolved-classical" title="Permalink to this headline">¶</a></h1>
-<p>we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial <a class="reference internal" href="toolbox-tut04.html"><em>with deconvolution vs. without deconvolution</em></a></p>
+<p>we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial <a class="reference internal" href="toolbox-tut04.html"><em>With and without deconvolution</em></a></p>
 </div>
 <div class="section" id="explanation-of-all-variable-fields">
 <h1>Explanation of all variable fields<a class="headerlink" href="#explanation-of-all-variable-fields" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="fields-of-eeg-deconv">
 <h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">EEG.deconv()</span></code><a class="headerlink" href="#fields-of-eeg-deconv" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
-<dt>effects_mean</dt>
-<dd>In case of effects coding contains the mean of the designmatrix columns. We do not want to keep the original event structure around, thus we save this information here</dd>
 <dt>predictorSplines</dt>
 <dd>all information on the splines are saved in here (see below). Splines are a bit more involved to describe, additional information needs to be saved</dd>
 <dt>formula</dt>
@@ -270,20 +268,22 @@
 <dd>A list connecting the colums of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code> with the event. Multiple events can be modeled but they are not separable based on <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code> alone.</dd>
 <dt>eventtype</dt>
 <dd>The names of the events that are modeled. Only interesting if multiple different events were modeled.</dd>
-<dt>dcX</dt>
+<dt>Xdc</dt>
 <dd>Timeexpanded designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>. If you need to modify this, have a look at <code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat_addcol()</span></code> to see which fields should be modified.</dd>
-<dt>dcBasis</dt>
+<dt>timebasis</dt>
 <dd>The basis-function of the timeexpand for the deconvolution. This matrix could be the identity matrix in case of &#8220;stick&#8221;/dirac-functions. Useful only for splines/fourier time-basis functions</dd>
-<dt>dcBasistime: [1×20 double]</dt>
+<dt>times: [1×20 double]</dt>
 <dd>A vector containing the time in seconds over what range the timeexpand occured. This encodes the time of the resulting ERP</dd>
-<dt>dcX_termidx</dt>
-<dd>A list connecting the columns of <code class="xref mat mat-func docutils literal"><span class="pre">dcX()</span></code> with columns of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code></dd>
-<dt>dcBeta</dt>
+<dt>Xdc_terms2cols</dt>
+<dd>A list connecting the columns of <code class="xref mat mat-func docutils literal"><span class="pre">Xdc()</span></code> with columns of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code></dd>
+<dt>beta_dc</dt>
 <dd>deconvolved betas. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_glmfit()</span></code>. This is the main outcome of this toolbox</dd>
+<dt>beta_nodc</dt>
+<dd>non-deconvolved betas. This is a massive univariate fit where each timepoint and each electrode were fitted independently. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_glmfit_nodc()</span></code></dd>
 <dt>channel</dt>
 <dd>for which channel the deconvolved betas have been calculated</dd>
-<dt>XBeta</dt>
-<dd>non-deconvolved betas. This is a massive univariate fit where each timepoint and each electrode were fitted independently. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_glmfit_nodc()</span></code></dd>
+<dt>effects_mean</dt>
+<dd>In case of effects coding contains the mean of the designmatrix columns</dd>
 </dl>
 </div>
 <div class="section" id="fields-of-unfold">
@@ -296,8 +296,8 @@
 <dd>same as EEG.times, thus the epoch-time in ms</dd>
 <dt>chanlocs</dt>
 <dd>same as EEG.chanlocs</dd>
-<dt>epoch</dt>
-<dd>a structure defining for each beta-value to what event and predictor it belong. In case &#8216;convertsplines&#8217; was activated in <code class="xref mat mat-func docutils literal"><span class="pre">dc_beta2unfold()</span></code> the spline-betas were evaluated at specified values, then these values are also saved here.</dd>
+<dt>param</dt>
+<dd>a structure defining for each beta-value which event, what predictor, which variable-type and what the corresponding value is.</dd>
 <dt>beta_nodc</dt>
 <dd>the betas without deconvolution [channel x time x predictors]</dd>
 <dt>beta</dt>
@@ -308,25 +308,19 @@
 <h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">deconv.predictorSplines()</span></code><a class="headerlink" href="#fields-of-deconv-predictorsplines" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
 <dt>paramValues</dt>
-<dd>[5988×1 double]</dd>
+<dd>the parameter values of each event, e.g. for saccade amplitude: [1.3, 2.3, 6, 1.2 ...]</dd>
 <dt>nSplines</dt>
-<dd>9</dd>
-<dt>min</dt>
-<dd>: -7.9975</dd>
-<dt>max</dt>
-<dd>: 7.9782</dd>
-<dt>spline2val</dt>
-<dd>: [1×1000 double]</dd>
-<dt>spline2val_idx</dt>
-<dd>: [1×5988 double]</dd>
-<dt>basis</dt>
-<dd>: [1000×9 double]</dd>
+<dd>the number of splines used for modelling</dd>
+<dt>knots</dt>
+<dd>the knot sequence. This is necessary to evaluate splines at a later point in time</dd>
+<dt>removedSplineIdx</dt>
+<dd>The index of the spline which was removed during spline-generation. It is necessary to remove one spline in order to not have any collinearities. Depending on configuration either a middle or the first spline is removed.</dd>
 <dt>X</dt>
-<dd>: [5988×9 double]</dd>
+<dd>the entries of X times the spline (i.e. the subset of X)</dd>
 <dt>name</dt>
-<dd>: &#8216;splineA&#8217;</dd>
+<dd>name of the spline</dd>
 <dt>colnames</dt>
-<dd>: {1×9 cell}</dd>
+<dd>column names that the spline will get in EEG.deconv.X</dd>
 </dl>
 </div>
 </div>
@@ -344,7 +338,7 @@
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Nov 20, 2017.<br/>
+      Last updated on Nov 22, 2017.<br/>
     </p>
   </div>
 </footer>

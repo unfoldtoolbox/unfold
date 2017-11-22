@@ -1,4 +1,4 @@
-with deconvolution vs. without deconvolution
+With and without deconvolution
 ============================================
 .. raw:: html
 
