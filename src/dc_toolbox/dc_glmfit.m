@@ -129,11 +129,11 @@ if strcmp(cfg.method,'lsmr')
     end
     
 elseif strcmp(cfg.method,'par-lsmr')
-    fprintf('starting parpool with ncpu-1...')
+    fprintf('starting parpool with ncpus...')
     pools = gcp('nocreate');
     cpus = feature('numCores');
     if size(pools) == 0
-        pool = parpool(cpus-1);
+        pool = parpool(cpus);
     end
     fprintf('done\n')
     addpath('../lib/lsmr/')

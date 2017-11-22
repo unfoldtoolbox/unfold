@@ -71,8 +71,8 @@ if strcmp(cfg.codingschema,'effects')
     
     [~,tmp] = max(paramValuesSpline(:,killThisSpline));
     peakAt = spl.paramValues(tmp);
-    fprintf('Due to collinearity, removing the spline for the effect %s has its peak at %f\n',spl.name,peakAt)
-    fprintf('This does not mean that the model-intercept represents this value!')
+    fprintf('The spline that got removed due to collinearity in the basis set (as intended) for the effect %s has its peak at %f\n',spl.name,peakAt)
+    fprintf('This does not mean that the event-intercept represents this value! \n')
 else
     killThisSpline = 1;
 end

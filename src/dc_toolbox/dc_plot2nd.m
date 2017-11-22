@@ -38,8 +38,8 @@ if cfg.singlesubjects
     if ~cfg.withSpline
         d2nd2 = d2nd;
         
-        d2nd2.epoch = repmat(d2nd2.epoch,1,size(d2nd.beta,4));
-        % d2nd2.deconv.X = ones(1,size(d2nd2.epoch,2));
+        d2nd2.param = repmat(d2nd2.param,1,size(d2nd.beta,4));
+        % d2nd2.deconv.X = ones(1,size(d2nd2.param,2));
         if isfield(d2nd,'beta_nodc')
             d2nd2.beta_nodc = d2nd2.beta_nodc(:,:,:);
         end
