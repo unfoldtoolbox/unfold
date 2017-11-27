@@ -137,6 +137,7 @@ for currPred= 1:length(paramList)
         end
         
         
+        
         % This functino always removes either first or last spline. We therefore
         % need to recover it by running it twice and concatenating
         % this is nearly identical to the code in dc_designmat_spline

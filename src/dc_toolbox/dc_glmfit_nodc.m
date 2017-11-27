@@ -47,20 +47,22 @@ elseif strcmp(cfg.method,'glmnet')
 %% GLMNET
      beta = nan(size(EEG.data,1),size(EEG.data,2),size(X,2)+1); %plus one, because glmnet adds a intercept
     
-    for time = 1:size(EEG.data,2)
-        for e = cfg.channel
-            t = tic;
-            fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
-            %glmnet needs double precision
+    
+     for e = cfg.channel
+         t = tic;
+         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
+         for time = 1:size(EEG.data,2)
+             %glmnet needs double precision
              fit = cvglmnet(X,(double(squeeze(EEG.data(e,time,:))')),'gaussian',struct('alpha',cfg.glmnetalpha));
-            
-            %find best cv-lambda coefficients
-            beta(e,time,:) = cvglmnetCoef(fit,'lambda_1se')';
-            
-            fprintf('... took %.1fs',toc(t))
-            
-        end
-    end
+             
+             %find best cv-lambda coefficients
+             beta(e,time,:) = cvglmnetCoef(fit,'lambda_1se')';
+             
+
+             
+         end
+         fprintf('... took %.1fs',toc(t))
+     end
     beta = beta([2:end 1],:,:); %put the dc-intercept last
 
     

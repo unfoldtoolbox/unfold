@@ -97,6 +97,8 @@ end
 d2nd2 = d2nd;
 d2nd2.beta = mean(d2nd2.beta(:,:,:,:),4);
 d2nd2.beta_nodc = mean(d2nd2.beta_nodc(:,:,:,:),4);
-
+if length(d2nd2.deconv) >1
+    d2nd2.deconv  = d2nd2.deconv(1);
+end
 ax = dc_plotParam(d2nd2,cfgPlot);
 
