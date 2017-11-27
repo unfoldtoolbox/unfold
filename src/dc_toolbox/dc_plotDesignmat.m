@@ -40,7 +40,7 @@ if cfg.timeexpand
     eventstruct = EEG.event;
     eventstruct(~ismember({eventstruct.type},modeledEvents)) = [];
     ix_midEvent = round(length(eventstruct)/2); % take "center" event
-    midEventSmp = eventstruct(ix_midEvent).latency;
+    midEventSmp = round(eventstruct(ix_midEvent).latency);
     midEventLat = EEG.times(midEventSmp); % in ms
     
     % time_lim = EEG.times(ceil(end/2)) + [-100,100] * 1000;
@@ -156,7 +156,7 @@ if cfg.timeexpand
             
             [un,~,c] = unique(allTypes(latix));
             makeGray = ~ismember(un,modeledEvents);
-            colorList = cbrewer('qual','Set1',length(un));
+            colorList = cbrewer('qual','Set1',max(length(un),3));
             legendlist = {};
             for ev = 1:length(un)
                 eventlat = lat(latix(c==ev))/1000;
@@ -180,7 +180,7 @@ if cfg.timeexpand
                 
                 
             end
-             if ~isempty(makeGray)
+             if sum(makeGray)>0
             legendlist{end+1,1} = 'non-modeled';
             legendlist{end,2} = 0;
             legendlist{end,3} = legendlist{find([legendlist{:,2}],1),3};
