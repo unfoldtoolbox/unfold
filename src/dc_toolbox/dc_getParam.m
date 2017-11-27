@@ -137,7 +137,7 @@ for currPred= 1:length(paramList)
         end
         
         
-        
+        if spl.knots(1) == spl.knots(2) % we are in normal bernstein 
         % This functino always removes either first or last spline. We therefore
         % need to recover it by running it twice and concatenating
         % this is nearly identical to the code in dc_designmat_spline
@@ -147,7 +147,12 @@ for currPred= 1:length(paramList)
         
         paramValuesSpline = basisL;
         paramValuesSpline(basisR(:)==1) = 1;
+        
+        else
+           paramValuesSpline = cyclical_spline(splValueSelect,spl.knots);
+        end
         paramValuesSpline(:,spl.removedSplineIdx) = [];
+        
         
         for c = 1:length(splValueSelect)
             % we have a [channel x time x beta] * [beta x 1] vector product
