@@ -48,10 +48,6 @@ if cfg.add_intercept
     
 end
 
-% XXX Todo: Make this more versatile
-if any(strcmp(unfold.deconv.variableType,'spline')) && size(unfold.(cfg.betaSetName),3) > size(unfold.deconv.predictorSplines{1}.spline2val,2)
-    unfold = dc_getParam(unfold,cfg);
-end
 
 data = unfold.(cfg.betaSetName);
 
@@ -68,7 +64,7 @@ data = data(cfg.channel,:,param);
 
 % Baseline Correction
 if ~isempty(cfg.baseline)
-   data= bsxfun(@minus,data ,mean(data(:,(unfold.times>=cfg.baseline(1))& (unfold.times<cfg.baseline(2)),:),1));
+   data= bsxfun(@minus,data ,mean(data(:,(unfold.times>=cfg.baseline(1))& (unfold.times<cfg.baseline(2)),:),2));
 end
 
 % caculate common coloraxis
@@ -90,8 +86,8 @@ for k = 1:length(param)
     if isnan(val)
        val = []; 
     end
-    text = sprintf('[%s]: %s: %g',strjoin_custom(unfold.param(param(k)).event),unfold.param(param(k)).name,val);
-    t = text(ax.topo.topo{k}.image{1},0,1.1,10,text,'Units','normalized','HorizontalAlignment','left');
+    str = sprintf('[%s]: %s: %g',strjoin_custom(unfold.param(param(k)).event),unfold.param(param(k)).name,val);
+    t = text(ax.topo.topo{k}.image{1},0,1.1,10,str,'Units','normalized','HorizontalAlignment','left');
     
     % we want them on top, else they can be behind the topos
     uistack(t,'top')
@@ -103,8 +99,16 @@ end
 %% Define Plotting time and get an idea of what plot_topo is doing
 n_topo = size(ax.topo.topo{1}.image,2);
 
-topotimes = linspace(min(unfold.times),max(unfold.times),n_topo+1);
-round(topotimes,2,'significant')
+
+
+if isfield(cfg,'time')
+    timelim = cfg.time;
+else
+    timelim = [min(unfold.times),max(unfold.times)];
+end
+
+topotimes = linspace(timelim(1),timelim(2),n_topo+1);
+topotimes = round(topotimes,2,'significant');
 
 %% Define timeline axes
 % We want a bit of space to the topoplots
@@ -124,8 +128,7 @@ plotAxes = axes('Position',plot_pos);
 ax.timeline= plotAxes;
 
 
-
-xlim([min(unfold.times),max(unfold.times)]);
+xlim(timelim);
 set(ax.timeline,'XTick',topotimes,'YTick',[])
 
 %%

@@ -70,32 +70,7 @@ assert(~(cfg.add_average&&cfg.add_intercept),'cannot add average AND intercept (
 
 % Find out whether we want beta_dc, beta_nodc and if there are other fields
 % that have the same size that we should plot as columns.
-nBetaSets = 1;
-betaSetName = [];
-if cfg.deconv == -1
-    assert(isfield(unfold,'beta')|isfield(unfold,'beta_nodc'),'error: to use autodetect at least the field unfold.beta  or unfold.beta_nodc needs to exist')
-    fn = fieldnames(unfold);
-    
-    if isfield(unfold,'beta')
-        sizeBeta = size(unfold.beta);
-    else
-        sizeBeta = size(unfold.beta_nodc);
-    end
-    for f = fn'
-        if strcmp(f,'times')
-            continue
-        end
-        if length(sizeBeta) == length(size(unfold.(f{1}))) &&  all(sizeBeta == size(unfold.(f{1})))
-            nBetaSets = nBetaSets+1;
-            betaSetName = [betaSetName f(1)];
-        end
-    end
-elseif cfg.deconv==0
-    betaSetName = {'beta_nodc'};
-else
-    betaSetName = {'beta'};
-    
-end
+betaSetName = dc_unfoldbetaSetname(unfold,varargin{:});
 
 if ~isempty(cfg.pred_value{1}{1})
     fprintf('Evaluating parameters at auto or specified values');
@@ -137,8 +112,7 @@ value(isnan(value)) = 0; %categorical variables are nan, we need to convert
 
 if cfg.add_average
     % necessary to add the average of the splines, i.e. simulate a marginal plot
-    unfold_new = dc_beta2unfold(unfold,'channel',cfg.channel);
-    unfold_avg = dc_getParam(unfold_new,'auto_method','average');
+    unfold = dc_addmarginal(unfold,'channel',cfg.channel);
 end
 
 %the linestyle, it is used when the intercept is added to differentiate
@@ -162,37 +136,7 @@ for bName =betaSetName
     plotName = [plotName paramList];
     plotEvent = [plotEvent event];
     plotValue = [plotValue value];
-    if cfg.add_average
-        for e = unique(event)
-            % check if predictor and event combination exists
-            eventIdx = find(strcmp(e,event));
-            if length(eventIdx) == 1
-                continue
-            end
-            eventParam = paramList(eventIdx);
-            for p = unique(eventParam)
-                % Find the names & types of the other parameters
-                currEvent = eventIdx(strcmp(p,eventParam));
-                otherEvents = setdiff(eventIdx,currEvent);
-                otherParamNames = unique(paramList(otherEvents));
-                unfoldavg_ix = [];
-                for pOther = otherParamNames
-                    unfoldavg_ix(end+1) = find(strcmp(pOther{1},{unfold_avg.param.name}));
-                end
-                % exclude all categoricals.
-                % they should be covered by the effects/dummy coding schema
-                % already ?!
-                removeix = strcmp('categorical',{unfold_avg.param(unfoldavg_ix).type});
-                unfoldavg_ix(removeix) = [];
-                % calculate the marginal over all other predictors
-                average_otherEffects = squeeze(sum(unfold_avg.(bName{1})(:,:,unfoldavg_ix),3));
-                
-                % add this marginal to the current predictor
-                data(:,currEvent) = data(:,currEvent) + average_otherEffects';
-                
-            end
-        end
-    end
+    
     if cfg.add_intercept || cfg.include_intercept
         
         for e  = unique(event)
@@ -294,7 +238,7 @@ end
 facet_grid(g,plotColLabel,rowName,'scale',facet_scale);
 geom_line(g);
 
-% give us continuous colors!
+%give us continuous colors!
 if length(unique(plotValue))>3
     set_continuous_color(g,'colormap','viridis');
 end
