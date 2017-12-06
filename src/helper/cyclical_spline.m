@@ -100,10 +100,10 @@ for xi = 1:length(x)
     lb(xi) = tmp; 
 end
 
-%# I[i] = 0 for x[i] <= np.min(knots)
+% I[i] = 0 for x[i] <= np.min(knots)
 lb(lb == 0) = 1;
 
-%# I[i] = knots.size - 2 for x[i] > np.max(knots)
+% I[i] = knots.size - 2 for x[i] > np.max(knots)
 lb(lb == length(knots)) = length(knots) - 1;
 
 end
