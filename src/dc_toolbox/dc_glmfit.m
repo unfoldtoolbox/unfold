@@ -32,8 +32,12 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %    'lambda_1se', i.e. minimum lambda + 1SE buffer towards more strict
 %    regularisation.
 %
-%   cfg.lsmriterations: (default 200), defines how many steps the iterative
-%                   solver should search for a solution. 
+%   cfg.lsmriterations: (default 400), defines how many steps the iterative
+%                   solver should search for a solution. While the solver is
+%		    mostly monotonic (see paper), it is recommended to increase
+%		    the iterations. A limit is only defined because in our
+%		    experience, high number of iterations are a result of
+%		    strong collinearities, and hint to a faulty model
 %
 %   cfg.glmnetalpha: (default 1), can be 0 for L2 norm, 1 for L1-norm or
 %                    something inbetween for elastic net
@@ -61,7 +65,7 @@ fprintf('\ndc_glmfit(): Fitting deconvolution model...');
 
 cfg = finputcheck(varargin,...
     {'method', 'string',{'par-lsmr','lsmr','matlab','pinv','glmnet'}, 'lsmr';
-    'lsmriterations','integer',[],200;
+    'lsmriterations','integer',[],400;
     'glmnetalpha','real',[],1;... # used for glmnet
     'channel','integer',[],1:size(EEG.data,1);
     'debug','boolean',[],0;
