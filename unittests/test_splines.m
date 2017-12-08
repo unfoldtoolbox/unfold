@@ -1,7 +1,7 @@
 function test_splines()
 % Generate data with only a single timepoint
 % apply a non-linear function and try to recover it.
-
+%%
 cfgSim = [];
 cfgSim.plot = 1;
 for type = {'default','cyclical','custom'}
@@ -57,12 +57,12 @@ for type = {'default','cyclical','custom'}
     %% fit
     switch cfgSim.type
         case 'default'
-            EEG = dc_designmat(EEG,'eventtype','stimulus','formula','y~1+spl(splineA,10)');
+            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1+spl(splineA,10)');
         case 'cyclical'
-            EEG = dc_designmat(EEG,'eventtype','stimulus','formula','y~1');
+            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1');
             EEG = dc_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(0,2*pi,15),'splinefunction','cyclical');
         case 'custom'
-            EEG = dc_designmat(EEG,'eventtype','stimulus','formula','y~1');
+            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1');
             EEG = dc_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(-10,10,5),'splinefunction',spl.function);
     end
     

@@ -129,11 +129,11 @@ EEG.deconv.X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix
 EEG.deconv.X = [EEG.deconv.X spl.X]; % add spline columns
 
 EEG.deconv.colnames = [EEG.deconv.colnames  spl.colnames'];
-EEG.deconv.variableNames = [EEG.deconv.variableNames {spl.name}];
+EEG.deconv.variablenames = [EEG.deconv.variablenames {spl.name}];
 
 
-EEG.deconv.cols2variableNames = [EEG.deconv.cols2variableNames repmat(length(EEG.deconv.variableNames),1, spl.nSplines)];
-EEG.deconv.cols2eventtype = [EEG.deconv.cols2eventtype repmat(EEG.deconv.cols2eventtype(1),1,size(spl.X,2))];
-EEG.deconv.variableType = [EEG.deconv.variableType 'spline'];
+EEG.deconv.cols2variablenames = [EEG.deconv.cols2variablenames repmat(length(EEG.deconv.variablenames),1, spl.nSplines)];
+EEG.deconv.cols2eventtypes = [EEG.deconv.cols2eventtypes repmat(EEG.deconv.cols2eventtypes(1),1,size(spl.X,2))];
+EEG.deconv.variabletypes = [EEG.deconv.variabletypes 'spline'];
 %predType = [predType repmat({'spline'},1,spl.nSplines)];
 

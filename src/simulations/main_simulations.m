@@ -30,7 +30,7 @@ testCase = 15
 EEG = simulate_test_case(testCase,'noise',0,'basis','hanning');
 
 cfgDesign = [];
-cfgDesign.eventtype = {'stimulusA'};
+cfgDesign.eventtypes = {'stimulusA'};
 cfgDesign.codingschema = 'reference';
 switch testCase
     case {1,2}
@@ -45,17 +45,17 @@ switch testCase
         cfgDesign.spline = {{'splineA',10}}; % In addition use one spline
     case {9,10}
         cfgDesign.formula = {'y~1','y~1'};
-        cfgDesign.eventtype = {'stimulusA','stimulusB'};
+        cfgDesign.eventtypes = {'stimulusA','stimulusB'};
     case {11,12}
         cfgDesign.formula = {'y~1','y~1','y~1'};
-        cfgDesign.eventtype = {'stimulusA','stimulusB','stimulusC'};
+        cfgDesign.eventtypes = {'stimulusA','stimulusB','stimulusC'};
     case {13,14}
         cfgDesign.formula = {'y~1','y~1+conditionA','y~1+continuousA'};
-        cfgDesign.eventtype = {'stimulusA','stimulusB','stimulusC'};
+        cfgDesign.eventtypes = {'stimulusA','stimulusB','stimulusC'};
         cfgDesign.categorical = {'conditionA'};
     case {15}
         cfgDesign.formula   = {'y~1',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
-        cfgDesign.eventtype = {'stimulus1', 'stimulus2',                       'stimulus3'};
+        cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
 end
 
 EEG = dc_designmat(EEG,cfgDesign);
@@ -74,7 +74,7 @@ unfold = dc_beta2unfold(EEG);
 
 multWith = ones(1,size(EEG.deconv.X,2));
 for col = 1:size(EEG.deconv.X,2)
-    ix = ismember({EEG.urevent.type},EEG.deconv.eventtype{EEG.deconv.cols2eventtype(col)});
+    ix = ismember({EEG.urevent.type},EEG.deconv.eventtypes{EEG.deconv.cols2eventtypes(col)});
     multWith(col) = mean(EEG.deconv.X(ix,col),1);
 end
 %%

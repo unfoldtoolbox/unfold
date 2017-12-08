@@ -2,7 +2,7 @@ function dc_plotEventHistogram(EEG,varargin)
 % Function that plots histogram of all events in the EEG.event structure
 %
 %Arguments:
-%   cfg.eventtype: Restrict the histogram to a specific eventtype
+%   cfg.eventtypes: Restrict the histogram to a specific eventtypes
 %
 %Return:
 %
@@ -10,14 +10,14 @@ function dc_plotEventHistogram(EEG,varargin)
 % dc_plotEventHistogram(EEG,'eventA')
 
 cfg = finputcheck(varargin,...
-    {'eventtype',   'cell', [], {};...
+    {'eventtypes',   'cell', [], {};...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
-if isempty(cfg.eventtype)
+if isempty(cfg.eventtypes)
     t2 = struct2table(EEG.event);
 else
-    t2 = struct2table(EEG.event(ismember({EEG.event(:).type},cfg.eventtype)));
+    t2 = struct2table(EEG.event(ismember({EEG.event(:).type},cfg.eventtypes)));
 end
 VarNames = t2.Properties.VariableNames;
 removeList = {'channel','bvtime','bvmknum','code','urevent'};

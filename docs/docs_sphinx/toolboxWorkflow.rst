@@ -85,22 +85,22 @@ formula
 X
   The designmatrix. This can be used for 'classical' massive-univariate linear modeling
 
-variableType
+variabletypes
   Type of each variable/predictor, can be 'categorical','continuous' and 'spline'
 
-variableNames
+variablenames
   Name of each variable/predictor
 
 colnames: {1×10 cell}
   The name of each column of `X`. As soon as categorical variables are used, we will have more columns than variables.
 
-cols2variableNames
+cols2variablenames
   A list connecting the columns of `X` with the variables. A 0 means that the intercept is meant.
 
-cols2eventtype
+cols2eventtypes
   A list connecting the colums of `X` with the event. Multiple events can be modeled but they are not separable based on `X` alone.
 
-eventtype
+eventtypes
   The names of the events that are modeled. Only interesting if multiple different events were modeled.
 
 Xdc

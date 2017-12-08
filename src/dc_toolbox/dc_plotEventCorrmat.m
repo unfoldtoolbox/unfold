@@ -2,7 +2,7 @@ function corrOut = dc_plotEventCorrmat(EEG,varargin)
 % Plots a correlation matrix of the event structure
 %
 %Arguments:
-%   eventtype (cell): Subselect the eventtype, by default chooses all
+%   eventtypes (cell): Subselect the eventtypes, by default chooses all
 %   figure (0/1): whether the corrmat should be plotted (default) or only
 %               returned
 %
@@ -11,20 +11,20 @@ function corrOut = dc_plotEventCorrmat(EEG,varargin)
 
 
 cfg = finputcheck(varargin,...
-    {'eventtype',   'cell', [], {};...
+    {'eventtypes',   'cell', [], {};...
     'figure','boolean',[],1;...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
-if isempty(cfg.eventtype)
+if isempty(cfg.eventtypes)
     t2 = struct2table(EEG.event);
 else
-    t2 = struct2table(EEG.event(ismember({EEG.event(:).type},cfg.eventtype)));
+    t2 = struct2table(EEG.event(ismember({EEG.event(:).type},cfg.eventtypes)));
 end
-if size(t2,1) == 0 && isempty(cfg.eventtype)
+if size(t2,1) == 0 && isempty(cfg.eventtypes)
     error('EEG.event seems to be empty')
-elseif   size(t2,1) == 0 && ~isempty(cfg.eventtype)
-    error('EEG.event is empty for event(s): %s',cfg.eventtype{:})
+elseif   size(t2,1) == 0 && ~isempty(cfg.eventtypes)
+    error('EEG.event is empty for event(s): %s',cfg.eventtypes{:})
 end
 
 t2 = t2(:,varfun(@isnumeric,t2,'output','uniform'));

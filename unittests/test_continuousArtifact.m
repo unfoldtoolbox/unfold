@@ -1,7 +1,7 @@
 function test_continuousArtifact()
 %%
 EEG = simulate_test_case(5,'noise',0,'basis','box');
-EEG = dc_designmat(EEG,'formula','y~1+continuousA','eventtype','stimulusA');
+EEG = dc_designmat(EEG,'formula','y~1+continuousA','eventtypes','stimulusA');
 
 cfgClean = [];
 cfgClean.amplitudeThreshold=150;

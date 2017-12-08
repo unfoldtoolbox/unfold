@@ -326,7 +326,7 @@ values at the given times to 0.</dd>
 <dt>Generate Designmatrix out of EEG.event structure and a cfg.formula</dt>
 <dd>Input an EEG event structure and you will get an EEG.deconv.X field with
 the designmatrix.
-If you add multiple eventtypes+formulas as cell-arrays , this function will iteratively
+If you add multiple eventtypess+formulas as cell-arrays , this function will iteratively
 call itself and combine it to one big designmatrix.
 The designmatrix is not yet ready to do deconvolution, use
 dc_timeexpandDesignmat for this.</dd>
@@ -352,14 +352,14 @@ This formula would add the following main effects:
 and the following interactions:
 &#8220;stimType:color, color:size&#8221;</p>
 </li>
-<li><strong>cfg.eventtype</strong> (<em>cell of strings</em>) &#8211; cell array of strings, the formula is fit on these
+<li><strong>cfg.eventtypes</strong> (<em>cell of strings</em>) &#8211; cell array of strings, the formula is fit on these
 events. make sure that all fields are filled for all events
-special-case: Multiple eventtypes (currently in TESTING mode)
+special-case: Multiple eventtypess (currently in TESTING mode)
 You can fit multiple different formulas on different events
 concurrently. The specification could be as follows:
 {{&#8216;A1&#8217;,&#8217;A2&#8217;,&#8217;A3&#8217;},{&#8216;B&#8217;},{&#8216;C&#8217;}}.
 If more than one formula are specified, we expect you to specify
-the eventtypes each formula should be applied to.</li>
+the eventtypess each formula should be applied to.</li>
 <li><strong>cfg.spline</strong> (<em>cell</em>) &#8211; define a b-spline non-parametric continuous effect. For example:
 cfg.spline = {{&#8216;speed&#8217;,15},{&#8216;size&#8217;,10}};
 This adds two non-parametric splines, speed with 15
@@ -388,8 +388,8 @@ Reference coding is also known as treatment coding</li>
 <li>X:          The design matrix</li>
 <li>colnames:     For each column of &#8216;X&#8217;, which predictor it represents</li>
 <li>formula:    The original cfg.formula</li>
-<li>event:      the cfg.eventtype</li>
-<li>cols2eventtype:   For each column of &#8216;X&#8217; which event it represents</li>
+<li>event:      the cfg.eventtypes</li>
+<li>cols2eventtypes:   For each column of &#8216;X&#8217; which event it represents</li>
 </ul>
 </p>
 </td>
@@ -405,7 +405,7 @@ Reference coding is also known as treatment coding</li>
 </dl>
 <div class="line-block">
 <div class="line">cfgDesign = [];</div>
-<div class="line">cfgDesign.eventtype = {&#8216;fixation&#8217;};</div>
+<div class="line">cfgDesign.eventtypes = {&#8216;fixation&#8217;};</div>
 <div class="line">cfgDesign.formula = &#8216;y ~ level_predictability*target_fixation + 1&#8217;;</div>
 <div class="line">cfgDesign.categorical = {&#8216;level_predictability&#8217;,&#8217;target_fixation&#8217;};</div>
 <div class="line"><br /></div>
@@ -414,7 +414,7 @@ Reference coding is also known as treatment coding</li>
 splines (n = 10) for the X and Y position of the current fixation. B)
 We add a second formula for a second event (StimOnset1/2) that only
 contains a constant (y~1).</div>
-<div class="line">cfgDesign.eventtype = {{&#8216;fixation&#8217;},{&#8216;StimOnset1&#8217;,&#8217;StimOnset2&#8217;}};</div>
+<div class="line">cfgDesign.eventtypes = {{&#8216;fixation&#8217;},{&#8216;StimOnset1&#8217;,&#8217;StimOnset2&#8217;}};</div>
 <div class="line">cfgDesign.formula = {&#8216;y ~ 1 + level_predictability*target_fixation&#8217;,&#8217;y~1&#8217;};</div>
 <div class="line">cfgDesign.spline = { {{&#8216;fixpos_x&#8217;,10},{&#8216;fixpos_y&#8217;,10}} , {} };</div>
 <div class="line">cfgDesign.categorical = {&#8216;level_predictability&#8217;,&#8217;target_fixation&#8217;};</div>
@@ -730,7 +730,7 @@ Secret option: &#8216;addContData&#8217;</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>eventtype</strong> (<em>cell</em>) &#8211; Subselect the eventtype, by default chooses all</li>
+<li><strong>eventtypes</strong> (<em>cell</em>) &#8211; Subselect the eventtypes, by default chooses all</li>
 <li><strong>figure</strong> (<em>0/1</em>) &#8211; whether the corrmat should be plotted (default) or only
 returned</li>
 </ul>
@@ -751,7 +751,7 @@ returned</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg.eventtype</strong> &#8211; Restrict the histogram to a specific eventtype</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg.eventtypes</strong> &#8211; Restrict the histogram to a specific eventtypes</td>
 </tr>
 </tbody>
 </table>

@@ -58,18 +58,18 @@ end
 
 %% Epoch the data
 EEG.urevent = EEG.event;
-[EEG_epoch,event_ind] = pop_epoch(EEG,[EEG.deconv.eventtype{:}],cfg.timelimits);
+[EEG_epoch,event_ind] = pop_epoch(EEG,[EEG.deconv.eventtypes{:}],cfg.timelimits);
 fprintf('Recalculating the EEG_epoch field using eeg_checkset, might take some time \n')
 EEG_epoch             = eeg_checkset(EEG_epoch,'eventconsistency'); % needed to add EEG_epoch.epoch field, don't ask why
 
 
 
 % we need to remove the entries in the table that got removed due to the
-% epoching step (e.g. boundary events). But we only have ind, which is relative to the eventtype.
-% Thus we need to get the eventtype once more and select only the matching
+% epoching step (e.g. boundary events). But we only have ind, which is relative to the eventtypes.
+% Thus we need to get the eventtypes once more and select only the matching
 % ones
 
-eventType = [EEG.deconv.eventtype{:}];
+eventType = [EEG.deconv.eventtypes{:}];
 eventType = eventType(~cellfun(@(x)isnan(x(1)),eventType));
 convertIND = find(ismember({EEG.event(:).type},eventType));
 EEG_epoch.deconv.X = EEG_epoch.deconv.X(convertIND(event_ind),:);

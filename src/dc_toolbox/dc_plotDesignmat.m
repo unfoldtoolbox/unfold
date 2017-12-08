@@ -36,7 +36,7 @@ if cfg.timeexpand
     % there may not be any experimental events around to see.
 
     
-    modeledEvents = [EEG.deconv.eventtype{:}];
+    modeledEvents = [EEG.deconv.eventtypes{:}];
     eventstruct = EEG.event;
     eventstruct(~ismember({eventstruct.type},modeledEvents)) = [];
     ix_midEvent = round(length(eventstruct)/2); % take "center" event
@@ -99,8 +99,8 @@ set(gca,'clim',[-cl cl])
 r = linspace(0,nPred,nPredTheory*2+1);
 set(ax,'XTick',r(2+shiftByOne:2:end))
 
-eventlabtmp = cellfun(@(x)['evt:' strjoin(x,'+')],EEG.deconv.eventtype,'UniformOutput',0);
-eventlabels = eventlabtmp(EEG.deconv.cols2eventtype);
+eventlabtmp = cellfun(@(x)['evt:' strjoin(x,'+')],EEG.deconv.eventtypes,'UniformOutput',0);
+eventlabels = eventlabtmp(EEG.deconv.cols2eventtypes);
 predlabels = EEG.deconv.colnames;
 
 % escape underscores

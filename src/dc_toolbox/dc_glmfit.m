@@ -210,12 +210,12 @@ beta = beta'; % I prefer channels X betas (easier to multiply things to)
 % end
 
 % We need to remove customrows, as they were not timeexpanded.
-eventcell = cellfun(@(x)iscell(x(1)),EEG.deconv.eventtype)*1;
-eventnan = cellfun(@(x)isnan(x(1)),EEG.deconv.eventtype(~eventcell));
+eventcell = cellfun(@(x)iscell(x(1)),EEG.deconv.eventtypes)*1;
+eventnan = cellfun(@(x)isnan(x(1)),EEG.deconv.eventtypes(~eventcell));
 eventnan = find(~eventcell);
 
 
-betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.deconv.timebasis,1),sum(~ismember(EEG.deconv.cols2eventtype,eventnan)));
+betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.deconv.timebasis,1),sum(~ismember(EEG.deconv.cols2eventtypes,eventnan)));
 
 
 

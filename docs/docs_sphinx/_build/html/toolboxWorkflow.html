@@ -256,17 +256,17 @@
 <dd>contains all formulas specified in <code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat()</span></code></dd>
 <dt>X</dt>
 <dd>The designmatrix. This can be used for &#8216;classical&#8217; massive-univariate linear modeling</dd>
-<dt>variableType</dt>
+<dt>variabletypes</dt>
 <dd>Type of each variable/predictor, can be &#8216;categorical&#8217;,&#8217;continuous&#8217; and &#8216;spline&#8217;</dd>
-<dt>variableNames</dt>
+<dt>variablenames</dt>
 <dd>Name of each variable/predictor</dd>
 <dt>colnames: {1×10 cell}</dt>
 <dd>The name of each column of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code>. As soon as categorical variables are used, we will have more columns than variables.</dd>
-<dt>cols2variableNames</dt>
+<dt>cols2variablenames</dt>
 <dd>A list connecting the columns of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code> with the variables. A 0 means that the intercept is meant.</dd>
-<dt>cols2eventtype</dt>
+<dt>cols2eventtypes</dt>
 <dd>A list connecting the colums of <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code> with the event. Multiple events can be modeled but they are not separable based on <code class="xref mat mat-func docutils literal"><span class="pre">X()</span></code> alone.</dd>
-<dt>eventtype</dt>
+<dt>eventtypes</dt>
 <dd>The names of the events that are modeled. Only interesting if multiple different events were modeled.</dd>
 <dt>Xdc</dt>
 <dd>Timeexpanded designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_timeexpandDesignmat()</span></code>. If you need to modify this, have a look at <code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat_addcol()</span></code> to see which fields should be modified.</dd>

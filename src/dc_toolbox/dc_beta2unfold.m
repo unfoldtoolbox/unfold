@@ -132,8 +132,8 @@ for pred = paramList
         value(loopRunner) = nan;
         name(loopRunner)= EEG.deconv.colnames(pred);
     end
-    event(loopRunner)= EEG.deconv.eventtype(EEG.deconv.cols2eventtype(pred));
-    type(loopRunner) = EEG.deconv.variableType(EEG.deconv.cols2variableNames(pred));
+    event(loopRunner)= EEG.deconv.eventtypes(EEG.deconv.cols2eventtypes(pred));
+    type(loopRunner) = EEG.deconv.variabletypes(EEG.deconv.cols2variablenames(pred));
     loopRunner = loopRunner+1;
 %     end
 

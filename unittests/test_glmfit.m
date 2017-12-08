@@ -39,7 +39,7 @@ cfgDesign = [];
 
 cfgDesign.coding = 'dummy';
 cfgDesign.formula   = {'y~1+continuousA+continuousB'};
-cfgDesign.eventtype = {'stimulusA'};
+cfgDesign.eventtypes = {'stimulusA'};
 
 EEG = dc_designmat(EEG,cfgDesign);
 % add a second channel

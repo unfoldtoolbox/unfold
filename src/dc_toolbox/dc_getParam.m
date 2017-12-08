@@ -114,16 +114,16 @@ for currPred= 1:length(paramList)
         %else it goes to the next predictor
         predIDX_next = paramList(currPred+1)-1;
     end
-    variableIdx = unfold.deconv.cols2variableNames(predIDX);
+    variableIdx = unfold.deconv.cols2variablenames(predIDX);
     
     b = beta(:,:,predIDX:predIDX_next);
     
     e = unfold.param(predIDX);
     
-    if strcmp(unfold.deconv.variableType{variableIdx},'spline')
+    if strcmp(unfold.deconv.variabletypes{variableIdx},'spline')
         
         splName = cellfun(@(x)x.name,unfold.deconv.splines,'UniformOutput',0);
-        splIdx = find(strcmp(splName,unfold.deconv.variableNames{variableIdx}));
+        splIdx = find(strcmp(splName,unfold.deconv.variablenames{variableIdx}));
         
         spl = unfold.deconv.splines{splIdx};
         % If we found the spline_value given value in the splines, then choose
@@ -173,7 +173,7 @@ for currPred= 1:length(paramList)
             epochNew(end+1) = eNew;
         end
         
-    elseif strcmp(unfold.deconv.variableType{variableIdx},'continuous')
+    elseif strcmp(unfold.deconv.variabletypes{variableIdx},'continuous')
         % we have either a categorical or a continuous predictor here
         customContValue = strcmp(predNameList,unfold.deconv.colnames(predIDX(1)));
         if any(customContValue)

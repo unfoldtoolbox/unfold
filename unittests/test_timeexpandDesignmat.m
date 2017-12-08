@@ -7,7 +7,7 @@ cfgDesign = [];
 
 cfgDesign.coding = 'dummy';
 cfgDesign.formula   = {'y~1'};
-cfgDesign.eventtype = {'stimulusA'};
+cfgDesign.eventtypes = {'stimulusA'};
 
 
 

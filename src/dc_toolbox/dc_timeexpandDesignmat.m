@@ -83,12 +83,12 @@ for e = 1:length(EEG.event)
     % at the same latency. They would overwrite if we do not specify which
     % columns to copy over.
     ty = EEG.event(e).type;
-    evtIx = find(cellfun(@(dcTy)any(strcmp(dcTy,ty)),EEG.deconv.eventtype));
+    evtIx = find(cellfun(@(dcTy)any(strcmp(dcTy,ty)),EEG.deconv.eventtypes));
     if isempty(evtIx)
         % Trigger is not in design
         continue
     end
-    s = ismember(EEG.deconv.cols2eventtype,evtIx);
+    s = ismember(EEG.deconv.cols2eventtypes,evtIx);
     
     % Copy over the correct columns at the right time
     eventvec(s,round(EEG.event(e).latency)) = EEG.deconv.X(e,s);

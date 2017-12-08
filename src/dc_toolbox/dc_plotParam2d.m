@@ -28,17 +28,17 @@ if isempty(cfg.channel)
 end
 
 
-paramIdx = find(strcmp(unfold.deconv.variableType,'spline') | strcmp(unfold.deconv.variableType,'continuous'));
+paramIdx = find(strcmp(unfold.deconv.variabletypes,'spline') | strcmp(unfold.deconv.variabletypes,'continuous'));
 
 for p = 1:length(paramIdx)
     
-    if any(strcmp(unfold.deconv.variableType,'continuous'))
+    if any(strcmp(unfold.deconv.variabletypes,'continuous'))
         cfg.auto_n = 100;
         cfg.auto_method = 'linear';
         unfold = dc_getParam(unfold,cfg);
     end
     figure
-    varName = unfold.deconv.variableNames(paramIdx(p));
+    varName = unfold.deconv.variablenames(paramIdx(p));
     if ~isempty(cfg.plotParam) && sum(strcmp(varName,cfg.plotParam))==0
         continue
     end
@@ -48,9 +48,9 @@ for p = 1:length(paramIdx)
     b = squeeze(unfold.(cfg.betaSetName)(cfg.channel,:,:));
     if cfg.add_intercept
         % get eventtname of current predictor
-        evtType =  unfold.deconv.cols2eventtype(paramIdx);
+        evtType =  unfold.deconv.cols2eventtypes(paramIdx);
         % combine it in case we have multiple events
-        evtType = strjoin_custom(unfold.deconv.eventtype{evtType},'+');
+        evtType = strjoin_custom(unfold.deconv.eventtypes{evtType},'+');
         % find the events in unfold.param
         epochStr = cellfun(@(x)strjoin_custom(x,'+'),{unfold.param(:).event},'UniformOutput',0);
         % check the event to be the same & that it is an intercept

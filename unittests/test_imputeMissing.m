@@ -3,7 +3,7 @@ EEG = simulate_test_case(5,'noise',0,'basis','box');
 for e = 10:20
     EEG.event(e).continuousA = nan(1);
 end
-EEG = dc_designmat(EEG,'formula','y~1+continuousA','eventtype','stimulusA');
+EEG = dc_designmat(EEG,'formula','y~1+continuousA','eventtypes','stimulusA');
 
 
 check_nan(dc_imputeMissing(EEG,'method','mean'))

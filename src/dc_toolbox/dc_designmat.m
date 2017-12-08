@@ -2,7 +2,7 @@ function [EEG] = dc_designmat(EEG,varargin)
 % Generate Designmatrix out of EEG.event structure and a cfg.formula
 % Input an EEG event structure and you will get an EEG.deconv.X field with
 % the designmatrix.
-% If you add multiple eventtypes+formulas as cell-arrays , this function will iteratively
+% If you add multiple eventtypess+formulas as cell-arrays , this function will iteratively
 % call itself and combine it to one big designmatrix.
 % The designmatrix is not yet ready to do deconvolution, use
 % dc_timeexpandDesignmat for this.
@@ -27,14 +27,14 @@ function [EEG] = dc_designmat(EEG,varargin)
 %                   and the following interactions:
 %                   "stimType:color, color:size"
 %
-%   cfg.eventtype(cell of strings): cell array of strings, the formula is fit on these
+%   cfg.eventtypes(cell of strings): cell array of strings, the formula is fit on these
 %                  events. make sure that all fields are filled for all events
-%                  special-case: Multiple eventtypes (currently in TESTING mode)
+%                  special-case: Multiple eventtypess (currently in TESTING mode)
 %                  You can fit multiple different formulas on different events
 %                  concurrently. The specification could be as follows:
 %                  {{'A1','A2','A3'},{'B'},{'C'}}.
 %                  If more than one formula are specified, we expect you to specify
-%                  the eventtypes each formula should be applied to.
+%                  the eventtypess each formula should be applied to.
 %
 %   cfg.spline(cell): define a b-spline non-parametric continuous effect. For example:
 %                   cfg.spline = {{'speed',15},{'size',10}};
@@ -66,13 +66,13 @@ function [EEG] = dc_designmat(EEG,varargin)
 %     * X:          The design matrix
 %     * colnames:     For each column of 'X', which predictor it represents
 %     * formula:    The original cfg.formula
-%     * event:      the cfg.eventtype
-%     * cols2eventtype:   For each column of 'X' which event it represents
+%     * event:      the cfg.eventtypes
+%     * cols2eventtypes:   For each column of 'X' which event it represents
 %
 %*Example:*
 %   A classical 2x2 factorial design with interaction
 %|   cfgDesign = [];
-%|   cfgDesign.eventtype = {'fixation'};
+%|   cfgDesign.eventtypes = {'fixation'};
 %|   cfgDesign.formula = 'y ~ level_predictability*target_fixation + 1';
 %|   cfgDesign.categorical = {'level_predictability','target_fixation'};
 %|
@@ -81,7 +81,7 @@ function [EEG] = dc_designmat(EEG,varargin)
 %    splines (n = 10) for the X and Y position of the current fixation. B)
 %    We add a second formula for a second event (StimOnset1/2) that only
 %    contains a constant (y~1).
-%|   cfgDesign.eventtype = {{'fixation'},{'StimOnset1','StimOnset2'}};
+%|   cfgDesign.eventtypes = {{'fixation'},{'StimOnset1','StimOnset2'}};
 %|   cfgDesign.formula = {'y ~ 1 + level_predictability*target_fixation','y~1'};
 %|   cfgDesign.spline = { {{'fixpos_x',10},{'fixpos_y',10}} , {} };
 %|   cfgDesign.categorical = {'level_predictability','target_fixation'};
@@ -92,7 +92,7 @@ function [EEG] = dc_designmat(EEG,varargin)
 cfg = finputcheck(varargin,...
     {'categorical',   'cell', [], {};...
     'formula','',[],[];...
-    'eventtype','',[],[];...
+    'eventtypes','',[],[];...
     'spline','cell',[],{};...
     'splinespacing','string',{'linear','quantile'},'quantile';
     'codingschema','string',{'effects','reference'},'reference';
@@ -102,26 +102,26 @@ cfg = finputcheck(varargin,...
 
 if(ischar(cfg)); error(cfg);end
 
-if isempty(cfg.eventtype)
-    error('no eventtype specified even though this is neccesary.')
+if isempty(cfg.eventtypes)
+    error('no eventtypes specified even though this is neccesary.')
 end
 
-if ~iscell(cfg.eventtype)
-    cfg.eventtype = {cfg.eventtype};
+if ~iscell(cfg.eventtypes)
+    cfg.eventtypes = {cfg.eventtypes};
 end
 
 if iscell(cfg.formula)
     if length(cfg.formula)>1
         display('Multiple events with separate model-formula detected')
-        assert(length(cfg.eventtype) == length(cfg.formula),'You need to specify as many formulas as you have different eventtype cells')
-        % if we are here, eventtype si something of the likes:
+        assert(length(cfg.eventtypes) == length(cfg.formula),'You need to specify as many formulas as you have different eventtypes cells')
+        % if we are here, eventtypes si something of the likes:
         % {{'A1','A2'},{'B1'},{'C1','C2','C3}} and we need the designmat
         % for each of the cells
         
         
         cfgSingle = cfg;
-        for k = 1:length(cfg.eventtype)
-            cfgSingle.eventtype = cfg.eventtype{k};
+        for k = 1:length(cfg.eventtypes)
+            cfgSingle.eventtypes = cfg.eventtypes{k};
             cfgSingle.formula= cfg.formula{k};
             if ~isempty(cfg.spline)
                 cfgSingle.spline = cfg.spline{k};
@@ -135,20 +135,20 @@ if iscell(cfg.formula)
                 
                 deconvAll = EEG2.deconv;
             else
-                %% First check for unique variableNames
+                %% First check for unique variablenames
                 
                 % to have unique variable names
-                setA = deconvAll.variableNames;
-                setB = EEG2.deconv.variableNames;
+                setA = deconvAll.variablenames;
+                setB = EEG2.deconv.variablenames;
                 samename = ismember(setB,setA);
                 if any(samename)
                     warning('event with same name found: %s. Renaming... \n',setB{samename})
                     % rename them
-                    EEG2.deconv.variableNames(samename) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.variableNames(samename),'UniformOutput',0);
-                    samenamecol = ismember(EEG2.deconv.cols2variableNames,find(samename));
+                    EEG2.deconv.variablenames(samename) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.variablenames(samename),'UniformOutput',0);
+                    samenamecol = ismember(EEG2.deconv.cols2variablenames,find(samename));
                     EEG2.deconv.colnames(samenamecol) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.colnames(samenamecol),'UniformOutput',0);
                     if ~isempty(EEG2.deconv.splines)
-                        splineIX =  strcmp(EEG2.deconv.variableType,'spline');
+                        splineIX =  strcmp(EEG2.deconv.variabletypes,'spline');
                         samenamespline =find(splineIX & samename);
                         if ~isempty(samenamespline)
                             samenamesplineIX = cumsum(splineIX);
@@ -167,17 +167,17 @@ if iscell(cfg.formula)
                 deconvAll.X(:,(end+1):(end+size(EEG2.deconv.X,2))) = EEG2.deconv.X;
                 deconvAll.colnames = [deconvAll.colnames,EEG2.deconv.colnames];
                 deconvAll.formula = [deconvAll.formula EEG2.deconv.formula];
-                deconvAll.eventtype = [deconvAll.eventtype EEG2.deconv.eventtype];
-                deconvAll.cols2eventtype = [deconvAll.cols2eventtype EEG2.deconv.cols2eventtype+max(deconvAll.cols2eventtype)];
-                deconvAll.variableNames = [deconvAll.variableNames EEG2.deconv.variableNames];
-                deconvAll.variableType = [deconvAll.variableType EEG2.deconv.variableType];
+                deconvAll.eventtypes = [deconvAll.eventtypes EEG2.deconv.eventtypes];
+                deconvAll.cols2eventtypes = [deconvAll.cols2eventtypes EEG2.deconv.cols2eventtypes+max(deconvAll.cols2eventtypes)];
+                deconvAll.variablenames = [deconvAll.variablenames EEG2.deconv.variablenames];
+                deconvAll.variabletypes = [deconvAll.variabletypes EEG2.deconv.variabletypes];
                 deconvAll.splines = [deconvAll.splines EEG2.deconv.splines];
                 %Add the current maximum
-                EEG2.deconv.cols2variableNames = EEG2.deconv.cols2variableNames+max(deconvAll.cols2variableNames);
+                EEG2.deconv.cols2variablenames = EEG2.deconv.cols2variablenames+max(deconvAll.cols2variablenames);
                 
-                % find the ones that where 0 in EEG2.deconv.cols2variableNames
+                % find the ones that where 0 in EEG2.deconv.cols2variablenames
                 % and reset them to 0 (0 meaning the intercept)
-                deconvAll.cols2variableNames = [deconvAll.cols2variableNames EEG2.deconv.cols2variableNames];
+                deconvAll.cols2variablenames = [deconvAll.cols2variablenames EEG2.deconv.cols2variablenames];
             end
             
         end
@@ -191,12 +191,12 @@ end
 
 
 % For feedback only
-if iscell(cfg.eventtype) && length(cfg.eventtype)>1
-    eventStr= strjoin(cfg.eventtype,',');
-elseif iscell(cfg.eventtype)
-    eventStr = cfg.eventtype{1};
+if iscell(cfg.eventtypes) && length(cfg.eventtypes)>1
+    eventStr= strjoin(cfg.eventtypes,',');
+elseif iscell(cfg.eventtypes)
+    eventStr = cfg.eventtypes{1};
 else
-    eventStr = cfg.eventtype;
+    eventStr = cfg.eventtypes;
 end
 
 fprintf('Modeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
@@ -266,8 +266,8 @@ t = struct2table(event);
 % find and remove all event types that are not needed
 % deletes **** rows ****
 indexList = [];
-for k = 1:length(cfg.eventtype)
-    indexmatch = find(strcmpi(cfg.eventtype(k),{EEG.event.type}));
+for k = 1:length(cfg.eventtypes)
+    indexmatch = find(strcmpi(cfg.eventtypes(k),{EEG.event.type}));
     if isempty(indexList)
         indexList = indexmatch;
     else
@@ -362,7 +362,7 @@ else
         
     end
     
-    [X,b,terms,cols2variableNames,colnames] = ...
+    [X,b,terms,cols2variablenames,colnames] = ...
         classreg.regr.modelutils.designmatrix(t_clean,'Model',F.Terms,...
         'CategoricalVars',categorical,...
         'PredictorVars',F.PredictorNames,'ResponseVar','zzz_response',...
@@ -371,7 +371,7 @@ else
     %temp = {'continuous','categorical'};
     %predType = {temp{categorical+1}};
 end
-variableNames = F.VariableNames(1:end-1);
+variablenames = F.VariableNames(1:end-1);
 has_intercept = any(strcmp(colnames,'(Intercept)'));
 
 if isempty(colnames)
@@ -381,7 +381,7 @@ is_interaction = cellfun(@(x)any(x),strfind(colnames,':'));
 
 if sum(is_interaction)>0
     %check whether main effects were modeled, if not remove them from
-    %variableNames
+    %variablenames
 
     removeList = []
     
@@ -398,17 +398,17 @@ if sum(is_interaction)>0
         end
     end
     % Also add the interaction to the variableName List
-    variableNames(end+1:(end+sum(is_interaction))) = colnames(is_interaction);
-    variableNames(removeList) = [];
+    variablenames(end+1:(end+sum(is_interaction))) = colnames(is_interaction);
+    variablenames(removeList) = [];
     categorical(removeList) = [];
 end
 
 if has_intercept
-    variableNames = ['(Intercept)' variableNames];
+    variablenames = ['(Intercept)' variablenames];
 end
-% cols2variableNames = cols2variableNames - 1; % -1 to remove the intercept which we do not cary explictly in the variableNames (only in the X-colnames)
+% cols2variablenames = cols2variablenames - 1; % -1 to remove the intercept which we do not cary explictly in the variablenames (only in the X-colnames)
 
-if any(cols2variableNames)<1
+if any(cols2variablenames)<1
     % I had this problem when adding a categorical predictor that had only
     % one level. I therefore added this check
     error('this error can occur if one of the predictors you specified had only one level/value')
@@ -439,17 +439,17 @@ end
 varLabel = {'intercept','continuous','categorical','interaction','spline'};
 
 
-EEG.deconv.variableType = [varLabel(varType+1)];
-EEG.deconv.variableNames = variableNames;
+EEG.deconv.variabletypes = [varLabel(varType+1)];
+EEG.deconv.variablenames = variablenames;
 
 
 EEG.deconv.colnames = colnames;
-EEG.deconv.cols2variableNames= cols2variableNames;
+EEG.deconv.cols2variablenames= cols2variablenames;
 
 
 
-EEG.deconv.cols2eventtype = ones(1,size(X,2)); % This looks odd, but the function is recursively called if multiple events are detected. This number is the fixed in the recursive call to represent the actual cols2eventtype
-EEG.deconv.eventtype = {cfg.eventtype};
+EEG.deconv.cols2eventtypes = ones(1,size(X,2)); % This looks odd, but the function is recursively called if multiple events are detected. This number is the fixed in the recursive call to represent the actual cols2eventtypes
+EEG.deconv.eventtypes = {cfg.eventtypes};
 
 %% Add the extra defined splines
 EEG.deconv.splines = [];
