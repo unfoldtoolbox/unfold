@@ -137,28 +137,26 @@ for currPred= 1:length(paramList)
         end
         
         
-        if spl.knots(1) == spl.knots(2) % we are in normal bernstein 
-        % This functino always removes either first or last spline. We therefore
-        % need to recover it by running it twice and concatenating
-        % this is nearly identical to the code in dc_designmat_spline
-        % possibly put both in a common function?!
-        basisL = Bernstein(splValueSelect,spl.knots,[],4,[],0);
-        basisR = Bernstein(splValueSelect,spl.knots,[],4,[],1);
-        
-        paramValuesSpline = basisL;
-        paramValuesSpline(basisR(:)==1) = 1;
-        
+        % default case, a spline function has been defined
+        if isfield(spl,'splinefunction')
+            Xspline = spl.splinefunction(splvalueSelect,spl.knots);       
+            
+        elseif spl.knots(1) == spl.knots(2) 
+            warning('deprecated spline-function detection,detected default bspline')
+            Xspline = default_spline(splvalueSelect,spl.knots(3:end-2));
         else
-           paramValuesSpline = cyclical_spline(splValueSelect,spl.knots);
+            warning('deprecated spline-function detection,assuming cyclical spline')
+            Xspline = cyclical_spline(splValueSelect,spl.knots);
         end
-        paramValuesSpline(:,spl.removedSplineIdx) = [];
+        
+        Xspline(:,spl.removedSplineIdx) = [];
         
         
         for c = 1:length(splValueSelect)
             % we have a [channel x time x beta] * [beta x 1] vector product
             % to calculate => loop over channel
             for chan = 1:size(b,1)
-                result = squeeze(b(chan,:,:))*paramValuesSpline(c,:)';
+                result = squeeze(b(chan,:,:))*Xspline(c,:)';
                 if chan == 1
                     betaNew(chan,:,end+1) =result;
                 else

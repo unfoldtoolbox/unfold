@@ -322,7 +322,10 @@ for p = 1:size(t_clean,2)
     elseif ~iscell(t_clean{:,p}) || ~all(cellfun(@isstr,t_clean{:,p}))
         % We don't have a num (checked before), also not a cell of strings.
         % Error!
-        error('Input Event Values have to be string or numeric. Event:%s was class: %s',t.Properties.VariableNames{p},class(t_clean{:,p}))
+        fprintf('non-string events: ')
+        fprintf('%i,',find(~cellfun(@isstr,t_clean{:,p})))
+        fprintf('\n')
+        error('Input Event Values have to be string or numeric. Event:%s was class: %s \n string found in %i out of %i events (sometimes one or a couple of events have NANS instead of strings) ',t.Properties.VariableNames{p},class(t_clean{:,p}),sum(cellfun(@isstr,t_clean{:,p})),size(t_clean,1))
     elseif all(cellfun(@isstr,t_clean{:,p}))
         % If all of them arr strings, we need to check that this is a
         % categorical variable
@@ -416,12 +419,18 @@ if ~isempty(cfg.spline)
     
     for s = 1:length(cfg.spline)
         
-        [spl,nanlist] = dc_designmat_spline(t,cfg.spline{s},cfg);
+        [spl,nanlist] = dc_designmat_spline('name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
+%         [spl,nanlist] = dc_designmat_spline(t,cfg.spline{s},cfg);
+
+        % All nans that were removed in the designmat spline function need
+        % to be removed from all events
+        isinevent = strcmp(t.type,cfg.eventtype);
+        nanlist(~isinevent) = 0;
         
         X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
         X = [X spl.X]; % add spline columns
                 
-        colnames = [colnames  spl.colnames]; % TODO change the name so that each column depicts the mean value of the spline in addition
+        colnames = [colnames  spl.colnames];
         variableNames = [variableNames {spl.name}];
         
         

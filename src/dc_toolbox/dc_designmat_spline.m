@@ -1,96 +1,111 @@
-function [spl,nanlist] = dc_designmat_spline(t,splinecfg,cfg)
+function [spl,nanlist] = dc_designmat_spline(varargin)
 % Helper function to generate spline-part of designmatrix
 %
 % splinecfg{1}  = 'splineName'
 % splinecfg{2}  = numberOfSplines
+% splinecfg{3}  = 'type', default= bernstein => b-spline
 %
 %
 % cfg.splinespacing
 % cfg.codingschema
 %
+cfg = finputcheck(varargin,...
+    {'name',   'string', [], 'spline_default';...
+    'paramValues','',[],[];...
+    'nsplines','integer',[],[];...
+    'knotsequence','real',[],[];...
+    'splinespacing','string',{'linear','quantile'},'quantile';
+    'type','string',{'default','cyclical','custom'},'default';
+    'customfunction','',[],[];
+    },'mode','ignore');
+
+
+assert(~isempty(cfg.nsplines) | ~isempty(cfg.knotsequence),'you need to specify either number of splines or knotsequence')
+assert(~isempty(cfg.paramValues),'paramValues were empty')
+assert(~all(isnan(cfg.paramValues)),'all paramValues are nans')
+
+
 spl = [];
-spl.paramValues = t{:,splinecfg{1}};
-spl.nSplines = splinecfg{2};
+spl.paramValues = cfg.paramValues;
+spl.nSplines = cfg.nsplines;
+
 %spl.range = range(spl.paramValues);
 splmin = min(spl.paramValues);
 splmax= max(spl.paramValues);
-spl.name = [splinecfg{1}];
-% We find the smallest increase to get an idea of the resolution we
-% need to define the splines
+spl.name = cfg.name;
 
-nanlist = [];
+spl.type = cfg.type;
 
-%         spl.spline2val = linspace(spl.min,spl.max,100*spl.nSplines);
-%spl.spline2val = spl.min:min(b):spl.max;
-for k = 1:length(spl.paramValues)
-    if isnan(spl.paramValues(k)) && ~isempty(t.type{k})
-        
-        
-        nanlist = [nanlist k];
-        %                 spl.spline2val_idx(k)=1; % this is only temporary, we will remove it after indexing again
-        continue
-    end
-    %             [~,spl.spline2val_idx(k)] = (min(abs(spl.spline2val- spl.paramValues(k))));
-end
-if ~isempty(nanlist)
-    warning('n = %i nan''s found @ %s, event:%i \n currently no support for nan-value in splines. setting it to 0.',length(nanlist),spl.name,k)
-end
+
+
 
 knots = [];
 
 
-switch cfg.splinespacing
-    case 'linear'
-        knots = linspace(splmin,splmax,spl.nSplines-2);
-        
-    case 'quantile'
-        knots = quantile(spl.paramValues,linspace(0,1,spl.nSplines-2));
-    otherwise
-        error('wrong cfg.splinespacing. expected linear or quantile')
+if isempty(cfg.knotsequence)
+    switch cfg.splinespacing
+        case 'linear'
+            spl.knots =  linspace(splmin,splmax,spl.nSplines-2);
+            
+        case 'quantile'
+            spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines));
+            
+        otherwise
+            error('wrong cfg.splinespacing. expected linear or quantile')
+    end
+else
+    spl.knots =  knotsequence;
 end
-% we add 3 knots (because cubic, 4th order splines) in the
-% beginning and the end.
-knots = [repmat(knots(1),1,3) knots repmat(knots(end),1,3)];
-spl.knots = knots;
 
+if strcmp(spl.type,'default')
+    spl.splinefunction = @default_spline;
+    
+elseif strcmp(spl.type,'cyclical')
+    spl.splinefunction = @cyclical_spline;
+    
+elseif strcmp(spl.type,'custom')
+    assert(isa(cfg.customfunction, 'function_handle'),'for custom type one need to define a customfunction')
+    spl.splinefunction = cfg.customfunction;
+    
+else
+    error('unknown spline type (should be checked earlier)')
+end
 
-% This functino always removes either first or last spline. We therefore
-% need to recover it by running it twice and concatenating
-a = Bernstein(spl.paramValues,spl.knots,[],4,[],0);
-b = Bernstein(spl.paramValues,spl.knots,[],4,[],1);
-
-paramValuesSpline = a;
-paramValuesSpline(b(:)==1) = 1; 
-
+Xspline =  spl.splinefunction(spl.paramValues,spl.knots);
 
 %%
-if strcmp(cfg.codingschema,'effects')
-    
-    minix = get_min(nanmean(spl.paramValues),spl.paramValues);
-    [~,killThisSpline] = max(paramValuesSpline(minix,:));
-    
-    [~,tmp] = max(paramValuesSpline(:,killThisSpline));
-    peakAt = spl.paramValues(tmp);
-    fprintf('The spline that got removed due to collinearity in the basis set (as intended) for the effect %s has its peak at %f\n',spl.name,peakAt)
-    fprintf('This does not mean that the event-intercept represents this value! \n')
-else
-    killThisSpline = 1;
-end
+% if strcmp(cfg.codingschema,'effects')
+
+minix = get_min(nanmean(spl.paramValues),spl.paramValues);
+[~,killThisSpline] = max(Xspline(minix,:));
+
+[~,tmp] = max(Xspline(:,killThisSpline));
+peakAt = spl.paramValues(tmp);
+fprintf('The spline that got removed due to collinearity in the basis set (as intended) for the effect %s has its peak at %f\n',spl.name,peakAt)
+fprintf('This does not mean that the event-intercept represents this value! \n')
+% else
+%     killThisSpline = 1;
+% end
 
 
 %         else
 %             killThisSpline = 1;
 %         end
-paramValuesSpline(:,killThisSpline) = [];
+Xspline(:,killThisSpline) = [];
 spl.removedSplineIdx = killThisSpline;
-spl.X= paramValuesSpline;
+spl.X= Xspline;
+
+% Where the event is not defined a NAN appears, we have to set those to 0
+
+nanlist = isnan(spl.paramValues);
+
 spl.X(nanlist,:) = 0; % remove the nans
 spl.nSplines = size(spl.X,2);
 
 % give the splines "good" names
 % we find the parameter value that maximizes a spline and take this as an
 % identifier for the spline. Not perfect, but a good approximation
-[~,I] = max(paramValuesSpline,[],1);
+[~,I] = max(Xspline,[],1);
 maxSplVal = spl.paramValues(I);
 
 % round to two significant digits:
