@@ -139,11 +139,11 @@ for currPred= 1:length(paramList)
         
         % default case, a spline function has been defined
         if isfield(spl,'splinefunction')
-            Xspline = spl.splinefunction(splvalueSelect,spl.knots);       
+            Xspline = spl.splinefunction(splValueSelect,spl.knots);       
             
         elseif spl.knots(1) == spl.knots(2) 
             warning('deprecated spline-function detection,detected default bspline')
-            Xspline = default_spline(splvalueSelect,spl.knots(3:end-2));
+            Xspline = default_spline(splValueSelect,spl.knots(3:end-2));
         else
             warning('deprecated spline-function detection,assuming cyclical spline')
             Xspline = cyclical_spline(splValueSelect,spl.knots);
@@ -156,7 +156,7 @@ for currPred= 1:length(paramList)
             % we have a [channel x time x beta] * [beta x 1] vector product
             % to calculate => loop over channel
             for chan = 1:size(b,1)
-                result = squeeze(b(chan,:,:))*Xspline(c,:)';
+                result = permute(b(chan,:,:),[2 3 1])*Xspline(c,:)'; % permute instead of squeeze in case of 1 timepoint 1 channel
                 if chan == 1
                     betaNew(chan,:,end+1) =result;
                 else

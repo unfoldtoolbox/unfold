@@ -8,8 +8,8 @@ knots = [repmat(knots(1),1,3) knots repmat(knots(end),1,3)];
 
 % This functino always removes either first or last spline. We therefore
 % need to recover it by running it twice and concatenating
-a = Bernstein(paramValues,knots,[],4,[],0);
-b = Bernstein(paramValues,knots,[],4,[],1);
+a = Bernstein(paramValues',knots,[],4,[],0);
+b = Bernstein(paramValues',knots,[],4,[],1);
 
 paramValuesSpline = a;
 paramValuesSpline(b(:)==1) = 1;

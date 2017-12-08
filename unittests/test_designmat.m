@@ -52,9 +52,14 @@ assert(strcmp(EEG2.deconv.variableNames{EEG2.deconv.cols2variableNames(end)},'co
 %%
 cfgDesign = [];
 cfgDesign.coding = 'dummy';
-cfgDesign.formula   = {'y~1+spl(splineA,3)+conditionA',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
+cfgDesign.formula   = {'y~1+spl(splineA,4)+conditionA',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
 cfgDesign.eventtype = {'stimulus1', 'stimulus2',                       'stimulus3'};
 
+% fill in spline A for all events
+for e= 1:length(EEGsim.event)
+    
+EEGsim.event(e).splineA = rand(1);
+end
 EEGtmp = dc_designmat(EEGsim,cfgDesign);
 assert(strcmp(EEGtmp.deconv.variableNames{4},'2_(Intercept)'))
 assert(strcmp(EEGtmp.deconv.variableNames{5},'2_conditionA'))

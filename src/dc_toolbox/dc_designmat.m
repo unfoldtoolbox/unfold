@@ -413,32 +413,8 @@ if any(cols2variableNames)<1
     % one level. I therefore added this check
     error('this error can occur if one of the predictors you specified had only one level/value')
 end
-%% Add the extra defined splines
-EEG.deconv.predictorSplines = [];
-if ~isempty(cfg.spline)
-    
-    for s = 1:length(cfg.spline)
-        
-        [spl,nanlist] = dc_designmat_spline('name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
-%         [spl,nanlist] = dc_designmat_spline(t,cfg.spline{s},cfg);
 
-        % All nans that were removed in the designmat spline function need
-        % to be removed from all events
-        isinevent = strcmp(t.type,cfg.eventtype);
-        nanlist(~isinevent) = 0;
-        
-        X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
-        X = [X spl.X]; % add spline columns
-                
-        colnames = [colnames  spl.colnames];
-        variableNames = [variableNames {spl.name}];
-        
-        
-        cols2variableNames = [cols2variableNames repmat(length(variableNames),1, spl.nSplines)];
-        %predType = [predType repmat({'spline'},1,spl.nSplines)];
-        EEG.deconv.predictorSplines{end+1} = spl;
-    end
-end
+
 %%
 % We need to kick out all events that we are not interested in, but keep
 % the general event matrix structur the same (e.g. we can still use
@@ -475,8 +451,15 @@ EEG.deconv.cols2variableNames= cols2variableNames;
 EEG.deconv.cols2eventtype = ones(1,size(X,2)); % This looks odd, but the function is recursively called if multiple events are detected. This number is the fixed in the recursive call to represent the actual cols2eventtype
 EEG.deconv.eventtype = {cfg.eventtype};
 
+%% Add the extra defined splines
+EEG.deconv.predictorSplines = [];
+if ~isempty(cfg.spline)
+    for s = 1:length(cfg.spline)
+        [EEG] = dc_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
+    end
+end
 
-%EEG.deconv.predType = predType;
+
 
 % Designmat Checks
 if any(any(isnan(EEG.deconv.X)))

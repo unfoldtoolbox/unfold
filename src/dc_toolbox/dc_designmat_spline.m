@@ -1,4 +1,4 @@
-function [spl,nanlist] = dc_designmat_spline(varargin)
+function [EEG,spl,nanlist] = dc_designmat_spline(EEG,varargin)
 % Helper function to generate spline-part of designmatrix
 %
 % splinecfg{1}  = 'splineName'
@@ -15,14 +15,19 @@ cfg = finputcheck(varargin,...
     'nsplines','integer',[],[];...
     'knotsequence','real',[],[];...
     'splinespacing','string',{'linear','quantile'},'quantile';
-    'type','string',{'default','cyclical','custom'},'default';
-    'customfunction','',[],[];
+    'splinefunction','','','default';
+    'splinefunction','',[],[];
     },'mode','ignore');
 
 
 assert(~isempty(cfg.nsplines) | ~isempty(cfg.knotsequence),'you need to specify either number of splines or knotsequence')
 assert(~isempty(cfg.paramValues),'paramValues were empty')
 assert(~all(isnan(cfg.paramValues)),'all paramValues are nans')
+
+if size(cfg.paramValues,2) == 1
+    cfg.paramValues = cfg.paramValues';
+end
+
 
 
 spl = [];
@@ -34,7 +39,7 @@ splmin = min(spl.paramValues);
 splmax= max(spl.paramValues);
 spl.name = cfg.name;
 
-spl.type = cfg.type;
+
 
 
 
@@ -48,27 +53,27 @@ if isempty(cfg.knotsequence)
             spl.knots =  linspace(splmin,splmax,spl.nSplines-2);
             
         case 'quantile'
-            spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines));
+            spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines-2));
             
         otherwise
             error('wrong cfg.splinespacing. expected linear or quantile')
     end
 else
-    spl.knots =  knotsequence;
+    spl.knots =  cfg.knotsequence;
 end
 
-if strcmp(spl.type,'default')
+
+if ~ischar(cfg.splinefunction)
+    assert(isa(cfg.splinefunction, 'function_handle'),'for custom type one need to define a splinefunction')
+    spl.splinefunction = cfg.splinefunction;
+elseif strcmp(cfg.splinefunction,'default')
     spl.splinefunction = @default_spline;
     
-elseif strcmp(spl.type,'cyclical')
+elseif strcmp(cfg.splinefunction,'cyclical')
     spl.splinefunction = @cyclical_spline;
     
-elseif strcmp(spl.type,'custom')
-    assert(isa(cfg.customfunction, 'function_handle'),'for custom type one need to define a customfunction')
-    spl.splinefunction = cfg.customfunction;
-    
 else
-    error('unknown spline type (should be checked earlier)')
+    error('unknown spline type')
 end
 
 Xspline =  spl.splinefunction(spl.paramValues,spl.knots);
@@ -97,9 +102,7 @@ spl.X= Xspline;
 
 % Where the event is not defined a NAN appears, we have to set those to 0
 
-nanlist = isnan(spl.paramValues);
 
-spl.X(nanlist,:) = 0; % remove the nans
 spl.nSplines = size(spl.X,2);
 
 % give the splines "good" names
@@ -110,8 +113,27 @@ maxSplVal = spl.paramValues(I);
 
 % round to two significant digits:
 tmpSplVal = 2-floor(log10(abs(maxSplVal)));
+tmpSplVal(isinf(tmpSplVal)) = 0;
 tmpSplVal(tmpSplVal<0) = 0;
-rawColnames = repmat({spl.name},1,spl.nSplines);
+rawColnames = repmat({spl.name},spl.nSplines,1);
 
 spl.colnames = cellfun(@(x,signPoint,y)sprintf('%s_%.*f',x,signPoint,y),rawColnames,num2cell(tmpSplVal)',num2cell(maxSplVal)','UniformOutput', 0);
+
+
+%% Add the spline to the EEG-data
+
+EEG.deconv.predictorSplines{end+1} = spl;
+
+nanlist = isnan(spl.paramValues);
+EEG.deconv.X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
+EEG.deconv.X = [EEG.deconv.X spl.X]; % add spline columns
+
+EEG.deconv.colnames = [EEG.deconv.colnames  spl.colnames'];
+EEG.deconv.variableNames = [EEG.deconv.variableNames {spl.name}];
+
+
+EEG.deconv.cols2variableNames = [EEG.deconv.cols2variableNames repmat(length(EEG.deconv.variableNames),1, spl.nSplines)];
+EEG.deconv.cols2eventtype = [EEG.deconv.cols2eventtype repmat(EEG.deconv.cols2eventtype(1),1,size(spl.X,2))];
+EEG.deconv.variableType = [EEG.deconv.variableType 'spline'];
+%predType = [predType repmat({'spline'},1,spl.nSplines)];
 
