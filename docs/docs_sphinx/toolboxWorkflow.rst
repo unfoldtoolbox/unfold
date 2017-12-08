@@ -76,7 +76,7 @@ Fields of `EEG.deconv`
 
 
 
-predictorSplines
+splines
   all information on the splines are saved in here (see below). Splines are a bit more involved to describe, additional information needs to be saved
 
 formula
@@ -150,7 +150,7 @@ beta_nodc
 beta
   the betas with deconvolution [channel x time x predictors]
 
-Fields of `deconv.predictorSplines`
+Fields of `deconv.splines`
 ------------------------------------
 paramValues
   the parameter values of each event, e.g. for saccade amplitude: [1.3, 2.3, 6, 1.2 ...]

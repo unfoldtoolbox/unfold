@@ -93,7 +93,7 @@ end
 % if nSpl == 0
 %     nSplineBetas = 0;
 % else
-%     nSplineBetas = -nSpl + sum( cellfun(@(x)size(x.basis,1),EEG.deconv.predictorSplines) );
+%     nSplineBetas = -nSpl + sum( cellfun(@(x)size(x.basis,1),EEG.deconv.splines) );
 % end
 % if ~cfg.convertSplines
 paramList = 1:size(EEG.deconv.X,2);

@@ -122,10 +122,10 @@ for currPred= 1:length(paramList)
     
     if strcmp(unfold.deconv.variableType{variableIdx},'spline')
         
-        splName = cellfun(@(x)x.name,unfold.deconv.predictorSplines,'UniformOutput',0);
+        splName = cellfun(@(x)x.name,unfold.deconv.splines,'UniformOutput',0);
         splIdx = find(strcmp(splName,unfold.deconv.variableNames{variableIdx}));
         
-        spl = unfold.deconv.predictorSplines{splIdx};
+        spl = unfold.deconv.splines{splIdx};
         % If we found the spline_value given value in the splines, then choose
         % that one
         customSplineValue = strcmp(predNameList,spl.name);

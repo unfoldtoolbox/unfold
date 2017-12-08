@@ -122,7 +122,7 @@ spl.colnames = cellfun(@(x,signPoint,y)sprintf('%s_%.*f',x,signPoint,y),rawColna
 
 %% Add the spline to the EEG-data
 
-EEG.deconv.predictorSplines{end+1} = spl;
+EEG.deconv.splines{end+1} = spl;
 
 nanlist = isnan(spl.paramValues);
 EEG.deconv.X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)

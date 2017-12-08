@@ -17,7 +17,7 @@ function [splIdxListAll,paramList] = dc_getSplineidx(EEG)
 %| paramList= [1 2 3 8]
 
 
-assert(isfield(EEG,'deconv')&&isfield(EEG.deconv,'predictorSplines'),'could not find EEG.deconv.predictorSplines')
+assert(isfield(EEG,'deconv')&&isfield(EEG.deconv,'splines'),'could not find EEG.deconv.splines')
 
 numParam = size(EEG.deconv.X,2);
 splIdxListAll = [];
@@ -28,7 +28,7 @@ splineVar = find(strcmp(EEG.deconv.variableType,'spline'));
 splineCol = EEG.deconv.cols2variableNames;
 splineCol(~ismember(EEG.deconv.cols2variableNames,splineVar)) = 0;
 
-if isfield(EEG.deconv,'predictorSplines') && ~isempty(EEG.deconv.predictorSplines)
+if isfield(EEG.deconv,'splines') && ~isempty(EEG.deconv.splines)
     for splIdx = 1:length(splineVar)
         splIdxList = find(splineCol == splineVar(splIdx));
 %         splIdxList = find(cellfun(@check_spline,EEG.deconv.colnames(:),repmat({splIdx},length(EEG.deconv.colnames),1)));

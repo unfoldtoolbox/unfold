@@ -147,15 +147,15 @@ if iscell(cfg.formula)
                     EEG2.deconv.variableNames(samename) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.variableNames(samename),'UniformOutput',0);
                     samenamecol = ismember(EEG2.deconv.cols2variableNames,find(samename));
                     EEG2.deconv.colnames(samenamecol) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.colnames(samenamecol),'UniformOutput',0);
-                    if ~isempty(EEG2.deconv.predictorSplines)
+                    if ~isempty(EEG2.deconv.splines)
                         splineIX =  strcmp(EEG2.deconv.variableType,'spline');
                         samenamespline =find(splineIX & samename);
                         if ~isempty(samenamespline)
                             samenamesplineIX = cumsum(splineIX);
                             samenamesplineIX = samenamesplineIX(samenamespline);
                             for s = samenamesplineIX
-                                EEG2.deconv.predictorSplines{s}.name = sprintf('%i_%s',k,EEG2.deconv.predictorSplines{s}.name);
-                                EEG2.deconv.predictorSplines{s}.colnames = cellfun(@(y)sprintf('%i_%s',k,y),EEG2.deconv.predictorSplines{s}.colnames,'UniformOutput',0);
+                                EEG2.deconv.splines{s}.name = sprintf('%i_%s',k,EEG2.deconv.splines{s}.name);
+                                EEG2.deconv.splines{s}.colnames = cellfun(@(y)sprintf('%i_%s',k,y),EEG2.deconv.splines{s}.colnames,'UniformOutput',0);
                             end
                         end
                     end
@@ -171,7 +171,7 @@ if iscell(cfg.formula)
                 deconvAll.cols2eventtype = [deconvAll.cols2eventtype EEG2.deconv.cols2eventtype+max(deconvAll.cols2eventtype)];
                 deconvAll.variableNames = [deconvAll.variableNames EEG2.deconv.variableNames];
                 deconvAll.variableType = [deconvAll.variableType EEG2.deconv.variableType];
-                deconvAll.predictorSplines = [deconvAll.predictorSplines EEG2.deconv.predictorSplines];
+                deconvAll.splines = [deconvAll.splines EEG2.deconv.splines];
                 %Add the current maximum
                 EEG2.deconv.cols2variableNames = EEG2.deconv.cols2variableNames+max(deconvAll.cols2variableNames);
                 
@@ -452,7 +452,7 @@ EEG.deconv.cols2eventtype = ones(1,size(X,2)); % This looks odd, but the functio
 EEG.deconv.eventtype = {cfg.eventtype};
 
 %% Add the extra defined splines
-EEG.deconv.predictorSplines = [];
+EEG.deconv.splines = [];
 if ~isempty(cfg.spline)
     for s = 1:length(cfg.spline)
         [EEG] = dc_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);

@@ -81,7 +81,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-predictorsplines">Fields of <code class="docutils literal"><span class="pre">deconv.predictorSplines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-splines">Fields of <code class="docutils literal"><span class="pre">deconv.splines()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -129,7 +129,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-predictorsplines">Fields of <code class="docutils literal"><span class="pre">deconv.predictorSplines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-splines">Fields of <code class="docutils literal"><span class="pre">deconv.splines()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -175,7 +175,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-predictorsplines">Fields of <code class="docutils literal"><span class="pre">deconv.predictorSplines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-splines">Fields of <code class="docutils literal"><span class="pre">deconv.splines()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -250,7 +250,7 @@
 <div class="section" id="fields-of-eeg-deconv">
 <h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">EEG.deconv()</span></code><a class="headerlink" href="#fields-of-eeg-deconv" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
-<dt>predictorSplines</dt>
+<dt>splines</dt>
 <dd>all information on the splines are saved in here (see below). Splines are a bit more involved to describe, additional information needs to be saved</dd>
 <dt>formula</dt>
 <dd>contains all formulas specified in <code class="xref mat mat-func docutils literal"><span class="pre">dc_designmat()</span></code></dd>
@@ -304,8 +304,8 @@
 <dd>the betas with deconvolution [channel x time x predictors]</dd>
 </dl>
 </div>
-<div class="section" id="fields-of-deconv-predictorsplines">
-<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">deconv.predictorSplines()</span></code><a class="headerlink" href="#fields-of-deconv-predictorsplines" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fields-of-deconv-splines">
+<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">deconv.splines()</span></code><a class="headerlink" href="#fields-of-deconv-splines" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
 <dt>paramValues</dt>
 <dd>the parameter values of each event, e.g. for saccade amplitude: [1.3, 2.3, 6, 1.2 ...]</dd>
