@@ -142,7 +142,7 @@ if iscell(cfg.formula)
                 setB = EEG2.deconv.variablenames;
                 samename = ismember(setB,setA);
                 if any(samename)
-                    warning('event with same name found: %s. Renaming... \n',setB{samename})
+                    fprintf('event with same name found: %s. Renaming... \n',setB{samename})
                     % rename them
                     EEG2.deconv.variablenames(samename) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.variablenames(samename),'UniformOutput',0);
                     samenamecol = ismember(EEG2.deconv.cols2variablenames,find(samename));
@@ -199,8 +199,10 @@ else
     eventStr = cfg.eventtypes;
 end
 
-fprintf('Modeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
-
+fprintf('\nModeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
+%%
+% First of all save the formula
+EEG.deconv.formula = {cfg.formula};
 %% Regexp the formula
 catRegexp = 'cat\((.+?)\)';
 splRegexp = 'spl\((.+?)(,.+?)+?\)';
@@ -383,7 +385,7 @@ if sum(is_interaction)>0
     %check whether main effects were modeled, if not remove them from
     %variablenames
 
-    removeList = []
+    removeList = [];
     
     for int = find(is_interaction)
         predInInteraction = terms(int,:);
@@ -422,7 +424,7 @@ end
 % Kicking out ==> putting completly to 0.
 X(removeIndex,:) = 0;
 
-EEG.deconv.formula = {F};
+
 
 EEG.deconv.X = X;
 
@@ -431,7 +433,7 @@ EEG.deconv.X = X;
 % We want intercept = 0,continuos = 1, categorical = 2, interaction=3 and spline = 4, then add one and
 % index the labels
 
-varType = [double(categorical(1:end-1)) repmat(2,1,sum(is_interaction)) repmat(3,1,length(cfg.spline)) ] + 1; %the last categorical one is the fake 'y~', 
+varType = [double(categorical(1:end-1)) repmat(2,1,sum(is_interaction))] + 1; %the last categorical one is the fake 'y~', 
 if has_intercept
     varType = [0 varType];
 end
@@ -463,7 +465,8 @@ end
 
 % Designmat Checks
 if any(any(isnan(EEG.deconv.X)))
-    warning('NaNs detected in designmat, be sure to impute them before fitting the model')
-    warning(['found in: ',EEG.deconv.colnames{any(isnan(EEG.deconv.X))}])
+    warning('NaNs detected in designmat, try to impute them before fitting the model')
+    fprintf(['nans found in: ',EEG.deconv.colnames{any(isnan(EEG.deconv.X))}])
+    fprintf('\n')
     
 end
