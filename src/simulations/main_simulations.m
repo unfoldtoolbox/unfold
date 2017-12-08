@@ -108,5 +108,5 @@ cfg.sameyaxis = 'all';
 cfg.deconv = 1;
 cfg.plotSeparate = 'event';
 cfg.plotParam = {'3_(Intercept)','3_continuousA','splineA','splineB'};
-cfg.add_average = 0;
+cfg.add_marginal = 0;
 ax = dc_plotParam(unfold,cfg);

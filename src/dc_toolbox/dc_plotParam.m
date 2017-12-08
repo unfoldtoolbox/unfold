@@ -53,7 +53,7 @@ cfg = finputcheck(varargin,...
     'deconv','integer',[-1 0 1],-1;
     'channel','integer',[],[];
     'add_intercept','boolean',[],0;
-    'add_average', 'boolean', [],0;
+    'add_marginal', 'boolean', [],0;
     'include_intercept','boolean',[],0;
     'plotParam','',[],'';
     'plotSeparate','string',{'all','event','none'},'none';
@@ -66,7 +66,7 @@ if(ischar(cfg)); error(cfg);end
 
 assert(~isempty(cfg.channel)&& cfg.channel>0 &&length(cfg.channel) == 1,'error please select a single channel to plot')
 
-assert(~(cfg.add_average&&cfg.add_intercept),'cannot add average AND intercept (the former contains the latter')
+assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept (the former contains the latter')
 
 % Find out whether we want beta_dc, beta_nodc and if there are other fields
 % that have the same size that we should plot as columns.
@@ -110,7 +110,7 @@ value = [unfold.param(paramIdx).value];
 value(isnan(value)) = 0; %categorical variables are nan, we need to convert
 
 
-if cfg.add_average
+if cfg.add_marginal
     % necessary to add the average of the splines, i.e. simulate a marginal plot
     unfold = dc_addmarginal(unfold,'channel',cfg.channel);
 end
