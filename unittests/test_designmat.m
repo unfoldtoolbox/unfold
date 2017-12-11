@@ -49,10 +49,10 @@ EEG2 = dc_designmat(EEG2,'eventtypes','stimulus2','formula','y~conditionB*condit
 
 assert(size(EEG2.deconv.X,2) == 4)
 assert(strcmp(EEG2.deconv.variablenames{EEG2.deconv.cols2variablenames(end)},'conditionA:conditionB:continuousA'))
-%%
+%% Renaming checks
 cfgDesign = [];
 cfgDesign.coding = 'dummy';
-cfgDesign.formula   = {'y~1+spl(splineA,4)+conditionA',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
+cfgDesign.formula   = {'y~1+spl(splineA,4)+conditionA',       'y~1+conditionA*continuousA+splineA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
 cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
 
 % fill in spline A for all events
@@ -61,10 +61,33 @@ for e= 1:length(EEGsim.event)
 EEGsim.event(e).splineA = rand(1);
 end
 EEGtmp = dc_designmat(EEGsim,cfgDesign);
-assert(strcmp(EEGtmp.deconv.variablenames{4},'2_(Intercept)'))
-assert(strcmp(EEGtmp.deconv.variablenames{5},'2_conditionA'))
-assert(strcmp(EEGtmp.deconv.variablenames{6},'continuousA'))
-assert(strcmp(EEGtmp.deconv.variablenames{8},'3_(Intercept)'))
-assert(strcmp(EEGtmp.deconv.variablenames{9},'3_continuousA'))
-assert(strcmp(EEGtmp.deconv.variablenames{10},'3_splineA'))
-assert(strcmp(EEGtmp.deconv.variablenames{11},'splineB'))
+
+shouldBe = {'(Intercept)','conditionA','splineA','2_(Intercept)','2_conditionA','continuousA','2_splineA','2_conditionA:continuousA','3_(Intercept)','3_continuousA','3_splineA','splineB'};
+for k = 1:length(EEGtmp.deconv.variablenames)
+    is = EEGtmp.deconv.variablenames{k};
+    assert(strcmp(is,shouldBe{k}),sprintf('error in %s, should be %s',is,shouldBe{k}))
+end
+
+%% Renaming check interactions
+cfgDesign = [];
+cfgDesign.coding = 'dummy';
+cfgDesign.formula   = {'y~1+ conditionA + conditionB','y~1+conditionC + conditionA:conditionB:conditionC','y~1+conditionC*conditionB'};
+cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
+
+% fill in spline A for all events
+for e= 1:length(EEGsim.event)
+    
+EEGsim.event(e).conditionA = randi(3)-1;
+EEGsim.event(e).conditionB = randi(3)-1;
+EEGsim.event(e).conditionC = randi(3)-1;
+end
+EEGtmp = dc_designmat(EEGsim,cfgDesign);
+
+
+shouldBe = {'(Intercept)','conditionA','conditionB','2_(Intercept)','conditionC','2_conditionA:2_conditionB:conditionC','3_(Intercept)','3_conditionB','3_conditionC','3_conditionB:3_conditionC'};
+for k = 1:length(EEGtmp.deconv.variablenames)
+    is = EEGtmp.deconv.variablenames{k};
+    assert(strcmp(is,shouldBe{k}),sprintf('error in %s, should be %s',is,shouldBe{k}))
+end
+
+end

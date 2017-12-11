@@ -135,49 +135,8 @@ if iscell(cfg.formula)
                 
                 deconvAll = EEG2.deconv;
             else
-                %% First check for unique variablenames
-                
-                % to have unique variable names
-                setA = deconvAll.variablenames;
-                setB = EEG2.deconv.variablenames;
-                samename = ismember(setB,setA);
-                if any(samename)
-                    fprintf('event with same name found: %s. Renaming... \n',setB{samename})
-                    % rename them
-                    EEG2.deconv.variablenames(samename) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.variablenames(samename),'UniformOutput',0);
-                    samenamecol = ismember(EEG2.deconv.cols2variablenames,find(samename));
-                    EEG2.deconv.colnames(samenamecol) = cellfun(@(x)sprintf('%i_%s',k,x),EEG2.deconv.colnames(samenamecol),'UniformOutput',0);
-                    if ~isempty(EEG2.deconv.splines)
-                        splineIX =  strcmp(EEG2.deconv.variabletypes,'spline');
-                        samenamespline =find(splineIX & samename);
-                        if ~isempty(samenamespline)
-                            samenamesplineIX = cumsum(splineIX);
-                            samenamesplineIX = samenamesplineIX(samenamespline);
-                            for s = samenamesplineIX
-                                EEG2.deconv.splines{s}.name = sprintf('%i_%s',k,EEG2.deconv.splines{s}.name);
-                                EEG2.deconv.splines{s}.colnames = cellfun(@(y)sprintf('%i_%s',k,y),EEG2.deconv.splines{s}.colnames,'UniformOutput',0);
-                            end
-                        end
-                    end
-                    
-                end
-                
-                
-            
-                deconvAll.X(:,(end+1):(end+size(EEG2.deconv.X,2))) = EEG2.deconv.X;
-                deconvAll.colnames = [deconvAll.colnames,EEG2.deconv.colnames];
-                deconvAll.formula = [deconvAll.formula EEG2.deconv.formula];
-                deconvAll.eventtypes = [deconvAll.eventtypes EEG2.deconv.eventtypes];
-                deconvAll.cols2eventtypes = [deconvAll.cols2eventtypes EEG2.deconv.cols2eventtypes+max(deconvAll.cols2eventtypes)];
-                deconvAll.variablenames = [deconvAll.variablenames EEG2.deconv.variablenames];
-                deconvAll.variabletypes = [deconvAll.variabletypes EEG2.deconv.variabletypes];
-                deconvAll.splines = [deconvAll.splines EEG2.deconv.splines];
-                %Add the current maximum
-                EEG2.deconv.cols2variablenames = EEG2.deconv.cols2variablenames+max(deconvAll.cols2variablenames);
-                
-                % find the ones that where 0 in EEG2.deconv.cols2variablenames
-                % and reset them to 0 (0 meaning the intercept)
-                deconvAll.cols2variablenames = [deconvAll.cols2variablenames EEG2.deconv.cols2variablenames];
+                %% combine them, rename variables if necessary
+                deconvAll = combine_deconvsets(deconvAll,EEG2,k);
             end
             
         end
@@ -219,12 +178,12 @@ cat  = regexp(cfg.formula,catRegexp,'tokens');
 spl = regexp(cfg.formula,splRegexp,'tokens');
 
 for s = 1:length(spl)
-    if length(spl{s})~=2 
+    if length(spl{s})~=2
         error('error while parsing formula. wrongly defined spline in: %s. Needs to be: spl(your_eventname,10)',cfg.formula)
     end
     spl{s}{2} = str2num(strrep(spl{s}{2},',',''));
     
-end
+end%% First check for unique variablenames
 cfg.spline = [cfg.spline spl];
 
 cfg.categorical = [cfg.categorical cellfun(@(x)x{1},cat,'UniformOutput',0)];
@@ -384,7 +343,7 @@ is_interaction = cellfun(@(x)any(x),strfind(colnames,':'));
 if sum(is_interaction)>0
     %check whether main effects were modeled, if not remove them from
     %variablenames
-
+    
     removeList = [];
     
     for int = find(is_interaction)
@@ -433,7 +392,7 @@ EEG.deconv.X = X;
 % We want intercept = 0,continuos = 1, categorical = 2, interaction=3 and spline = 4, then add one and
 % index the labels
 
-varType = [double(categorical(1:end-1)) repmat(2,1,sum(is_interaction))] + 1; %the last categorical one is the fake 'y~', 
+varType = [double(categorical(1:end-1)) repmat(2,1,sum(is_interaction))] + 1; %the last categorical one is the fake 'y~',
 if has_intercept
     varType = [0 varType];
 end
@@ -469,4 +428,109 @@ if any(any(isnan(EEG.deconv.X)))
     fprintf(['nans found in: ',EEG.deconv.colnames{any(isnan(EEG.deconv.X))}])
     fprintf('\n')
     
+end
+end
+
+function deconvAll = combine_deconvsets(deconvAll,EEG2,k)
+% Function to combine recursive calls
+% checks that variables have unique variable names
+
+% Columnnames should be renamend according to variablenames. I.e. the
+% following should be:
+%   formula: y~condA, y~cat(condA)
+%   variablename = 'condA','2_condA'
+%   colname = 'condA','2_condA_0','2_condA_1'
+% and not
+%   colname = 'condA','condA_0','condA_1' 
+
+
+setA = deconvAll.variablenames;
+setA = cellfun(@(x)strsplit(x,':'),setA,'UniformOutput',0);
+
+currnames= EEG2.deconv.variablenames;
+colnames = EEG2.deconv.colnames;
+
+for curridx = 1:length(currnames)
+    
+    currnameext= strsplit(currnames{curridx},':');
+    
+        % check if any of the extended fieldnames are members of setA
+    samenameext = ismember(currnameext,[setA{:}]);
+    
+    
+    
+    
+    % rename those
+    if length(currnameext) == 1 && samenameext
+        %maineffect/intercept
+       newname = sprintf('%i_%s',k,currnameext{1});
+        % which columns belong to this predictor    
+        c2var = EEG2.deconv.cols2variablenames;
+        
+        % find all columns, could be more than variablenames because of
+        % dummy coding
+        ix = c2var(ismember(c2var,curridx));
+        for j = 1:length(ix)
+            % find the substring and replace it. Colnames could be longer
+            % than variablenames, i.e. 
+            % variablename: condA
+            % colname:      condA_0, condA_1, condA_2
+            colnames{ix(j) + j -1} = strrep(colnames{ix(j) + j - 1},currnameext{1},newname);
+        end
+        
+    elseif any(samenameext)
+        % interaction
+        newname = [];
+        for intidx = 1:length(currnameext)
+            if samenameext(intidx)
+               newname{intidx} = sprintf('%i_%s',k,currnameext{intidx});
+                % colnames
+%                 if ismember(j,EEG2.
+                  % find all columns, could be more than variablenames because of
+                  % dummy coding
+                  ix = c2var(ismember(c2var,curridx));
+                  for j = ix
+                      % find the substring and replace it. Colnames could be longer
+                      % than variablenames, i.e.
+                      % variablename: condA
+                      % colname:      condA_0, condA_1, condA_2
+                      colnames{j} = strrep(colnames{j},currnameext{intidx},newname{intidx});
+                  end
+                  
+            else
+                newname{intidx} = currnameext{intidx};
+            end
+
+        end
+       newname = strjoin(newname,':');
+
+    else
+        % if we do not need to rename, just take the old name
+        newname = currnames{curridx};
+    end
+    % does not add a ':' for single names
+
+    currnames{curridx} = newname;
+    
+end
+EEG2.deconv.variablenames = currnames;
+EEG2.deconv.colnames = colnames;
+
+
+
+
+deconvAll.X(:,(end+1):(end+size(EEG2.deconv.X,2))) = EEG2.deconv.X;
+deconvAll.colnames = [deconvAll.colnames,EEG2.deconv.colnames];
+deconvAll.formula = [deconvAll.formula EEG2.deconv.formula];
+deconvAll.eventtypes = [deconvAll.eventtypes EEG2.deconv.eventtypes];
+deconvAll.cols2eventtypes = [deconvAll.cols2eventtypes EEG2.deconv.cols2eventtypes+max(deconvAll.cols2eventtypes)];
+deconvAll.variablenames = [deconvAll.variablenames EEG2.deconv.variablenames];
+deconvAll.variabletypes = [deconvAll.variabletypes EEG2.deconv.variabletypes];
+deconvAll.splines = [deconvAll.splines EEG2.deconv.splines];
+%Add the current maximum
+EEG2.deconv.cols2variablenames = EEG2.deconv.cols2variablenames+max(deconvAll.cols2variablenames);
+
+% find the ones that where 0 in EEG2.deconv.cols2variablenames
+% and reset them to 0 (0 meaning the intercept)
+deconvAll.cols2variablenames = [deconvAll.cols2variablenames EEG2.deconv.cols2variablenames];
 end
