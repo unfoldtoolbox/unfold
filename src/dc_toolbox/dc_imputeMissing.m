@@ -33,10 +33,15 @@ else
 end
 
 for pred = missingColumn
-    nanIDX = isnan(EEG.deconv.X(:,pred));
+    
     cols2eventtypes = EEG.deconv.cols2eventtypes(pred);
-    eventrows = strcmp(EEG.deconv.eventtypes{cols2eventtypes},{EEG.event(:).type}); % bugfix proposal by OD: field "EEG.deconv.event" does not exist
-    X_pred = EEG.deconv.X(eventrows'&~nanIDX,pred);
+    eventrows = find(strcmp(EEG.deconv.eventtypes{cols2eventtypes},{EEG.event(:).type})); % bugfix proposal by OD: field "EEG.deconv.event" does not exist
+    assert(length(EEG.event) == size(EEG.deconv.X,1),'error, EEG.event structure not as long as EEG.deconv.X')
+    
+    nanIDX = isnan(EEG.deconv.X(eventrows,pred));
+
+    X_pred = EEG.deconv.X(eventrows(~nanIDX),pred);
+
     
     
     nNAN = sum(nanIDX);
@@ -59,5 +64,5 @@ for pred = missingColumn
         case 'median'
             imputedValues(:) = median(X_pred);
     end
-    EEG.deconv.X(nanIDX,pred) = imputedValues(:);
+    EEG.deconv.X(eventrows(nanIDX),pred) = imputedValues(:);
 end
