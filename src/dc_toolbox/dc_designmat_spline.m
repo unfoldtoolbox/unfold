@@ -125,8 +125,8 @@ spl.colnames = cellfun(@(x,signPoint,y)sprintf('%s_%.*f',x,signPoint,y),rawColna
 EEG.deconv.splines{end+1} = spl;
 
 nanlist = isnan(spl.paramValues);
-EEG.deconv.X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
 EEG.deconv.X = [EEG.deconv.X spl.X]; % add spline columns
+EEG.deconv.X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
 
 EEG.deconv.colnames = [EEG.deconv.colnames  spl.colnames'];
 EEG.deconv.variablenames = [EEG.deconv.variablenames {spl.name}];
