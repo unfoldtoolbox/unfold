@@ -51,7 +51,7 @@ function [varargout] = dc_plotParam(unfold,varargin)
 cfg = finputcheck(varargin,...
     {'pred_value','cell',[],{{'',[]}};
     'deconv','integer',[-1 0 1],-1;
-    'channel','integer',[],[];
+    'channel','',[],[];
     'add_intercept','boolean',[],0;
     'add_marginal', 'boolean', [],0;
     'include_intercept','boolean',[],0;
@@ -65,11 +65,17 @@ cfg = finputcheck(varargin,...
 if(ischar(cfg)); error(cfg);end
 
 
+
 betaSetName = dc_unfoldbetaSetname(unfold,varargin{:});
 
 if isempty(cfg.channel) && size(unfold.(betaSetName{1}),1) == 1
     cfg.channel = 1;
     fprintf('a single channel detected, none specified, thus using this one')
+end
+if ischar(cfg.channel)
+   assert(~isempty(unfold.chanlocs),'unfold.chanlocs is empty, it is necessary to be non-empty if you want to specify a channel by string, use numbers instead or populate unfold.chanlocs') 
+   cfg.channel = find(strcmp({unfold.chanlocs.labels},cfg.channel));
+
 end
 assert(~isempty(cfg.channel)&& cfg.channel>0 &&length(cfg.channel) == 1,'error please select a single channel to plot')
 
