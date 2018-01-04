@@ -51,7 +51,7 @@ function [varargout] = dc_plotParam(unfold,varargin)
 cfg = finputcheck(varargin,...
     {'pred_value','cell',[],{{'',[]}};
     'deconv','integer',[-1 0 1],-1;
-    'channel','integer',[],[];
+    'channel','',[],[];
     'add_intercept','boolean',[],0;
     'add_marginal', 'boolean', [],0;
     'include_intercept','boolean',[],0;
@@ -64,6 +64,10 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
+if ischar(cfg.channel)
+   assert(~isempty(unfold.chanlocs),'unfold.chanlocs is empty, it is necessary to be non-empty if you want to specify a channel by string, use numbers instead or populate unfold.chanlocs') 
+   cfg.channel = find(strcmp({unfold.chanlocs.labels},cfg.channel));
+end
 assert(~isempty(cfg.channel)&& cfg.channel>0 &&length(cfg.channel) == 1,'error please select a single channel to plot')
 
 assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept (the former contains the latter')
