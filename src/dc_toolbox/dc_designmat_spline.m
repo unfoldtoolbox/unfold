@@ -1,13 +1,6 @@
 function [EEG,spl,nanlist] = dc_designmat_spline(EEG,varargin)
 % Helper function to generate spline-part of designmatrix
 %
-% splinecfg{1}  = 'splineName'
-% splinecfg{2}  = numberOfSplines
-% splinecfg{3}  = 'type', default= bernstein => b-spline
-%
-%
-% cfg.splinespacing
-% cfg.codingschema
 %
 cfg = finputcheck(varargin,...
     {'name',   'string', [], 'spline_default';...
@@ -16,7 +9,6 @@ cfg = finputcheck(varargin,...
     'knotsequence','real',[],[];...
     'splinespacing','string',{'linear','quantile'},'quantile';
     'splinefunction','','','default';
-    'splinefunction','',[],[];
     },'mode','ignore');
 
 

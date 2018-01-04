@@ -64,13 +64,19 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
+
+betaSetName = dc_unfoldbetaSetname(unfold,varargin{:});
+
+if isempty(cfg.channel) && size(unfold.(betaSetName{1}),1) == 1
+    cfg.channel = 1;
+    fprintf('a single channel detected, none specified, thus using this one')
+end
 assert(~isempty(cfg.channel)&& cfg.channel>0 &&length(cfg.channel) == 1,'error please select a single channel to plot')
 
 assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept (the former contains the latter')
 
 % Find out whether we want beta_dc, beta_nodc and if there are other fields
 % that have the same size that we should plot as columns.
-betaSetName = dc_unfoldbetaSetname(unfold,varargin{:});
 
 if ~isempty(cfg.pred_value{1}{1})
     fprintf('Evaluating parameters at auto or specified values');
@@ -125,9 +131,9 @@ for bName =betaSetName
         fprintf('performing baseline correction \n')
         data = bsxfun(@minus,data,mean(data((unfold.times>=cfg.baseline(1))& (unfold.times<cfg.baseline(2)),:),1));
     end
-    if length(size(unfold.(bName{1}))) == 2
-        data = data';
-    end
+%     if length(size(unfold.(bName{1}))) == 2
+%         data = data';
+%     end
     
     
     
