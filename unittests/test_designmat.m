@@ -31,7 +31,9 @@ for e = 1:length(EEGsim.event)
 end
 EEG2 = dc_designmat(EEGsim,'eventtypes',{'stimulus1' 'stimulus2'},'formula',{'y~evt','y~evt'});
 assert(size(EEG2.deconv.X,2) == 4);
-%%
+
+
+%% Only Interaction bug check
 % We had a bug where specifying only the interaction without main effects
 % jumbles things
 EEG2 = dc_designmat(EEGsim,'eventtypes','stimulus2','formula','y~conditionA:continuousA');
