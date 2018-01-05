@@ -335,6 +335,7 @@ end
 variablenames = F.VariableNames(1:end-1);
 has_intercept = any(strcmp(colnames,'(Intercept)'));
 
+assert(all(cols2variablenames~=0),'error: at least one predictor has only a single value')
 if isempty(colnames)
     error('did you specify y~ -1? You need at least a single column in your designmatrix')
 end
@@ -416,7 +417,8 @@ EEG.deconv.eventtypes = {cfg.eventtypes};
 EEG.deconv.splines = [];
 if ~isempty(cfg.spline)
     for s = 1:length(cfg.spline)
-        [EEG] = dc_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
+        [EEG, ~,nanlist] = dc_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
+        EEG.deconv.X(nanlist,:) = 0;
     end
 end
 
