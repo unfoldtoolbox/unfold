@@ -5,24 +5,25 @@ function [EEG] = dc_imputeMissing(EEG,varargin)
 %
 % Arguments:
 % cfg.method:
-%  * 'drop'     : (Default, similar to R) Drop the whole event from the designmat (fill
-%                 it with 0).
+%  * 'drop'     : (similar to R) Drop the whole event from the designmat (fill
+%                 it with 0). This will lead to the event not being used
+%                 for overlap correction!
 %  * 'marginal' : fill in a random value from the marginal predictor-distribution
 %                 in the future it might be interesting to implement not the
 %                 marginal, but multivariate methods to conservate
 %                 correlations between predictors (c.f. Horton & Kleinmann 2007)
 %  * 'mean'     : fill in the mean value
-%  * 'median'   : fill in the median value
+%  * 'median'   : (Default) fill in the median value
 %
 % Returns:
 % EEG.deconv.X in which missing NAN-values were imputed ('marginal', 'mean',
 % 'median') or in which the events with missing predictor information were 
-% removed ('drop')
+% removed ('drop'), which means put to 0
 
 fprintf('\n%s(): Looking for missing predictor information...',mfilename)
 
 cfg = finputcheck(varargin,...
-    {'method',   'string', {'drop','marginal','mean','median'},'drop';...
+    {'method',   'string', {'drop','marginal','mean','median'},'median';...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
@@ -70,9 +71,9 @@ for pred = missingColumn
     %% now deal with missing values   
     switch cfg.method
         case 'drop'
+            % in case of drop, we want to remove the whole event
             EEG.deconv.X(nanIDX,:) = 0; 
-            % bugfix olaf: this index was previously wrong, since nanIDX was created only on the "eventrows" subset of EEG.deconv.X, not the whole EEG.deconv.X!
-            continue % shouldn't this be "return"?
+            continue
         case 'marginal'
             imputedValues(:) = datasample(X_pred,nNAN);
         case 'mean'

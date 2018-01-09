@@ -1,15 +1,30 @@
 function test_imputeMissing()
-EEG = simulate_test_case(5,'noise',0,'basis','box');
-for e = 10:20
-    EEG.event(e).continuousA = nan(1);
+EEG = simulate_test_case(13,'noise',0,'basis','box');
+stimCix = find(strcmpi({EEG.event.type},'stimulusC'));
+% 3 stimuliC need to be imputed
+
+for e = 5:8
+    EEG.event(stimCix(e)).continuousA = nan(1);
 end
-EEG = dc_designmat(EEG,'formula','y~1+continuousA','eventtypes','stimulusA');
+EEG = dc_designmat(EEG,'formula',{'y~1','y~1+continuousA'},'eventtypes',{{'stimulusA'},{'stimulusC'}});
 
 
-check_nan(dc_imputeMissing(EEG,'method','mean'))
-check_nan(dc_imputeMissing(EEG,'method','median'))
-check_nan(dc_imputeMissing(EEG,'method','marginal'))
-check_nan(dc_imputeMissing(EEG,'method','drop'))
+for type = {'mean','median','marginal','drop'}
+    EEGimp = dc_imputeMissing(EEG,'method',type{1});
+
+    switch type{1}
+        case 'mean'
+            assert(all(nanmean(EEG.deconv.X) - nanmean(EEGimp.deconv.X)< 10^-10),'error, mean imputation showed larger error')
+        case 'drop'
+            tmp = EEGimp.deconv.X(stimCix(5:8),:);
+            assert(all(tmp(:)==0),'error, drop imputation did something wrong')
+        otherwise
+            
+    end
+    
+check_nan(EEGimp)
+end
+
 EEG2 = dc_imputeMissing(EEG,'method','drop');
 
 
