@@ -83,7 +83,7 @@ formula
   contains all formulas specified in `dc_designmat`
 
 X
-  The designmatrix. This can be used for 'classical' massive-univariate linear modeling
+  The designmatrix. This can be used for 'classical' mass-univariate linear modeling
 
 variabletypes
   Type of each variable/predictor, can be 'categorical','continuous' and 'spline'
@@ -119,7 +119,7 @@ beta_dc
   deconvolved betas. Output of `dc_glmfit`. This is the main outcome of this toolbox
 
 beta_nodc
-    non-deconvolved betas. This is a massive univariate fit where each timepoint and each electrode were fitted independently. Output of `dc_glmfit_nodc`
+    non-deconvolved betas. This is a mass univariate fit where each timepoint and each electrode were fitted independently. Output of `dc_glmfit_nodc`
 
 channel
   for which channel the deconvolved betas have been calculated
