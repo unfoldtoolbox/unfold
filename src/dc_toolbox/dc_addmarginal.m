@@ -61,7 +61,7 @@ for e = unique(event)
         average_otherEffects = squeeze(sum(unfold_avg.(cfg.betaSetname)(cfg.channel,:,unfoldavg_ix),3));
         
         % add this marginal to the current predictor
-        unfold.(cfg.betaSetname)(cfg.channel,:,currEvent) = unfold.(cfg.betaSetname)(cfg.channel,:,currEvent) + average_otherEffects;
+        unfold.(cfg.betaSetname)(cfg.channel,:,currEvent) = unfold.(cfg.betaSetname)(cfg.channel,:,currEvent) + repmat(average_otherEffects,1,1,length(currEvent));
         
     end
 end
