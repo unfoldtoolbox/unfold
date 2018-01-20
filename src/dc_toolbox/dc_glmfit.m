@@ -122,7 +122,7 @@ if strcmp(cfg.method,'lsmr')
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         
         % use iterative solver for least-squares problems (lsmr)
-        [beta(:,e),ISTOP,ITN] = lsmr(X,sparse(double(data(e,:)')),[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
+        [beta(:,e),ISTOP,ITN] = lsmr(X,double(data(e,:)'),[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
         if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
         end
@@ -143,7 +143,7 @@ elseif strcmp(cfg.method,'par-lsmr')
     addpath('../lib/lsmr/')
     beta = nan(size(X,2),EEG.nbchan);
     Xdc = X;
-    data = sparse(double(data'));
+    data = double(data');
     % go tru channels
     fprintf('starting parallel loop')
     parXdc = parallel.pool.Constant(Xdc);
