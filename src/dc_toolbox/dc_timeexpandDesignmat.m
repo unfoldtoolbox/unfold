@@ -115,7 +115,7 @@ switch cfg.method
         indrow_all = [];
         val_all    = [];
         for l = 1:size(eventvec,1) %for each predictor
-            fprintf('Timeexpanding %i from %i \n',l,size(eventvec,1))
+            fprintf('Time-expanding predictor %i of %i \n',l,size(eventvec,1))
             currow = eventvec(l,:);
             
             

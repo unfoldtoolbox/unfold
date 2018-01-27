@@ -28,9 +28,7 @@ cfg.winrej = round(cfg.winrej);
 for k = 1:size(cfg.winrej,1)
     rej = [rej cfg.winrej(k,1):cfg.winrej(k,2)];
 end
-
-fprintf('\nremoving %.1f%% from design matrix (fill it with zeros) \n',length(unique(rej))/size(EEG.deconv.Xdc,1)*100)
 EEG.deconv.Xdc(round(rej),:) = 0;
-
+fprintf('\nremoving %.2f%% of rows from design matrix (fill it with zeros) \n',length(unique(rej))/size(EEG.deconv.Xdc,1)*100)
 
 end
