@@ -10,6 +10,14 @@ cfg = finputcheck(varargin,...
 
 if(ischar(cfg)); error(cfg);end
 
+% In order to add the marginal, we need evaluated splines (dc_getParam) first.
+% here we are looking for spline_converted or continuous_converted. I.e. if
+% any have not been converted, throw an error.
+if any(strcmp({unfold.param.type},'spline')) || any(strcmp({unfold.param.type},'continous'))
+    error('In order to add the marginals, you need to run dc_getParam first to evaluate the splines and continuous predictors');
+end
+
+
 if isempty(cfg.betaSetname)
     [betaSetname] = dc_unfoldbetaSetname(unfold,varargin{:});
     
@@ -25,6 +33,8 @@ if isempty(cfg.betaSetname)
     end
 end
 % END OF RECURSION ALERT
+
+
 
 fprintf('dc_addmarginal: working on field %s \n',cfg.betaSetname)
 if isempty(cfg.channel)
@@ -56,6 +66,7 @@ for e = unique(event)
         % they should be covered by the effects/dummy coding schema
         % already ?!
         removeix = strcmp('categorical',{unfold_avg.param(unfoldavg_ix).type});
+        removeix = [removeix strcmp('interaction',{unfold_avg.param(unfoldavg_ix).type})];
         unfoldavg_ix(removeix) = [];
         % calculate the marginal over all other predictors
         average_otherEffects = squeeze(sum(unfold_avg.(cfg.betaSetname)(cfg.channel,:,unfoldavg_ix),3));
