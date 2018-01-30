@@ -107,7 +107,10 @@ if  strcmp(cfg.method,'matlab') % save time
     if cfg.debug
         spparms('spumoni',2)
     end
-    beta(:,cfg.channel) = X \ (double(data(cfg.channel,:)'));
+    for e = cfg.channel
+        beta(:,e)= X \ (double(data(e,:)'));
+    end
+
     
 elseif strcmp(cfg.method,'pinv')
     Xinv = pinv(full(X));
