@@ -91,7 +91,7 @@ plot(unfold.times,bsxfun(@times,squeeze(unfold.beta_nodc),multWith),'-x'),hold a
 % plot(unfold.times,squeeze(unfold.beta_nodc),'-x'),hold all
 plot(EEG.sim.sig.time,EEG.sim.separateSignal','-ok')
 title('epoched vs. orig')
-%%
+%% draw splinethings
 unfold = dc_beta2unfold(EEG);
 
 cfg = [];
@@ -105,7 +105,7 @@ unfold = dc_getParam(unfold,cfg);
 cfg = [];
 cfg.channel = 1;
 cfg.sameyaxis = 'all';
-cfg.deconv = 1;
+cfg.deconv = -1;
 cfg.plotSeparate = 'event';
 cfg.plotParam = {'3_(Intercept)','3_continuousA','splineA','splineB'};
 cfg.add_marginal = 0;
