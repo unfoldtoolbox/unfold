@@ -4,9 +4,9 @@ function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
 % copies over time (in the range of the windowlength).
 %
 %Arguments:
-%  cfg.method(string): default 'full'; Three methods are available:
+%  cfg.method(string): default 'stick'; Three methods are available:
 %
-%        * 'full'        We shift the signal over each point in time
+%        * 'stick'      We shift the signal over each point in time, uses the stickfunction basis
 %        * 'splines'    We use cubic splines (number = TimeexpandPARAM) to approximate the signal. This makes sense as neighbouring timepoints are very likely correlated.
 %        * 'fourier'    We use a fourier set (up to the first TimeexpandPARAM frequencies) to model the signal.
 %
@@ -31,7 +31,7 @@ function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
 fprintf('\ndc_timeexpandDesignmat(): Timeexpanding the designmatrix...\n');
 
 cfg = finputcheck(varargin,...
-    { 'method',         'string' ,  {'full','splines','spline','fourier'}, 'full';
+    { 'method',         'string' ,  {'full','splines','spline','fourier','stick'}, 'stick';
     'timelimits','integer',[],[];...
     'timeexpandparam', 'integer', [], 30;...
     'sparse','boolean',[],1;...
@@ -39,8 +39,14 @@ cfg = finputcheck(varargin,...
 if(ischar(cfg)); error(cfg);end
 
 if strcmp(cfg.method,'spline')
-    cfg.method = 'splines'
+    warning('you used method=spline, but it is method=splines')
+    cfg.method = 'splines';
 end
+if strcmp(cfg.method,'full')
+    warning('the method full is deprevated, we renamed it to stick')
+    cfg.method = 'stick';
+end
+
 
 assert(cfg.timelimits(1)<cfg.timelimits(2),'Timelimits are not ordered correctly or are equal')
 assert(~any(isnan(EEG.deconv.X(:))),'Warning NAN values found in designmatrix. will not continue')
@@ -107,49 +113,68 @@ end
 
 
 switch cfg.method
-    case 'full'
-        if cfg.sparse ==0
-            warning('the full-deconvolution only exists in sparse mode')
-        end
-        indcol_all = [];
-        indrow_all = [];
-        val_all    = [];
+    case 'stick'
+        
+        n_entries = sum(eventvec ~= 0,2);
+        
+        n_cols = sum(n_entries) * cfg.windowlength;
+
+        indcol_all = nan(1,n_cols);
+        indrow_all = nan(1,n_cols);
+        val_all = nan(1,n_cols);
+        
+        shiftvec = [1:cfg.windowlength] + cfg.timelimits(1)*EEG.srate -1;
+
+        ixlist = cumsum(n_entries)*cfg.windowlength;
         for l = 1:size(eventvec,1) %for each predictor
-            fprintf('Timeexpanding %i from %i \n',l,size(eventvec,1))
-            currow = eventvec(l,:);
+            if l == 1
+                startix = 1;
+            else
+                startix = ixlist(l-1)+1;
+            end
+            endix = ixlist(l);
             
             
-            shiftvec = [1:cfg.windowlength] + cfg.timelimits(1)*EEG.srate -1;
-            for k = 1:length(shiftvec) %for each time-point in the window
-                idx = currow~=0; %should be "floating" safe, as matrix is instanciated using "zeros"
-                
-                indcol = repmat(k+(l-1)*cfg.windowlength,1,sum(idx));
-                
-                indrow = 1:length(currow);
-                indrow = indrow(idx);
-                indrow = indrow + shiftvec(k);
-                
-                indcol_all = [indcol_all indcol];
-                indrow_all = [indrow_all indrow];
-                val_all = [val_all currow(idx)];
-                
+            % column index
+            tmp = repmat(1:cfg.windowlength,n_entries(l),1);
+            indcol_all(startix:endix) = tmp(:)' ;
+            if l >1
+                indcol_all(startix:endix)  = indcol_all(startix:endix)  + indcol_all(startix-1);
             end
             
             
+            
+            %row index
+            rowix =find(eventvec(l,:) ~= 0);
+
+            tmp = repmat(rowix,cfg.windowlength,1)';
+            
+            % shift up / down according to the cfg.windowlength location
+            tmp = bsxfun(@plus,tmp,shiftvec);
+           
+            indrow_all(startix:endix) = tmp(:)' ;
+
+            % values
+
+            tmp = repmat(eventvec(l,rowix),cfg.windowlength,1)';
+            val_all(startix:endix) = tmp(:)';
         end
+
         
+        
+        % delete everything larger than what its supposed to be
         dimFullX = [size(eventvec,2),cfg.windowlength*size(eventvec,1)];
         % We need to make sure the dimFullX are integers
         dimFullX = round(dimFullX);
         removeIdx = indrow_all>dimFullX(1) | indrow_all<=0;
-        
-        % We need the floor on the indices because there can be very small floating point
-        % errors in the multiplication more upstream
-        
         Xdc = sparse(round(indrow_all(~removeIdx)),round(indcol_all(~removeIdx)),val_all(~removeIdx),dimFullX(1),dimFullX(2));
-        
+        if cfg.sparse ==0
+           fprintf('Converting sparse Xdc to full Xdc as requested\n')
+           Xdc = full(Xdc);
+        end
         basis = eye(cfg.windowlength);
-        
+
+
     case {'splines', 'fourier'}
         switch cfg.method
             case 'splines'
