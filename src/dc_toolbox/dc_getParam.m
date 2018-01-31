@@ -232,7 +232,7 @@ switch cfg.auto_method
         contmax = max(predVal);
         contmin = min(predVal);
         ran = contmax-contmin;
-        
+        warning('moving min/max inside by 0.05 of total range in order to reduce bad extreme-estimates');
         contValueSelect = linspace(contmin+0.05*ran,contmax-0.05*ran,cfg.auto_n);
     case 'quantile'
         contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
