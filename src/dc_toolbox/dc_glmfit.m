@@ -12,7 +12,7 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %    very memory efficient, but is a lot slower than the 'matlab' option
 %    because each electrode has to be solved independently. The LSMR
 %    algorithm is used for sparse iterative solving.
-%   
+%
 %    * "par-lsmr"  same as lsmr, but uses parfor with ncpu-1. This does not
 %    seem to be any faster. Not recommended
 %
@@ -49,7 +49,7 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %   cfg.debug (boolean): 0, only with method:matlab, outputs additional
 %                  details from the solver used
 %
-%   save_memory_or_time: Deprecated, has been renamed to 'method' 
+%   save_memory_or_time: Deprecated, has been renamed to 'method'
 %   EEG:  the EEG set, need to have EEG.deconv.Xdc compatible with
 %         the size of EEG.data
 %
@@ -68,6 +68,7 @@ cfg = finputcheck(varargin,...
     {'method', 'string',{'par-lsmr','lsmr','matlab','pinv','glmnet','lsqr'}, 'lsmr';
     'lsmriterations','integer',[],400;
     'glmnetalpha','real',[],1;... # used for glmnet
+    'precondition','boolean',[],1;... % inofficial
     'channel','integer',[],1:size(EEG.data,1);
     'debug','boolean',[],0;
     },'mode','ignore');
@@ -81,7 +82,7 @@ assert(size(EEG.deconv.Xdc,1) == size(EEG.data,2),'Size of designmatrix (%d,%d),
 assert(~any(isnan(EEG.deconv.Xdc(:))),'Warning NAN values found in designmatrix. will not continue')
 
 X = EEG.deconv.Xdc;
- 
+
 
 disp('solving the equation system');
 t = tic;
@@ -97,19 +98,20 @@ data(:,emptyRows) = [];
 % diagonal precondition // normalize columns
 % this speeds up calculation by factor 2-3
 
-normfactor = sqrt(sum(X.^2)); % cant use norm because of sparsematrix
-% X = X./normfactor; %matlab 2016b and later
-X = bsxfun(@rdivide,X,normfactor);
-
+if cfg.precondition
+    normfactor = sqrt(sum(X.^2)); % cant use norm because of sparsematrix
+    % X = X./normfactor; %matlab 2016b and later
+    X = bsxfun(@rdivide,X,normfactor);
+end
 %% Main methods
 beta = nan(size(X,2),EEG.nbchan);
 if  strcmp(cfg.method,'matlab') % save time
     if cfg.debug
         spparms('spumoni',2)
     end
-        beta(:,e)= X (double(data'));
+    beta= X \(double(data'));
     
-
+    
     
 elseif strcmp(cfg.method,'pinv')
     Xinv = pinv(full(X));
@@ -121,11 +123,11 @@ elseif strcmp(cfg.method,'pinv')
 elseif strcmp(cfg.method,'lsqr')
     for e = cfg.channel
         beta(:,e) = lsqr(X,data(e,:)',10^-8,cfg.lsmriterations);
-    end    
-
+    end
+    
 elseif strcmp(cfg.method,'lsmr')
     
-
+    
     % go trough channels
     for e = cfg.channel
         t = tic;
@@ -199,9 +201,10 @@ elseif strcmp(cfg.method,'glmnet')
 end
 fprintf('\n LMfit finished \n')
 
-% rescaling to remove preconditioning
-beta = bsxfun(@rdivide,beta,full(normfactor)');
-
+if cfg.precondition
+    % rescaling to remove preconditioning
+    beta = bsxfun(@rdivide,beta,full(normfactor)');
+end
 
 beta = beta'; % I prefer channels X betas (easier to multiply things to)
 
