@@ -236,20 +236,20 @@ switch sim
         signals{1}(3) = cont;
         signals{1}(3).overlap = 0.8;
         signals{1}(3).effectsize= +1;
-%         
-%         signals{1}(4) = cont;
-%         signals{1}(4).overlap = 0.8;
-%         signals{1}(4).effectsize= -1;
-%         signals{1}(3).function = nan;
-%         signals{1}(4).function = nan;
-%         signals{1}(4).predictorName = 'contB';
-%         
-%         
-%         signals{1}(5) = spline;
-%         signals{1}(5).overlap = nan; % not yet defined
-%         signals{1}(5).effectsize= 0.01;
-%         signals{1}(5).predictorName = 'splineA';
-%         signals{1}(5).function = @(x)x.^2;
+         
+        signals{1}(4) = cont;
+        signals{1}(4).overlap = 0.8;
+        signals{1}(4).effectsize= -1;
+        signals{1}(3).function = nan;
+        signals{1}(4).function = nan;
+        signals{1}(4).predictorName = 'contB';
+        
+        
+        signals{1}(5) = spline;
+        signals{1}(5).overlap = nan; % not yet defined
+        signals{1}(5).effectsize= 0.01;
+        signals{1}(5).predictorName = 'splineA';
+        signals{1}(5).function = @(x)x.^2;
         
         
     otherwise
