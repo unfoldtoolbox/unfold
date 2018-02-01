@@ -17,8 +17,8 @@ cfg = struct();
 cfg.designmat.coding = {'dummy','reference'};
 cfg.designmat.splinespacing = {'linear','quantile'};
 cfg.timeexpandDesignmat.timelimits = {[-0.5,1.5],[-0.5,-0.1],[1 2]};
-cfg.timeexpandDesignmat.method = {'full','splines','fourier'};
-cfg.timeexpandDesignmat.timeexpandparam = [3, 5,10,35];
+cfg.timeexpandDesignmat.method = {'stick','splines','fourier'};
+cfg.timeexpandDesignmat.timeexpandparam = [4, 16, 35];
 cfg.timeexpandDesignmat.sparse = [0,1];
 cfg.glmfit.method={'lsmr','matlab','pinv'};
 cfg.glmfit.channel = 1;
@@ -67,7 +67,7 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
                 
                 for g = glmfit'
                     EEGg= dc_glmfit(EEGt,'method',g{1},'channel',g{2});
-                    
+                    assert(~any(isnan(EEGg.deconv.beta_dc(:))),'error, found nan after fit');
                     for b = beta2EEG'
                         EEGb = EEGg;
                         if b{1} == 0
@@ -75,7 +75,7 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
                             EEGb = dc_glmfit_nodc(EEGb);
                         end
                         unfold = dc_beta2unfold(EEGb,'deconv',b{1},'channel',b{2});
-                        if strcmp(t{2},'full') && testCase==14 && b{2} == 1 && all(t{1} == [-0.5,1.5])
+                        if strcmp(t{2},'stick') && testCase==14 && b{2} == 1 && all(t{1} == [-0.5,1.5])
                             if ~isfield(EEGb,'urevent') || isempty(EEG.urevent)
                                 EEGb.urevent = EEG.event; % this field is populated in dc_epoch
                             end
