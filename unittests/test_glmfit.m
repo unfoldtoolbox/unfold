@@ -52,11 +52,11 @@ EEG = eeg_checkset(EEG);
 EEG = dc_timeexpandDesignmat(EEG,'timelimits',[-1 2]);
 %%
 test_fit(EEG,'lsmr')
-try
-test_fit(EEG,'par-lsmr')
-catch
-    warning('parallel code had an error, no parallel toolbox?')
-end
+% try
+%     test_fit(EEG,'par-lsmr')
+% catch
+%     warning('parallel code had an error, no parallel toolbox?')
+% end
 test_fit(EEG,'pinv')
 test_fit(EEG,'matlab')
 % test_fit(EEG,'glmnet') % the mex was crashing at the time
