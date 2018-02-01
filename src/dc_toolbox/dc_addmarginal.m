@@ -1,6 +1,41 @@
 function unfold = dc_addmarginal(unfold,varargin)
 %add the marginal of the other predictors (i.e. continuous & spline
-%predictors to the beta estimates
+%predictors) to the beta estimates.
+% Important: If dummy-coded (i.e. non-effect coded) predictors and
+% interactions exist, they are NOT added to the marginal effect. I.e. the
+% output of the method returns the average ERP evaluated at the average of
+% all spline/continuous predictors, keeping the categorical/interaction
+% structure untouched.
+%
+%
+% For instance the model 1 + cat(facA) + continuousB
+% has the betas: intercept, facA==1, continuousB-Slope
+%
+% The beta output of dc_unfold2beta(dc_glmfit) mean the following:
+% intercept: response with facA = 0 and continuousB = 0
+% facA==1  : differential effect of facA == 1 (against facA==0)
+% continuousB-slope: the slope of continous B
+%
+% Using dc_getParam, we evaluate the continuous parameter at [0 50 100]
+% The beta output of dc_getParam mean the following:
+% intercept: same as before
+% facA==1  : same as before
+% continuousB@0  : the differential effect if continuous B is 0 
+% continuousB@50 : the differential effect if continuous B is 50
+% continuousB@100: the differential effect if continuous B is 100
+%
+% Using dc_addmarginal, the average response is added to all predictors.
+%
+% intercept: the response of facA==0 AND continuousB@mean(continuousB)
+% intercept: the response of facA==1 AND continuousB@mean(continuousB)
+% continuousB@0  : the response of facA==0 if continuous B is 0 
+% continuousB@50 : the response of facA==0 if continuous B is 50
+% continuousB@100: the response of facA==0 if continuous B is 100
+%
+% Note that mean(continuousB) does not need to be a number we evaluated in
+% the dc_getParam step.
+
+
 
 % parse inputs
 cfg = finputcheck(varargin,...
