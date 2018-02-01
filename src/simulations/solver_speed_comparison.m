@@ -1,7 +1,7 @@
 
 
 %% The function reseats the random generator (and sets it back)
-EEGsim = simulate_test_case(15,'noise',0,'basis','box','datalength',10*60,'srate',500);
+EEGsim = simulate_test_case(15,'noise',0,'basis','box','datalength',100*60,'srate',500);
 EEGsim.data = EEGsim.data  + 0*randn(size(EEGsim.data));
 EEGsim.data = repmat(EEGsim.data,50,1);
 cfg = [];
@@ -9,7 +9,7 @@ cfg.formula   = {'y~1',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(spline
 cfg.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
 
 EEGsim = dc_designmat(EEGsim,cfg);
-EEGsim = dc_timeexpandDesignmat(EEGsim,'timelimits',[-0.5 0.5],'method','full');
+EEGsim = dc_timeexpandDesignmat(EEGsim,'timelimits',[-0.5 0.5],'method','stick');
 
 %%
 
@@ -25,5 +25,15 @@ for method = {'lsmr','lsqr','matlab'}
 end
 
 
-%% CPU VS GPU, LSQR vs LSMR
+%% Precondition increases speed by 50%
 
+tAll = table();
+for precond = [0 1]
+   t1 = tic;
+   
+   EEGsolved = dc_glmfit(EEGsim,'method','lsmr','precondition',precond,'channel',1);
+   t2 = toc(t1);
+   
+   t = table(t2,precond);
+   ex = [tAll;t];
+end
