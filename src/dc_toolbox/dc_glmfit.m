@@ -8,8 +8,8 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %
 %Arguments:
 %   cfg.method (string):
-%    * "lsmr"      default; iterative solver is used, this is
-%    very memory efficient, but is a lot slower than the 'matlab' option
+%    * "lsmr"      default; SAVES MEMORY an iterative solver is used, this is
+%    very memory efficient, but is a lot slower than the 'time' option
 %    because each electrode has to be solved independently. The LSMR
 %    algorithm is used for sparse iterative solving.
 %
@@ -65,7 +65,7 @@ fprintf('\ndc_glmfit(): Fitting deconvolution model...');
 
 
 cfg = finputcheck(varargin,...
-    {'method', 'string',{'par-lsmr','lsmr','matlab','pinv','glmnet','lsqr'}, 'lsmr';
+    {'method', 'string',{'par-lsmr','lsmr','matlab','pinv','glmnet'}, 'lsmr';
     'lsmriterations','integer',[],400;
     'glmnetalpha','real',[],1;... # used for glmnet
     'precondition','boolean',[],1;... % inofficial
@@ -83,11 +83,10 @@ assert(~any(isnan(EEG.deconv.Xdc(:))),'Warning NAN values found in designmatrix.
 
 X = EEG.deconv.Xdc;
 
-
 disp('solving the equation system');
 t = tic;
 beta = nan(size(EEG.deconv.Xdc,2),EEG.nbchan);
-data = double(EEG.data);
+data = EEG.data;
 
 %% Remove data that is unnecessary for the fit
 % this helps calculating better tolerances for lsmr
@@ -95,8 +94,25 @@ emptyRows = sum(abs(X),2) == 0;
 X(emptyRows,:)  = [];
 data(:,emptyRows) = [];
 
-% diagonal precondition // normalize columns
-% this speeds up calculation by factor 2-3
+% % normalize data
+% READ THIS
+% this is uncommented because it doesn't actually solve the problem I
+% wanted to solve. nevertheless it might be helpful to normalize data
+% before the fits. We hav eto check the methods, some do this automatically
+% (glmnet). Others might (matlab?). Pinv should benefit from this, lsmr - I
+% don't really know.
+%
+% if any(strcmp(cfg.method,{'lsmr','par-lsmr'}))
+%     % I don't do mean/median subtraction yet, because I'm not actually sure
+%     % how to undo it again? I don't have a total-EEG signal Intercept.
+%     % Maybe I could just do it and not undo it again?
+%
+%     normalize = struct();
+%     %     normalize.median = nanmedian(data,2);
+%     normalize.mad = mad(data')';
+%     %     data = bsxfun(@minus,data,normalize.median);
+%     data = bsxfun(@rdivide,data,normalize.mad);
+% end
 
 if cfg.precondition
     normfactor = sqrt(sum(X.^2)); % cant use norm because of sparsematrix
@@ -127,14 +143,13 @@ elseif strcmp(cfg.method,'lsqr')
     
 elseif strcmp(cfg.method,'lsmr')
     
-    
-    % go trough channels
+ 
     for e = cfg.channel
         t = tic;
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         
         % use iterative solver for least-squares problems (lsmr)
-        [beta(:,e),ISTOP,ITN] = lsmr(X,data(e,:)',[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
+        [beta(:,e),ISTOP,ITN] = lsmr(X,double(data(e,:)'),[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
         if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
         end
@@ -143,7 +158,6 @@ elseif strcmp(cfg.method,'lsmr')
         %lsqr(EEG.deconv.Xdc,sparse(double(EEG.data(e,:)')),[],30);
         
     end
-    
     
 elseif strcmp(cfg.method,'par-lsmr')
     fprintf('starting parpool with ncpus...')
@@ -154,10 +168,12 @@ elseif strcmp(cfg.method,'par-lsmr')
     end
     fprintf('done\n')
     addpath('../lib/lsmr/')
+    beta = nan(size(X,2),EEG.nbchan);
+    Xdc = X;
     data = double(data');
     % go tru channels
     fprintf('starting parallel loop')
-    parXdc = parallel.pool.Constant(X);
+    parXdc = parallel.pool.Constant(Xdc);
     parData= parallel.pool.Constant(data);
     parfor e = cfg.channel
         t = tic;
@@ -176,6 +192,19 @@ elseif strcmp(cfg.method,'par-lsmr')
         
     end
     
+    
+elseif strcmp(cfg.method,'matlab') % save time
+    
+    
+    if cfg.debug
+        spparms('spumoni',2)
+    end
+    
+    beta(:,cfg.channel) = X \ sparse(double(data(cfg.channel,:)'));
+    
+elseif strcmp(cfg.method,'pinv')
+    Xinv = pinv(full(X));
+    beta = calc_beta(data,EEG.nbchan,Xinv,cfg.channel);
     
     
 elseif strcmp(cfg.method,'glmnet')
@@ -205,9 +234,13 @@ if cfg.precondition
     % rescaling to remove preconditioning
     beta = bsxfun(@rdivide,beta,full(normfactor)');
 end
-
 beta = beta'; % I prefer channels X betas (easier to multiply things to)
 
+% Unnormalize data
+% if any(strcmp(cfg.method,{'lsmr','par-lsmr'}))
+%    beta = bsxfun(@times,beta,normalize.mad);
+%
+% end
 
 % We need to remove customrows, as they were not timeexpanded.
 eventcell = cellfun(@(x)iscell(x(1)),EEG.deconv.eventtypes)*1;
@@ -226,4 +259,11 @@ if length(eventnan)>0
 end
 EEG.deconv.channel = cfg.channel;
 
+end
+
+function [beta] = calc_beta(data,nbchan,Xinv,channel)
+beta = nan(size(Xinv,1),nbchan);
+for c = channel
+    beta(:,c)= (Xinv*squeeze(data(c,:,:))');
+end
 end

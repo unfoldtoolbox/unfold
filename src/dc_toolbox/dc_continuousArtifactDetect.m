@@ -71,7 +71,6 @@ cfg = finputcheck(varargin,...
 
 if(ischar(cfg)); error(cfg);end
 
-
 ampth     = cfg.amplitudeThreshold;%microV
 winms     = cfg.windowsize;%ms
 stepms    = cfg.stepsize;% ms steps
@@ -79,8 +78,6 @@ chanArray = cfg.channels;
 
 
 shortisi  = cfg.combineSegements;
-
-
 
 [WinRej, chanrej] = basicrap(EEG, chanArray, ampth, winms, stepms);
 shortisisam  = floor(shortisi*EEG.srate/1000);  % to samples
@@ -106,8 +103,6 @@ else
                 WinRej(i,2) = max(WinRej(i,2),WinRej(i+1,2));
             end
 
-
-
         end
         WinRej(throw_out,:) = [];
     end
@@ -117,7 +112,8 @@ else
     % matrixrej = [WinRej colormatrej chanrej];
     % % call figure
     % eegplot(EEG.data, 'winrej', matrixrej, 'srate', EEG.srate,'events', EEG.event,'winlength', 50,'dispchans',1,'command','');
-    fprintf('\n %g segments were marked.\n\n', size(WinRej,1));
-
-
+    
+    nbad = sum(WinRej(:,2)-WinRej(:,1));
+    fprintf('\n %i segments were marked.', size(WinRej,1));
+    fprintf('\n A total of %i samples (%.02f percent of data) was marked as bad.\n\n',nbad,nbad/size(EEG.data,2)*100);    
 end
