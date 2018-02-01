@@ -66,7 +66,7 @@ for e = unique(event)
         % they should be covered by the effects/dummy coding schema
         % already ?!
         removeix = strcmp('categorical',{unfold_avg.param(unfoldavg_ix).type});
-        removeix = [removeix strcmp('interaction',{unfold_avg.param(unfoldavg_ix).type})];
+        removeix = removeix|strcmp('interaction',{unfold_avg.param(unfoldavg_ix).type});
         unfoldavg_ix(removeix) = [];
         % calculate the marginal over all other predictors
         average_otherEffects = squeeze(sum(unfold_avg.(cfg.betaSetname)(cfg.channel,:,unfoldavg_ix),3));
