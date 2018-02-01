@@ -31,7 +31,7 @@ cfg = finputcheck(varargin,...
     'deconv','integer',[-1,0,1],-1;
     'auto_method','string',{'quantile','linear','average'},'quantile';
     'auto_n','integer',[],10;
-    },'mode','ignore');
+    },'mode','error');
 
 if(ischar(cfg)); error(cfg);end
 
