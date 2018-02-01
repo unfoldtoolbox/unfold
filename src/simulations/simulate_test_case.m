@@ -1,7 +1,7 @@
 function EEG = simulate_test_case(sim,varargin)
 
 sprev = rng(1);
-assert(ismember(sim,1:15),'requested signal has to be between 1-14')
+assert(ismember(sim,1:16),'requested signal has to be between 1-16')
 % Varargin is loopt to simulate_data2
 
 % Basis functions
@@ -39,6 +39,10 @@ spline.range = [-2,2];
 spline.function = @(x)x.^3;
 
 
+intercept = orderfields(intercept);
+singleFactor= orderfields(singleFactor);
+cont = orderfields(cont);
+spline = orderfields(spline);
 
 %%
 
@@ -174,12 +178,16 @@ switch sim
         signals{2} = intercept;
         
         signals{2}(1).eventname = 'stimulusB';
-        signals{2}(2) = singleFactor;
+        signals{2} = orderfields(signals{2}); %bug in R2014b, in 2016b this is not necessary
+        signals{2}(2) = orderfields(singleFactor);
         signals{2}(1).range = nan;
 
         signals{2}(2).overlap = 0.8;
         signals{2}(2).effectsize= 1;
         signals{2}(2).range = nan;
+        
+        signals{2} = orderfields(signals{2}); 
+
         signals{2}(3) = cont;
         signals{2}(3).overlap = 0.8;
         signals{2}(3).effectsize= 0.02;
@@ -190,6 +198,9 @@ switch sim
         signals{3}.function = nan;
         signals{3}.overlap = -1;
         
+        
+        signals{3} = orderfields(signals{3}); 
+
         signals{3}(2) = spline;
         signals{3}(2).overlap = nan; % not yet defined
         signals{3}(2).effectsize= 0.01;
@@ -201,6 +212,8 @@ switch sim
         
         cont2 = cont;
         cont2.function = nan;
+        
+        cont2 = orderfields(cont2);
         signals{3}(4) = cont2;
         signals{3}(4).overlap = 0.2; % not yet defined
         signals{3}(4).effectsize= 0.02;
@@ -208,6 +221,36 @@ switch sim
         signals{1}(1).eventname = 'stimulus1';
         signals{2}(1).eventname = 'stimulus2';
         signals{3}(1).eventname = 'stimulus3';
+    case 16
+        signals{1} = intercept;
+        
+        signals{1}(1).eventname = 'stimulusA';
+        
+        
+        
+        signals{1}(2) = singleFactor;
+        signals{1}(2).overlap = 0.8;
+        signals{1}(2).effectsize= 1;
+        signals{1}(2).range = nan;
+       
+        signals{1}(3) = cont;
+        signals{1}(3).overlap = 0.8;
+        signals{1}(3).effectsize= +1;
+%         
+%         signals{1}(4) = cont;
+%         signals{1}(4).overlap = 0.8;
+%         signals{1}(4).effectsize= -1;
+%         signals{1}(3).function = nan;
+%         signals{1}(4).function = nan;
+%         signals{1}(4).predictorName = 'contB';
+%         
+%         
+%         signals{1}(5) = spline;
+%         signals{1}(5).overlap = nan; % not yet defined
+%         signals{1}(5).effectsize= 0.01;
+%         signals{1}(5).predictorName = 'splineA';
+%         signals{1}(5).function = @(x)x.^2;
+        
         
     otherwise
         error('unknown simulation')
