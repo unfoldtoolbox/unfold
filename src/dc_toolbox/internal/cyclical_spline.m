@@ -33,7 +33,13 @@ if cyclic
 else
     f = get_natural_f(knots);
 end
-dmt = ajm .* i(j, :)' + ajp .* i(j1, :)'+ cjm .* f(j, :)'+ cjp .* f(j1, :)';
+
+% This works only in R2016b, but is easier to read
+% dmt = ajm .* i(j, :)' + ajp .* i(j1, :)'+ cjm .* f(j, :)'+ cjp .* f(j1, :)';
+
+% reimplemented for 2014b
+mult = @(x,y)bsxfun(@times,double(x),double(y));
+dmt = mult(ajm,i(j,:)') + mult(ajp,i(j1,:)') + mult(cjm,f(j,:)') + mult(cjp,f(j1,:)');
 dmt = dmt';
 
 
