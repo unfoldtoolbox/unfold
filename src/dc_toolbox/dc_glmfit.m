@@ -40,7 +40,7 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %		    experience, high number of iterations are a result of
 %		    strong collinearities, and hint to a faulty model
 %
-%   cfg.glmnetalpha: (default 1), can be 0 for L2 norm, 1 for L1-norm or
+%   cfg.glmnetalpha: (default 1, as in glmnet), can be 0 for L2 norm, 1 for L1-norm or
 %                    something inbetween for elastic net
 %
 %   cfg.channel(array): Restrict the beta-calculation to a subset of
@@ -58,7 +58,8 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 % n-timesplines, n-fourierbasis or samples)
 %
 %*Examples:*
-% EEG = dc_glmfit(EEG); EEG = dc_glmfit(EEG,'method','matlab');
+% EEG = dc_glmfit(EEG);
+% EEG = dc_glmfit(EEG,'method','matlab','channel',[3 5]);
 %
 
 fprintf('\ndc_glmfit(): Fitting deconvolution model...');
@@ -223,6 +224,7 @@ elseif strcmp(cfg.method,'glmnet')
         
     end
     beta = beta([2:end 1],:); %put the dc-intercept last
+    normfactor = [normfactor 1];
     EEG = dc_designmat_addcol(EEG,ones(1,size(EEG.deconv.Xdc,1)),'glmnet-DC-Correction');
     
     
