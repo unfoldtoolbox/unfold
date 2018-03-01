@@ -2,7 +2,7 @@ function [varargout] = uf_plotParam(ufresult,varargin)
 % Plots time vs. Voltage in separate plots for each predictor, where there
 % are multiple lines for each predictor
 %
-% 'unfold' needs to have the 'unfold' structure, the output from
+% 'ufresult' needs to have the 'ufresult' structure, the output from
 % "uf_condense"
 %
 % Uses the 'gramm'-toolbox for plotting
@@ -73,8 +73,8 @@ if isempty(cfg.channel) && size(ufresult.(betaSetName{1}),1) == 1
     fprintf('a single channel detected, none specified, thus using this one')
 end
 if ischar(cfg.channel)
-   assert(~isempty(ufresult.chanlocs),'unfold.chanlocs is empty, it is necessary to be non-empty if you want to specify a channel by string, use numbers instead or populate ufresult.chanlocs') 
-   cfg.channel = find(strcmp({unfold.chanlocs.labels},cfg.channel));
+   assert(~isempty(ufresult.chanlocs),'ufresult.chanlocs is empty, it is necessary to be non-empty if you want to specify a channel by string, use numbers instead or populate ufresult.chanlocs') 
+   cfg.channel = find(strcmp({ufresult.chanlocs.labels},cfg.channel));
 
 end
 assert(~isempty(cfg.channel)&& cfg.channel>0 &&length(cfg.channel) == 1,'error please select a single channel to plot')
@@ -86,14 +86,14 @@ assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept 
 
 if ~isempty(cfg.predictAt{1}{1})
     fprintf('Evaluating parameters at auto or specified values');
-    ufresult = uf_getParam(ufresult,cfg);
+    ufresult = uf_predictContinuous(ufresult,cfg);
 end
 %% Prepare data
 % select parameters to plot, or else plot all available
 
 if isempty(cfg.plotParam)
     display('plotting all parameters')
-    paramList = {unfold.param.name};
+    paramList = {ufresult.param.name};
     paramIdx = 1:length(ufresult.param);
 else
     display('plotting selected parameters')
@@ -104,9 +104,9 @@ else
     end
     paramList = {};
     for c = cfg.plotParam
-        hits = find(strcmp(c, {unfold.param.name}));
+        hits = find(strcmp(c, {ufresult.param.name}));
         paramIdx = [paramIdx hits];
-        paramList = [paramList {unfold.param(hits).name}];
+        paramList = [paramList {ufresult.param(hits).name}];
     end
     
 end
@@ -115,10 +115,10 @@ end
 %name + event are later used to split up columns
 
 name = paramList;
-event = cellfun(@(y)strjoin_custom(y,'+'),{unfold.param(paramIdx).event},'UniformOutput',0);
+event = cellfun(@(y)strjoin_custom(y,'+'),{ufresult.param(paramIdx).event},'UniformOutput',0);
 
 % value, this is necessary for continuous + spline
-value = [unfold.param(paramIdx).value];
+value = [ufresult.param(paramIdx).value];
 value(isnan(value)) = 0; %categorical variables are nan, we need to convert
 
 
@@ -155,7 +155,7 @@ for bName =betaSetName
             %is there an intercept?
             eventIdx =  strcmp(event,e);
             
-            interceptIdx = cellfun(@(x)~isempty(x),strfind({unfold.param(paramIdx).name},'(Intercept)'));
+            interceptIdx = cellfun(@(x)~isempty(x),strfind({ufresult.param(paramIdx).name},'(Intercept)'));
             if sum(interceptIdx) == 0
                 warning('no intercept found, did you select a parameter but not the intercepts?')
                 continue
@@ -227,10 +227,10 @@ end
 
 % Generate gramm, update old one if it exists
 if isempty(cfg.gramm)
-    g = gramm('x',unfold.times,'y',plotData','group',plotLabel,'color',plotValue,'linestyle',plotLinestyle);
+    g = gramm('x',ufresult.times,'y',plotData','group',plotLabel,'color',plotValue,'linestyle',plotLinestyle);
 else
     g = cfg.gramm;
-    update(g,'x',unfold.times,'y',plotData','group',plotLabel,'color',plotValue,'linestyle',plotLinestyle);
+    update(g,'x',ufresult.times,'y',plotData','group',plotLabel,'color',plotValue,'linestyle',plotLinestyle);
 end
 
 % which variables should be plotted in new figures?

@@ -57,7 +57,7 @@ end
 if isempty(cfg.plotParam)
     param = 1:length(ufresult.param);
 else
-    param = find(ismember({unfold.param(:).name},cfg.plotParam));
+    param = find(ismember({ufresult.param(:).name},cfg.plotParam));
 end
 
 data = data(cfg.channel,:,param);
@@ -75,7 +75,7 @@ end
 
 % plot the topoplots
 cfg.butterfly = 'no';
-ax = plot_topobutter(data,unfold.times,unfold.chanlocs(cfg.channel),cfg);
+ax = plot_topobutter(data,ufresult.times,ufresult.chanlocs(cfg.channel),cfg);
 
 % plot row-names
 for k = 1:length(param)
@@ -86,7 +86,7 @@ for k = 1:length(param)
     if isnan(val)
        val = []; 
     end
-    str = sprintf('[%s]: %s: %g',strjoin_custom(ufresult.param(param(k)).event),unfold.param(param(k)).name,val);
+    str = sprintf('[%s]: %s: %g',strjoin_custom(ufresult.param(param(k)).event),ufresult.param(param(k)).name,val);
     t = text(ax.topo.topo{k}.image{1},0,1.1,10,str,'Units','normalized','HorizontalAlignment','left');
     
     % we want them on top, else they can be behind the topos

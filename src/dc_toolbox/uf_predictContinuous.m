@@ -1,4 +1,4 @@
-function output = uf_getParam(ufresult,varargin)
+function output = uf_predictContinuous(ufresult,varargin)
 %% Evaluates a continuous/spline parameter at specific values
 % For example you get an beta for par1 at 3 for a continuous
 % variable. The output then would be the respective values 30,60 and
@@ -37,8 +37,8 @@ if(ischar(cfg)); error(cfg);end
 
 % check if function has been run before
 % this will lead to mistakes and errors because some betas will not be the betas we expect anymore - don't allow that!
-if any(cellfun(@(x)~isempty(x),strfind({unfold.param.type},'converted')))
-    error('cannot run uf_getParam twice. Run uf_condense again first')
+if any(cellfun(@(x)~isempty(x),strfind({ufresult.param.type},'converted')))
+    error('cannot run uf_predictContinuous twice. Run uf_condense again first')
 end
 
 
@@ -75,7 +75,7 @@ elseif cfg.deconv == -1 % auto detect, recursive call
             cfg.deconv = 1;
             ufresult_tmp = ufresult;
             ufresult_tmp.beta = ufresult.(f{1});
-            output_tmp = uf_getParam(ufresult_tmp,cfg); %------- recursive call
+            output_tmp = uf_predictContinuous(ufresult_tmp,cfg); %------- recursive call
             if ~exist('output','var')
                 output = output_tmp;
                 output = rmfield(output,'beta'); %delete the temporary beta field
@@ -122,8 +122,8 @@ for currPred= 1:length(paramList)
     
     if strcmp(ufresult.deconv.variabletypes{variableIdx},'spline')
         
-        splName = cellfun(@(x)x.name,unfold.deconv.splines,'UniformOutput',0);
-        splIdx = find(strcmp(splName,unfold.deconv.variablenames{variableIdx}));
+        splName = cellfun(@(x)x.name,ufresult.deconv.splines,'UniformOutput',0);
+        splIdx = find(strcmp(splName,ufresult.deconv.variablenames{variableIdx}));
         
         spl = ufresult.deconv.splines{splIdx};
         % If we found the spline_value given value in the splines, then choose
@@ -175,7 +175,7 @@ for currPred= 1:length(paramList)
         
     elseif strcmp(ufresult.deconv.variabletypes{variableIdx},'continuous')
         % we have either a categorical or a continuous predictor here
-        customContValue = strcmp(predNameList,unfold.deconv.colnames(predIDX(1)));
+        customContValue = strcmp(predNameList,ufresult.deconv.colnames(predIDX(1)));
         if any(customContValue)
             contValueSelect = predValueSelectList{customContValue}{2};
             
@@ -213,7 +213,7 @@ if cfg.deconv
 else
     ufresult.beta_nodc = betaNew;
 end
-unfold.param = epochNew;
+ufresult.param = epochNew;
 output = ufresult;
 
 end

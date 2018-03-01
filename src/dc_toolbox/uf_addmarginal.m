@@ -16,8 +16,8 @@ function ufresult = uf_addmarginal(ufresult,varargin)
 % facA==1  : differential effect of facA == 1 (against facA==0)
 % continuousB-slope: the slope of continous B
 %
-% Using uf_getParam, we evaluate the continuous parameter at [0 50 100]
-% The beta output of uf_getParam mean the following:
+% Using uf_predictContinuous, we evaluate the continuous parameter at [0 50 100]
+% The beta output of uf_predictContinuous mean the following:
 % intercept: same as before
 % facA==1  : same as before
 % continuousB@0  : the differential effect if continuous B is 0 
@@ -33,7 +33,7 @@ function ufresult = uf_addmarginal(ufresult,varargin)
 % continuousB@100: the response of facA==0 if continuous B is 100
 %
 % Note that mean(continuousB) does not need to be a number we evaluated in
-% the uf_getParam step.
+% the uf_predictContinuous step.
 
 
 
@@ -45,11 +45,11 @@ cfg = finputcheck(varargin,...
 
 if(ischar(cfg)); error(cfg);end
 
-% In order to add the marginal, we need evaluated splines (uf_getParam) first.
+% In order to add the marginal, we need evaluated splines (uf_predictContinuous) first.
 % here we are looking for spline_converted or continuous_converted. I.e. if
 % any have not been converted, throw an error.
-if any(strcmp({unfold.param.type},'spline')) || any(strcmp({unfold.param.type},'continous'))
-    error('In order to add the marginals, you need to run uf_getParam first to evaluate the splines and continuous predictors');
+if any(strcmp({ufresult.param.type},'spline')) || any(strcmp({ufresult.param.type},'continous'))
+    error('In order to add the marginals, you need to run uf_predictContinuous first to evaluate the splines and continuous predictors');
 end
 
 
@@ -75,12 +75,12 @@ fprintf('uf_addmarginal: working on field %s \n',cfg.betaSetname)
 if isempty(cfg.channel)
     cfg.channel = 1:size(ufresult.(cfg.betaSetname),1);
 end
-event = [unfold.param.event];
-paramList = {unfold.param.name};
+event = [ufresult.param.event];
+paramList = {ufresult.param.name};
 
-fprintf('re-running beta2unfold to recover unconverted splines \n')
-unfold_avg = uf_condense(ufresult);
-unfold_avg = uf_getParam(ufresult_avg,'auto_method','average');
+fprintf('re-running uf_condense to recover unconverted splines \n')
+ufresult_avg = uf_condense(ufresult);
+ufresult_avg = uf_predictContinuous(ufresult_avg,'auto_method','average');
 for e = unique(event)
     % check if predictor and event combination exists
     eventIdx = find(strcmp(e,event));
@@ -95,16 +95,16 @@ for e = unique(event)
         otherParamNames = unique(paramList(otherEvents));
         ufresultavg_ix = [];
         for pOther = otherParamNames
-            ufresultavg_ix(end+1) = find(strcmp(pOther{1},{unfold_avg.param.name}));
+            ufresultavg_ix(end+1) = find(strcmp(pOther{1},{ufresult_avg.param.name}));
         end
         % exclude all categoricals.
         % they should be covered by the effects/dummy coding schema
         % already ?!
-        removeix = strcmp('categorical',{unfold_avg.param(ufresultavg_ix).type});
-        removeix = removeix|strcmp('interaction',{unfold_avg.param(ufresultavg_ix).type});
+        removeix = strcmp('categorical',{ufresult_avg.param(ufresultavg_ix).type});
+        removeix = removeix|strcmp('interaction',{ufresult_avg.param(ufresultavg_ix).type});
         ufresultavg_ix(removeix) = [];
         % calculate the marginal over all other predictors
-        average_otherEffects = squeeze(sum(ufresult_avg.(cfg.betaSetname)(cfg.channel,:,unfoldavg_ix),3));
+        average_otherEffects = squeeze(sum(ufresult_avg.(cfg.betaSetname)(cfg.channel,:,ufresultavg_ix),3));
         
         % add this marginal to the current predictor
         ufresult.(cfg.betaSetname)(cfg.channel,:,currEvent) = ufresult.(cfg.betaSetname)(cfg.channel,:,currEvent) + repmat(average_otherEffects,1,1,length(currEvent));

@@ -6,11 +6,29 @@ function uf_tests()
 % original signal is and throws an error if the difference is too large
 
 %separate tests
+test_addmarginals
 test_continuousArtifact
-test_imputeMissing
 test_designmat
 test_glmfit
+test_imputeMissing
+test_splines
 test_timeexpandDesignmat
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 % Multi-Test
 cfg = struct();

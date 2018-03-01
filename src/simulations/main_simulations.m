@@ -99,7 +99,7 @@ cfg.auto_method = 'linear'; %default quantile
 cfg.auto_n = 20;
 cfg.convertSplines = 1;
 
-ufresult = uf_getParam(ufresult,cfg);
+ufresult = uf_predictContinuous(ufresult,cfg);
 
 
 cfg = [];

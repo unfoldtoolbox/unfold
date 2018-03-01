@@ -18,9 +18,9 @@ EEG = uf_glmfit(EEG);
 
 ufresult = uf_condense(EEG);
 
-unfold3 = uf_predictContinuous(ufresult,'method','average');
+ufresult3 = uf_predictContinuous(ufresult,'auto_method','average');
 ufresult = uf_predictContinuous(ufresult,'predictAt',{{'continuousA',[0 1]},{'contB',[0 1]},{'splineA',[-1 0 1]}});
-unfold2 = uf_addmarginal(ufresult);
+ufresult2 = uf_addmarginal(ufresult);
 
 
 

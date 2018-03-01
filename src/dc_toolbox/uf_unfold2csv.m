@@ -45,22 +45,22 @@ nchan = size(data,1);
 ntime = size(data,2);
 npred = size(data,3);
 
-predName= repmat({unfold.param(:).name}',1,ntime,nchan);
+predName= repmat({ufresult.param(:).name}',1,ntime,nchan);
 predName= permute(predName,[3 2 1]);
 
-predValue= repmat([unfold.param(:).value]',1,ntime,nchan);
+predValue= repmat([ufresult.param(:).value]',1,ntime,nchan);
 predValue= permute(predValue,[3 2 1]);
 
-predEvent= repmat({unfold.param(:).event}',1,ntime,nchan);
+predEvent= repmat({ufresult.param(:).event}',1,ntime,nchan);
 predEvent= permute(predEvent,[3 2 1]);
 predEvent = cellfun(@(x)strjoin(x),predEvent,'UniformOutput',0);
 
 
-time   = repmat([unfold.times]',1,nchan,npred);
+time   = repmat([ufresult.times]',1,nchan,npred);
 time   = permute(time,[2 1 3]);
 
 if isfield(ufresult,'chanlocs') && ~isempty(ufresult.chanlocs)
-    channels = repmat({unfold.chanlocs(~rmchan).labels}',1,ntime,npred);
+    channels = repmat({ufresult.chanlocs(~rmchan).labels}',1,ntime,npred);
 else
     channels = repmat(1:nchan,1,ntime,npred);
 end

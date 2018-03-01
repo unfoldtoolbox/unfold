@@ -35,15 +35,15 @@ for p = 1:length(paramIdx)
     if any(strcmp(ufresult.deconv.variabletypes,'continuous'))
         cfg.auto_n = 100;
         cfg.auto_method = 'linear';
-        ufresult = uf_getParam(ufresult,cfg);
+        ufresult = uf_predictContinuous(ufresult,cfg);
     end
     figure
     varName = ufresult.deconv.variablenames(paramIdx(p));
     if ~isempty(cfg.plotParam) && sum(strcmp(varName,cfg.plotParam))==0
         continue
     end
-    ix = strcmp(varName,{unfold.param.name});
-    val = [unfold.param.value];
+    ix = strcmp(varName,{ufresult.param.name});
+    val = [ufresult.param.value];
     
     b = squeeze(ufresult.(cfg.betaSetName)(cfg.channel,:,:));
     if cfg.add_intercept
@@ -52,9 +52,9 @@ for p = 1:length(paramIdx)
         % combine it in case we have multiple events
         evtType = strjoin_custom(ufresult.deconv.eventtypes{evtType},'+');
         % find the events in ufresult.param
-        epochStr = cellfun(@(x)strjoin_custom(x,'+'),{unfold.param(:).event},'UniformOutput',0);
+        epochStr = cellfun(@(x)strjoin_custom(x,'+'),{ufresult.param(:).event},'UniformOutput',0);
         % check the event to be the same & that it is an intercept
-        interceptIdx = strcmp(evtType,epochStr) & strcmp('(Intercept)',{unfold.param(:).name});
+        interceptIdx = strcmp(evtType,epochStr) & strcmp('(Intercept)',{ufresult.param(:).name});
         
         if sum(interceptIdx) ~= 1
             error('could not find the intercept you requested (predictor:%s',varName)

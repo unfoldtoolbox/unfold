@@ -69,7 +69,7 @@ for type = {'default','cyclical','custom'}
     EEGepoch = uf_epoch(EEG,'timelimits',[0 1]);
     EEGepoch = uf_glmfit_nodc(EEGepoch);
     ufresult = uf_condense(EEGepoch);
-    ufresultconverted = uf_getParam(ufresult,'predictAt',{{'splineA',spl.values}});
+    ufresultconverted = uf_predictContinuous(ufresult,'predictAt',{{'splineA',spl.values}});
     dc  =  ufresultconverted.beta_nodc(:,:,1);
     result = squeeze(ufresultconverted.beta_nodc(:,:,2:end) +dc);
     
