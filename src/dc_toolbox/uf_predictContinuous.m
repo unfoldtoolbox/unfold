@@ -7,7 +7,7 @@ function output = dc_getParam(unfold,varargin)
 % becomes non trivial and thus this function.
 %
 %Arguments:
-%   cfg.pred_value(cell): One entry per parameter:
+%   cfg.predictAt(cell): One entry per parameter:
 %       {{'par1',[10 20 30]},{'par2',[0,1,2]}}.
 %       This evaluates parameter 1 at the values 10,20 and 30. Parameter 2
 %       at 0, 1 and 2.
@@ -27,7 +27,7 @@ function output = dc_getParam(unfold,varargin)
 
 
 cfg = finputcheck(varargin,...
-    {'pred_value','cell',[],{{'',[]}};
+    {'predictAt','cell',[],{{'',[]}};
     'deconv','integer',[-1,0,1],-1;
     'auto_method','string',{'quantile','linear','average'},'quantile';
     'auto_n','integer',[],10;
@@ -91,7 +91,7 @@ end
 
 
 % Array of the sorts: {{'parName',linspace(0,10,5)},{'parname2',1:5}}
-predValueSelectList = cfg.pred_value;
+predValueSelectList = cfg.predictAt;
 predNameList = cellfun(@(x)x{1},predValueSelectList,'UniformOutput',0);
 [~,paramList] = dc_getSplineidx(unfold);
 if cfg.deconv == 1
@@ -186,7 +186,7 @@ for currPred= 1:length(paramList)
             % This is supoptimal and I'm sorry if it creates inconveniences.
             % We would need to introduce a whole new field to carry around
             % to compensate for this.
-            warning('auto spacing for continuous variables exlcudes all zeros. Specfiy manually if necessary using ''pred_value''')
+            warning('auto spacing for continuous variables exlcudes all zeros. Specfiy manually if necessary using ''predictAt''')
             contValueSelect = auto_spacing(cfg,values(values~=0));
         end
         

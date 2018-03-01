@@ -10,7 +10,7 @@ function [varargout] = dc_plotParam(unfold,varargin)
 %Arguments:
 %    'channel' (integer): Which channel to plot
 %
-%    'pred_value' (cell): a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
+%    'predictAt' (cell): a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
 %       This splits up the parName-predictor into 5 bins from
 %       0 to 10, so 5 lines would be plotted. Default are 7 lines
 %       from min to max
@@ -49,7 +49,7 @@ function [varargout] = dc_plotParam(unfold,varargin)
 
 % parse inputs
 cfg = finputcheck(varargin,...
-    {'pred_value','cell',[],{{'',[]}};
+    {'predictAt','cell',[],{{'',[]}};
     'deconv','integer',[-1 0 1],-1;
     'channel','',[],[];
     'add_intercept','boolean',[],0;
@@ -84,7 +84,7 @@ assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept 
 % Find out whether we want beta_dc, beta_nodc and if there are other fields
 % that have the same size that we should plot as columns.
 
-if ~isempty(cfg.pred_value{1}{1})
+if ~isempty(cfg.predictAt{1}{1})
     fprintf('Evaluating parameters at auto or specified values');
     unfold = dc_getParam(unfold,cfg);
 end

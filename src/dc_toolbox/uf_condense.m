@@ -12,7 +12,7 @@ function output = dc_beta2unfold(EEG,varargin)
 %                         and returns both
 %   cfg.channel(array): Restrict the beta-output to a subset of
 %                         channels. Default is all channels
-%   cfg.pred_value(cell): Only necessary if splines are used. One entry per parameter:
+%   cfg.predictAt(cell): Only necessary if splines are used. One entry per parameter:
 %       {{'par1',[10 20 30]},{'par2',[0,1,2]}}.
 %       This evaluates parameter 1 at the values 10,20 and 30. Parameter 2
 %       at 0, 1 and 2. Default behaviour: evaluates 7 linearly spaced values between the min + max. of the

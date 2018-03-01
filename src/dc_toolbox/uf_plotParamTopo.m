@@ -3,7 +3,7 @@ function [varargout] = dc_plotParamTopo(unfold,varargin)
 %
 %Arguments:
 % 'plotParam' : cell array of parameters to be plotted, if empty plots all
-% 'pred_value': only used for continuous / spline predictors. 
+% 'predictAt': only used for continuous / spline predictors. 
 %               a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
 %               This would split up the parName-predictor into 5 bins from
 %               0 to 10, so 5 rows of topoplots would be plotted. Default are 7 lines
@@ -32,7 +32,7 @@ function [varargout] = dc_plotParamTopo(unfold,varargin)
 
 
 cfg = finputcheck(varargin,...
-    {'pred_value','cell',[],{{'',[]}};
+    {'predictAt','cell',[],{{'',[]}};
     'add_intercept','boolean',[],0;
     'plotParam','cell',[],{};
     'baseline','real',[min(unfold.times) max(unfold.times)],[];...
