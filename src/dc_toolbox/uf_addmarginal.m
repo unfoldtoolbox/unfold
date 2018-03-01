@@ -1,4 +1,4 @@
-function unfold = uf_addmarginal(unfold,varargin)
+function ufresult = uf_addmarginal(ufresult,varargin)
 %add the marginal of the other predictors (i.e. continuous & spline
 %predictors) to the beta estimates.
 % Important: If dummy-coded (i.e. non-effect coded) predictors and
@@ -11,7 +11,7 @@ function unfold = uf_addmarginal(unfold,varargin)
 % For instance the model 1 + cat(facA) + continuousB
 % has the betas: intercept, facA==1, continuousB-Slope
 %
-% The beta output of uf_unfold2beta(uf_glmfit) mean the following:
+% The beta output of uf_condense(uf_glmfit) mean the following:
 % intercept: response with facA = 0 and continuousB = 0
 % facA==1  : differential effect of facA == 1 (against facA==0)
 % continuousB-slope: the slope of continous B
@@ -54,13 +54,13 @@ end
 
 
 if isempty(cfg.betaSetname)
-    [betaSetname] = uf_unfoldbetaSetname(unfold,varargin{:});
+    [betaSetname] = uf_unfoldbetaSetname(ufresult,varargin{:});
     
     % RECURSION ALERT!
     if length(betaSetname)>1
         for b = betaSetname
-            unfold_tmp = uf_addmarginal(unfold,'betaSetname',b{1});
-            unfold.(b{1}) = unfold_tmp.(b{1});
+            ufresult_tmp = uf_addmarginal(ufresult,'betaSetname',b{1});
+            ufresult.(b{1}) = ufresult_tmp.(b{1});
         end
         return
     else
@@ -73,14 +73,14 @@ end
 
 fprintf('uf_addmarginal: working on field %s \n',cfg.betaSetname)
 if isempty(cfg.channel)
-    cfg.channel = 1:size(unfold.(cfg.betaSetname),1);
+    cfg.channel = 1:size(ufresult.(cfg.betaSetname),1);
 end
 event = [unfold.param.event];
 paramList = {unfold.param.name};
 
 fprintf('re-running beta2unfold to recover unconverted splines \n')
-unfold_avg = uf_condense(unfold);
-unfold_avg = uf_getParam(unfold_avg,'auto_method','average');
+unfold_avg = uf_condense(ufresult);
+unfold_avg = uf_getParam(ufresult_avg,'auto_method','average');
 for e = unique(event)
     % check if predictor and event combination exists
     eventIdx = find(strcmp(e,event));
@@ -93,21 +93,21 @@ for e = unique(event)
         currEvent = eventIdx(strcmp(p,eventParam));
         otherEvents = setdiff(eventIdx,currEvent);
         otherParamNames = unique(paramList(otherEvents));
-        unfoldavg_ix = [];
+        ufresultavg_ix = [];
         for pOther = otherParamNames
-            unfoldavg_ix(end+1) = find(strcmp(pOther{1},{unfold_avg.param.name}));
+            ufresultavg_ix(end+1) = find(strcmp(pOther{1},{unfold_avg.param.name}));
         end
         % exclude all categoricals.
         % they should be covered by the effects/dummy coding schema
         % already ?!
-        removeix = strcmp('categorical',{unfold_avg.param(unfoldavg_ix).type});
-        removeix = removeix|strcmp('interaction',{unfold_avg.param(unfoldavg_ix).type});
-        unfoldavg_ix(removeix) = [];
+        removeix = strcmp('categorical',{unfold_avg.param(ufresultavg_ix).type});
+        removeix = removeix|strcmp('interaction',{unfold_avg.param(ufresultavg_ix).type});
+        ufresultavg_ix(removeix) = [];
         % calculate the marginal over all other predictors
-        average_otherEffects = squeeze(sum(unfold_avg.(cfg.betaSetname)(cfg.channel,:,unfoldavg_ix),3));
+        average_otherEffects = squeeze(sum(ufresult_avg.(cfg.betaSetname)(cfg.channel,:,unfoldavg_ix),3));
         
         % add this marginal to the current predictor
-        unfold.(cfg.betaSetname)(cfg.channel,:,currEvent) = unfold.(cfg.betaSetname)(cfg.channel,:,currEvent) + repmat(average_otherEffects,1,1,length(currEvent));
+        ufresult.(cfg.betaSetname)(cfg.channel,:,currEvent) = ufresult.(cfg.betaSetname)(cfg.channel,:,currEvent) + repmat(average_otherEffects,1,1,length(currEvent));
         
     end
 end

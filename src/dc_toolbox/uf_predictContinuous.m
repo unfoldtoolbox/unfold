@@ -1,4 +1,4 @@
-function output = uf_getParam(unfold,varargin)
+function output = uf_getParam(ufresult,varargin)
 %% Evaluates a continuous/spline parameter at specific values
 % For example you get an beta for par1 at 3 for a continuous
 % variable. The output then would be the respective values 30,60 and
@@ -42,8 +42,8 @@ if any(cellfun(@(x)~isempty(x),strfind({unfold.param.type},'converted')))
 end
 
 
-beta_dcExists   = isfield(unfold,'beta')&& isnumeric(unfold.beta);
-beta_nodcExists = isfield(unfold,'beta_nodc') && isnumeric(unfold.beta_nodc);
+beta_dcExists   = isfield(ufresult,'beta')&& isnumeric(ufresult.beta);
+beta_nodcExists = isfield(ufresult,'beta_nodc') && isnumeric(ufresult.beta_nodc);
 
 if cfg.deconv == 1
     assert(beta_dcExists,'beta_dc missing or not numeric')
@@ -55,13 +55,13 @@ elseif cfg.deconv == 0
     
 elseif cfg.deconv == -1 % auto detect, recursive call
     
-    assert(isfield(unfold,'beta')|isfield(unfold,'beta_nodc'),'error: to use autodetect at least the field unfold.beta  or unfold.beta_nodc needs to exist')
-    fn = fieldnames(unfold);
+    assert(isfield(ufresult,'beta')|isfield(ufresult,'beta_nodc'),'error: to use autodetect at least the field ufresult.beta  or ufresult.beta_nodc needs to exist')
+    fn = fieldnames(ufresult);
     
-    if isfield(unfold,'beta')
-        sizeBeta = size(unfold.beta);
+    if isfield(ufresult,'beta')
+        sizeBeta = size(ufresult.beta);
     else
-        sizeBeta = size(unfold.beta_nodc);
+        sizeBeta = size(ufresult.beta_nodc);
     end
     %-------------- Recursive part
     
@@ -69,13 +69,13 @@ elseif cfg.deconv == -1 % auto detect, recursive call
         if strcmp(f,'times')
             continue
         end
-        if length(sizeBeta) == length(size(unfold.(f{1}))) &&  all(sizeBeta == size(unfold.(f{1})))
+        if length(sizeBeta) == length(size(ufresult.(f{1}))) &&  all(sizeBeta == size(ufresult.(f{1})))
             
             % overwrite the "beta" field and use that
             cfg.deconv = 1;
-            unfold_tmp = unfold;
-            unfold_tmp.beta = unfold.(f{1});
-            output_tmp = uf_getParam(unfold_tmp,cfg); %------- recursive call
+            ufresult_tmp = ufresult;
+            ufresult_tmp.beta = ufresult.(f{1});
+            output_tmp = uf_getParam(ufresult_tmp,cfg); %------- recursive call
             if ~exist('output','var')
                 output = output_tmp;
                 output = rmfield(output,'beta'); %delete the temporary beta field
@@ -93,39 +93,39 @@ end
 % Array of the sorts: {{'parName',linspace(0,10,5)},{'parname2',1:5}}
 predValueSelectList = cfg.predictAt;
 predNameList = cellfun(@(x)x{1},predValueSelectList,'UniformOutput',0);
-[~,paramList] = uf_getSplineidx(unfold);
+[~,paramList] = uf_getSplineidx(ufresult);
 if cfg.deconv == 1
-    beta = unfold.beta;
+    beta = ufresult.beta;
 elseif cfg.deconv == 0
     
-    beta = unfold.beta_nodc;
+    beta = ufresult.beta_nodc;
 end
 
 betaNew = [];
-epochNew = unfold.param(1); %needs to be removed
+epochNew = ufresult.param(1); %needs to be removed
 for currPred= 1:length(paramList)
     predIDX = paramList(currPred);
     
     % if we are at the last predictor, this one goes to the end of the
     % designmatrix
     if currPred == length(paramList)
-        predIDX_next = size(unfold.deconv.X,2);
+        predIDX_next = size(ufresult.deconv.X,2);
     else
         %else it goes to the next predictor
         predIDX_next = paramList(currPred+1)-1;
     end
-    variableIdx = unfold.deconv.cols2variablenames(predIDX);
+    variableIdx = ufresult.deconv.cols2variablenames(predIDX);
     
     b = beta(:,:,predIDX:predIDX_next);
     
-    e = unfold.param(predIDX);
+    e = ufresult.param(predIDX);
     
-    if strcmp(unfold.deconv.variabletypes{variableIdx},'spline')
+    if strcmp(ufresult.deconv.variabletypes{variableIdx},'spline')
         
         splName = cellfun(@(x)x.name,unfold.deconv.splines,'UniformOutput',0);
         splIdx = find(strcmp(splName,unfold.deconv.variablenames{variableIdx}));
         
-        spl = unfold.deconv.splines{splIdx};
+        spl = ufresult.deconv.splines{splIdx};
         % If we found the spline_value given value in the splines, then choose
         % that one
         customSplineValue = strcmp(predNameList,spl.name);
@@ -163,7 +163,7 @@ for currPred= 1:length(paramList)
                     betaNew(chan,:,end) =result;
                 end
             end
-            % the event is already saved in 'e' (unfold.param(predIDX))
+            % the event is already saved in 'e' (ufresult.param(predIDX))
             
             eNew = e;
             eNew.value = splValueSelect(c);
@@ -173,14 +173,14 @@ for currPred= 1:length(paramList)
             epochNew(end+1) = eNew;
         end
         
-    elseif strcmp(unfold.deconv.variabletypes{variableIdx},'continuous')
+    elseif strcmp(ufresult.deconv.variabletypes{variableIdx},'continuous')
         % we have either a categorical or a continuous predictor here
         customContValue = strcmp(predNameList,unfold.deconv.colnames(predIDX(1)));
         if any(customContValue)
             contValueSelect = predValueSelectList{customContValue}{2};
             
         else
-            values = unfold.deconv.X(:,predIDX(1));
+            values = ufresult.deconv.X(:,predIDX(1));
             % we do not have access at this point to which 'X' entry belongs to that event.
             % Thus we discard every 0 value and hope a bit, that it does not matter because 0 is the intercept anyway.
             % This is supoptimal and I'm sorry if it creates inconveniences.
@@ -209,12 +209,12 @@ epochNew(1) = [];
 betaNew(:,:,1) = [];
 
 if cfg.deconv
-    unfold.beta = betaNew;
+    ufresult.beta = betaNew;
 else
-    unfold.beta_nodc = betaNew;
+    ufresult.beta_nodc = betaNew;
 end
 unfold.param = epochNew;
-output = unfold;
+output = ufresult;
 
 end
 

@@ -1,4 +1,4 @@
-function [] = uf_plotParam2d(unfold,varargin)
+function [] = uf_plotParam2d(ufresult,varargin)
 %Function not yet ready (sorry)
 % This function plots an imagesc plot of time vs. parameter of choice
 %
@@ -7,13 +7,13 @@ function [] = uf_plotParam2d(unfold,varargin)
 %                   all splines/continuous parameters
 % 'add_intercept' : add the intercept to the plot, default 0
 % 'channel'       : Specify which channel-idx to plot
-% 'betaSetName'   : Default 'beta'. Can be any field of the unfold-struct
+% 'betaSetName'   : Default 'beta'. Can be any field of the ufresult-struct
 % 'caxis'         : Default [], specify coloraxis
 
 
 cfg= finputcheck(varargin,...
     {'plotParam','',[],{};
-    'betaSetName','string',fieldnames(unfold),'beta';
+    'betaSetName','string',fieldnames(ufresult),'beta';
     'add_intercept','boolean',[0 1],0;
     'caxis','',[],[];
     'channel','integer',[],[];
@@ -28,30 +28,30 @@ if isempty(cfg.channel)
 end
 
 
-paramIdx = find(strcmp(unfold.deconv.variabletypes,'spline') | strcmp(unfold.deconv.variabletypes,'continuous'));
+paramIdx = find(strcmp(ufresult.deconv.variabletypes,'spline') | strcmp(ufresult.deconv.variabletypes,'continuous'));
 
 for p = 1:length(paramIdx)
     
-    if any(strcmp(unfold.deconv.variabletypes,'continuous'))
+    if any(strcmp(ufresult.deconv.variabletypes,'continuous'))
         cfg.auto_n = 100;
         cfg.auto_method = 'linear';
-        unfold = uf_getParam(unfold,cfg);
+        ufresult = uf_getParam(ufresult,cfg);
     end
     figure
-    varName = unfold.deconv.variablenames(paramIdx(p));
+    varName = ufresult.deconv.variablenames(paramIdx(p));
     if ~isempty(cfg.plotParam) && sum(strcmp(varName,cfg.plotParam))==0
         continue
     end
     ix = strcmp(varName,{unfold.param.name});
     val = [unfold.param.value];
     
-    b = squeeze(unfold.(cfg.betaSetName)(cfg.channel,:,:));
+    b = squeeze(ufresult.(cfg.betaSetName)(cfg.channel,:,:));
     if cfg.add_intercept
         % get eventtname of current predictor
-        evtType =  unfold.deconv.cols2eventtypes(paramIdx);
+        evtType =  ufresult.deconv.cols2eventtypes(paramIdx);
         % combine it in case we have multiple events
-        evtType = strjoin_custom(unfold.deconv.eventtypes{evtType},'+');
-        % find the events in unfold.param
+        evtType = strjoin_custom(ufresult.deconv.eventtypes{evtType},'+');
+        % find the events in ufresult.param
         epochStr = cellfun(@(x)strjoin_custom(x,'+'),{unfold.param(:).event},'UniformOutput',0);
         % check the event to be the same & that it is an intercept
         interceptIdx = strcmp(evtType,epochStr) & strcmp('(Intercept)',{unfold.param(:).name});
@@ -63,12 +63,12 @@ for p = 1:length(paramIdx)
     end
     
     
-    imagesc(unfold.times,val(ix),b(:,ix)')
+    imagesc(ufresult.times,val(ix),b(:,ix)')
     
     ylabel(varName,'Interpreter','none')
     xlabel('time [s]')
-    if isfield(unfold,'chanlocs')&&~isempty(unfold.chanlocs)
-        chanName = unfold.chanlocs(1).labels;
+    if isfield(ufresult,'chanlocs')&&~isempty(ufresult.chanlocs)
+        chanName = ufresult.chanlocs(1).labels;
     else
         chanName = num2str(cfg.channel);
     end

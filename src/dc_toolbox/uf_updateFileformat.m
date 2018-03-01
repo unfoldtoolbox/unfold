@@ -1,27 +1,27 @@
-function unfold = uf_updateFileformat(unfold)
-% updates the unfold file struct to some changes in variable names
-unfold.deconv = rename_stru(unfold.deconv,'dcX','Xdc');
-unfold.deconv = rename_stru(unfold.deconv,'dcX_termidx','Xuf_terms2cols');
-unfold.deconv = rename_stru(unfold.deconv,'dcBeta','beta_dc');
-unfold.deconv = rename_stru(unfold.deconv,'XBeta','beta_nodc');
-unfold.deconv = rename_stru(unfold.deconv,'dcBasis','timebasis');
-unfold.deconv = rename_stru(unfold.deconv,'dcX_termidx','Xuf_terms2cols');
-unfold.deconv = rename_stru(unfold.deconv,'dcBasistime','times');
-unfold.deconv = rename_stru(unfold.deconv,'col2eventtypes','cols2eventtypes');
+function ufresult = uf_updateFileformat(ufresult)
+% updates the ufresult file struct to some changes in variable names
+unfold.deconv = rename_stru(ufresult.deconv,'dcX','Xdc');
+unfold.deconv = rename_stru(ufresult.deconv,'dcX_termidx','Xuf_terms2cols');
+unfold.deconv = rename_stru(ufresult.deconv,'dcBeta','beta_dc');
+unfold.deconv = rename_stru(ufresult.deconv,'XBeta','beta_nodc');
+unfold.deconv = rename_stru(ufresult.deconv,'dcBasis','timebasis');
+unfold.deconv = rename_stru(ufresult.deconv,'dcX_termidx','Xuf_terms2cols');
+unfold.deconv = rename_stru(ufresult.deconv,'dcBasistime','times');
+unfold.deconv = rename_stru(ufresult.deconv,'col2eventtypes','cols2eventtypes');
 
 
-unfold.deconv = rename_stru(unfold.deconv,'variableType','variabletypes');
-unfold.deconv = rename_stru(unfold.deconv,'variableNames','variablenames');
-unfold.deconv = rename_stru(unfold.deconv,'cols2variableNames','cols2variablenames');
-unfold.deconv = rename_stru(unfold.deconv,'cols2eventtype','cols2eventtypes');
-unfold.deconv = rename_stru(unfold.deconv,'eventtype','eventtypes');
+unfold.deconv = rename_stru(ufresult.deconv,'variableType','variabletypes');
+unfold.deconv = rename_stru(ufresult.deconv,'variableNames','variablenames');
+unfold.deconv = rename_stru(ufresult.deconv,'cols2variableNames','cols2variablenames');
+unfold.deconv = rename_stru(ufresult.deconv,'cols2eventtype','cols2eventtypes');
+unfold.deconv = rename_stru(ufresult.deconv,'eventtype','eventtypes');
 
-unfold.deconv = rename_stru(unfold.deconv,'predictorSplines','splines');
-
-
+unfold.deconv = rename_stru(ufresult.deconv,'predictorSplines','splines');
 
 
-unfold = rename_stru(unfold,'epoch','param');
+
+
+ufresult = rename_stru(ufresult,'epoch','param');
 
 
 end

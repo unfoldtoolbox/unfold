@@ -68,10 +68,10 @@ for type = {'default','cyclical','custom'}
     
     EEGepoch = uf_epoch(EEG,'timelimits',[0 1]);
     EEGepoch = uf_glmfit_nodc(EEGepoch);
-    unfold = uf_condense(EEGepoch);
-    unfoldconverted = uf_getParam(unfold,'predictAt',{{'splineA',spl.values}});
-    dc  =  unfoldconverted.beta_nodc(:,:,1);
-    result = squeeze(unfoldconverted.beta_nodc(:,:,2:end) +dc);
+    ufresult = uf_condense(EEGepoch);
+    ufresultconverted = uf_getParam(ufresult,'predictAt',{{'splineA',spl.values}});
+    dc  =  ufresultconverted.beta_nodc(:,:,1);
+    result = squeeze(ufresultconverted.beta_nodc(:,:,2:end) +dc);
     
     if cfgSim.plot
         
@@ -79,13 +79,13 @@ for type = {'default','cyclical','custom'}
         subplot(2,1,1)
         Xspline = spl.function(spl.values,EEG.deconv.splines{1}.knots);
         Xspline(:,EEG.deconv.splines{1}.removedSplineIdx) = [];
-        plot(dc + Xspline*squeeze(unfold.beta_nodc(:,:,2:end)),'Linewidth',2)
+        plot(dc + Xspline*squeeze(ufresult.beta_nodc(:,:,2:end)),'Linewidth',2)
         hold on
-        plot(dc + Xspline.*squeeze(unfold.beta_nodc(:,:,2:end))',':','Linewidth',2)
+        plot(dc + Xspline.*squeeze(ufresult.beta_nodc(:,:,2:end))',':','Linewidth',2)
         
         % original data vs recovery
         subplot(2,1,2)
-        plot(dc+ Xspline*squeeze(unfold.beta_nodc(:,:,2:end)),'Linewidth',2)
+        plot(dc+ Xspline*squeeze(ufresult.beta_nodc(:,:,2:end)),'Linewidth',2)
         hold on
         plot(EEG.data,'--','Linewidth',2)
         

@@ -70,7 +70,7 @@ EEG = uf_epoch(EEG,'timelimits',timelimits);
 EEG = uf_glmfit_nodc(EEG); %does not overwrite
 
 %%
-unfold = uf_condense(EEG);
+ufresult = uf_condense(EEG);
 
 multWith = ones(1,size(EEG.deconv.X,2));
 for col = 1:size(EEG.deconv.X,2)
@@ -81,25 +81,25 @@ end
 
 figure
 subplot(2,1,1)
-plot(unfold.times,bsxfun(@times,squeeze(unfold.beta),multWith),'-x'),hold all
-% plot(unfold.times,squeeze(unfold.beta),'-x'),hold all
+plot(ufresult.times,bsxfun(@times,squeeze(ufresult.beta),multWith),'-x'),hold all
+% plot(ufresult.times,squeeze(ufresult.beta),'-x'),hold all
 plot(EEG.sim.sig.time,EEG.sim.separateSignal','-ok')
 title('unfold vs. orig')
 
 subplot(2,1,2)
-plot(unfold.times,bsxfun(@times,squeeze(unfold.beta_nodc),multWith),'-x'),hold all
-% plot(unfold.times,squeeze(unfold.beta_nodc),'-x'),hold all
+plot(ufresult.times,bsxfun(@times,squeeze(ufresult.beta_nodc),multWith),'-x'),hold all
+% plot(ufresult.times,squeeze(ufresult.beta_nodc),'-x'),hold all
 plot(EEG.sim.sig.time,EEG.sim.separateSignal','-ok')
 title('epoched vs. orig')
 %% draw splinethings
-unfold = uf_condense(EEG);
+ufresult = uf_condense(EEG);
 
 cfg = [];
 cfg.auto_method = 'linear'; %default quantile
 cfg.auto_n = 20;
 cfg.convertSplines = 1;
 
-unfold = uf_getParam(unfold,cfg);
+ufresult = uf_getParam(ufresult,cfg);
 
 
 cfg = [];
@@ -109,4 +109,4 @@ cfg.deconv = -1;
 cfg.plotSeparate = 'event';
 cfg.plotParam = {'3_(Intercept)','3_continuousA','splineA','splineB'};
 cfg.add_marginal = 0;
-ax = uf_plotParam(unfold,cfg);
+ax = uf_plotParam(ufresult,cfg);

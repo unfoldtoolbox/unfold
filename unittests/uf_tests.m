@@ -74,7 +74,7 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
                             EEGb = uf_epoch(EEGb,'timelimits',t{1});
                             EEGb = uf_glmfit_nodc(EEGb);
                         end
-                        unfold = uf_condense(EEGb,'deconv',b{1},'channel',b{2});
+                        ufresult = uf_condense(EEGb,'deconv',b{1},'channel',b{2});
                         if strcmp(t{2},'stick') && testCase==14 && b{2} == 1 && all(t{1} == [-0.5,1.5])
                             if ~isfield(EEGb,'urevent') || isempty(EEG.urevent)
                                 EEGb.urevent = EEG.event; % this field is populated in uf_epoch
@@ -84,7 +84,7 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
                                 ix = ismember({EEGb.urevent.type},EEGb.deconv.eventtypes{EEGb.deconv.cols2eventtypes(col)});
                                 multWith(col) = mean(EEGb.deconv.X(ix,col),1);
                             end
-                            beta = bsxfun(@times,squeeze(unfold.beta),multWith);
+                            beta = bsxfun(@times,squeeze(ufresult.beta),multWith);
                             orgSig = [zeros(5,5),EEGb.sim.separateSignal,zeros(5,5)];
                             resid = abs(beta - orgSig');
                             % normalize
@@ -149,14 +149,14 @@ end
 %
 %     %%
 %
-%     % unfold_epoch = uf_beta2EEG(EEG,'deconv',0);
+%     % ufresult_epoch = uf_beta2EEG(EEG,'deconv',0);
 %
 %     multWith = ones(1,size(EEG.deconv.X,2));
 %     for col = 1:size(EEG.deconv.X,2)
 %         ix = ismember({EEG.urevent.type},EEG.deconv.eventtypes{EEG.deconv.cols2eventtypes(col)});
 %         multWith(col) = mean(EEG.deconv.X(ix,col),1);
 %     end
-%     unfold.beta*multWith;
+%     ufresult.beta*multWith;
 % end
 
 end

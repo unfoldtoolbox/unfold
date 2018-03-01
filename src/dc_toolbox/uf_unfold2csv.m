@@ -1,4 +1,4 @@
-function varargout = uf_unfold2csv(unfold,varargin)
+function varargout = uf_unfold2csv(ufresult,varargin)
 % Exports betas in an organized csv file to be opened in another tool
 % returns a data-table
 %
@@ -26,9 +26,9 @@ if(ischar(cfg)); error(cfg);end
 %% generate empty output structure
 
 if cfg.deconv == 1
-    data = unfold.beta;
+    data = ufresult.beta;
 elseif cfg.deconv == 0
-    data = unfold.beta_nodc;
+    data = ufresult.beta_nodc;
 end
 
 % remove channels with only nan (non-fitted)
@@ -59,7 +59,7 @@ predEvent = cellfun(@(x)strjoin(x),predEvent,'UniformOutput',0);
 time   = repmat([unfold.times]',1,nchan,npred);
 time   = permute(time,[2 1 3]);
 
-if isfield(unfold,'chanlocs') && ~isempty(unfold.chanlocs)
+if isfield(ufresult,'chanlocs') && ~isempty(ufresult.chanlocs)
     channels = repmat({unfold.chanlocs(~rmchan).labels}',1,ntime,npred);
 else
     channels = repmat(1:nchan,1,ntime,npred);

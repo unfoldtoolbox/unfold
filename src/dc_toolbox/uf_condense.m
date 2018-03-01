@@ -19,16 +19,16 @@ function output = uf_condense(EEG,varargin)
 %       parameterdomain
 %
 %Return:
-%   unfold.beta= (nchans x time x parameters)
-%   unfold.beta_nodc = (nchans x time x parameters) (only if deconv=0 or -1)
-%   unfold.param = (struct size: parameters) each field contains the values of the respective parameter.
-%   unfold.deconv = EEG.deconv
-%   unfold.times = EEG.times
-%   unfold.chanlocs = EEG.chanlocs
+%   ufresult.beta= (nchans x time x parameters)
+%   ufresult.beta_nodc = (nchans x time x parameters) (only if deconv=0 or -1)
+%   ufresult.param = (struct size: parameters) each field contains the values of the respective parameter.
+%   ufresult.deconv = EEG.deconv
+%   ufresult.times = EEG.times
+%   ufresult.chanlocs = EEG.chanlocs
 %
 %**Example:**
 %
-%unfold = uf_condense(EEG)
+%ufresult = uf_condense(EEG)
 %
 %unfold.param(X):
 %
