@@ -1,4 +1,4 @@
-function output = dc_beta2unfold(EEG,varargin)
+function output = dc_condense(EEG,varargin)
 %Returns an "unfold"-struct that contains the predictor betas over time
 %and accompanying information. This structure is further used in all
 %plotting functions
@@ -28,7 +28,7 @@ function output = dc_beta2unfold(EEG,varargin)
 %
 %**Example:**
 %
-%unfold = dc_beta2unfold(EEG)
+%unfold = dc_condense(EEG)
 %
 %unfold.param(X):
 %
@@ -69,15 +69,15 @@ elseif cfg.deconv == -1 % auto detect, recursive call
     assert(beta_dcExists | beta_nodcExists,'either beta_dc or beta_nodc need to exist. Did you fit the model already?')
     %-------------- Recursive part
     if beta_dcExists && beta_nodcExists
-        output1 = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',1);
-        output2 = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',0);
+        output1 = dc_condense(EEG,'channel',cfg.channel,'deconv',1);
+        output2 = dc_condense(EEG,'channel',cfg.channel,'deconv',0);
 
         output = output1;
         output.beta_nodc = output2.beta_nodc;
     elseif beta_dcExists
-        output = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',1);
+        output = dc_condense(EEG,'channel',cfg.channel,'deconv',1);
     else
-        output = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',0);
+        output = dc_condense(EEG,'channel',cfg.channel,'deconv',0);
     end
     return
     %-------------- End Recursive part

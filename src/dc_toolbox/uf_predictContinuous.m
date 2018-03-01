@@ -38,7 +38,7 @@ if(ischar(cfg)); error(cfg);end
 % check if function has been run before
 % this will lead to mistakes and errors because some betas will not be the betas we expect anymore - don't allow that!
 if any(cellfun(@(x)~isempty(x),strfind({unfold.param.type},'converted')))
-    error('cannot run dc_getParam twice. Run dc_beta2unfold again first')
+    error('cannot run dc_getParam twice. Run dc_condense again first')
 end
 
 

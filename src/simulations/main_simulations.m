@@ -70,7 +70,7 @@ EEG = dc_epoch(EEG,'timelimits',timelimits);
 EEG = dc_glmfit_nodc(EEG); %does not overwrite
 
 %%
-unfold = dc_beta2unfold(EEG);
+unfold = dc_condense(EEG);
 
 multWith = ones(1,size(EEG.deconv.X,2));
 for col = 1:size(EEG.deconv.X,2)
@@ -92,7 +92,7 @@ plot(unfold.times,bsxfun(@times,squeeze(unfold.beta_nodc),multWith),'-x'),hold a
 plot(EEG.sim.sig.time,EEG.sim.separateSignal','-ok')
 title('epoched vs. orig')
 %% draw splinethings
-unfold = dc_beta2unfold(EEG);
+unfold = dc_condense(EEG);
 
 cfg = [];
 cfg.auto_method = 'linear'; %default quantile

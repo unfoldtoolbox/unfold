@@ -68,7 +68,7 @@ for type = {'default','cyclical','custom'}
     
     EEGepoch = dc_epoch(EEG,'timelimits',[0 1]);
     EEGepoch = dc_glmfit_nodc(EEGepoch);
-    unfold = dc_beta2unfold(EEGepoch);
+    unfold = dc_condense(EEGepoch);
     unfoldconverted = dc_getParam(unfold,'predictAt',{{'splineA',spl.values}});
     dc  =  unfoldconverted.beta_nodc(:,:,1);
     result = squeeze(unfoldconverted.beta_nodc(:,:,2:end) +dc);

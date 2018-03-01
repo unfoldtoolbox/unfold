@@ -79,7 +79,7 @@ event = [unfold.param.event];
 paramList = {unfold.param.name};
 
 fprintf('re-running beta2unfold to recover unconverted splines \n')
-unfold_avg = dc_beta2unfold(unfold);
+unfold_avg = dc_condense(unfold);
 unfold_avg = dc_getParam(unfold_avg,'auto_method','average');
 for e = unique(event)
     % check if predictor and event combination exists

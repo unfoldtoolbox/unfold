@@ -3,7 +3,7 @@ function [varargout] = dc_plotParam(unfold,varargin)
 % are multiple lines for each predictor
 %
 % 'unfold' needs to have the 'unfold' structure, the output from
-% "dc_beta2unfold"
+% "dc_condense"
 %
 % Uses the 'gramm'-toolbox for plotting
 %
