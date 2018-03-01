@@ -1,9 +1,9 @@
-function [varargout] = dc_plotParam(unfold,varargin)
+function [varargout] = uf_plotParam(unfold,varargin)
 % Plots time vs. Voltage in separate plots for each predictor, where there
 % are multiple lines for each predictor
 %
 % 'unfold' needs to have the 'unfold' structure, the output from
-% "dc_condense"
+% "uf_condense"
 %
 % Uses the 'gramm'-toolbox for plotting
 %
@@ -45,7 +45,7 @@ function [varargout] = dc_plotParam(unfold,varargin)
 %   allAxesInFigure: All 'subplot' axes that were generated
 %
 %Example
-% dc_plotParam(unfold,'channel',1)
+% uf_plotParam(unfold,'channel',1)
 
 % parse inputs
 cfg = finputcheck(varargin,...
@@ -66,7 +66,7 @@ if(ischar(cfg)); error(cfg);end
 
 
 
-betaSetName = dc_unfoldbetaSetname(unfold,varargin{:});
+betaSetName = uf_unfoldbetaSetname(unfold,varargin{:});
 
 if isempty(cfg.channel) && size(unfold.(betaSetName{1}),1) == 1
     cfg.channel = 1;
@@ -86,7 +86,7 @@ assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept 
 
 if ~isempty(cfg.predictAt{1}{1})
     fprintf('Evaluating parameters at auto or specified values');
-    unfold = dc_getParam(unfold,cfg);
+    unfold = uf_getParam(unfold,cfg);
 end
 %% Prepare data
 % select parameters to plot, or else plot all available
@@ -124,7 +124,7 @@ value(isnan(value)) = 0; %categorical variables are nan, we need to convert
 
 if cfg.add_marginal
     % necessary to add the average of the splines, i.e. simulate a marginal plot
-    unfold = dc_addmarginal(unfold,'channel',cfg.channel);
+    unfold = uf_addmarginal(unfold,'channel',cfg.channel);
 end
 
 %the linestyle, it is used when the intercept is added to differentiate

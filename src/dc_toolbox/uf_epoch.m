@@ -1,4 +1,4 @@
-function EEG_epoch = dc_epoch(EEG,varargin)
+function EEG_epoch = uf_epoch(EEG,varargin)
 %% Epoch the data according to the deconv structure
 % Deconvolution works on continuous data, thus to compare it to the
 % "normal" use-case, we have to epoch it. Because the data has not been
@@ -14,7 +14,7 @@ function EEG_epoch = dc_epoch(EEG,varargin)
 %   Epoched EEG file to cfg.timelimits
 %
 %*Example:*
-% EEG_epoch = dc_epoch(EEG,'winrej',winrej,'timelimits',cfgTimeexpand.timelimits)
+% EEG_epoch = uf_epoch(EEG,'winrej',winrej,'timelimits',cfgTimeexpand.timelimits)
 %
 
 

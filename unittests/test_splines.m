@@ -57,19 +57,19 @@ for type = {'default','cyclical','custom'}
     %% fit
     switch cfgSim.type
         case 'default'
-            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1+spl(splineA,10)');
+            EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1+spl(splineA,10)');
         case 'cyclical'
-            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1');
-            EEG = dc_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(0,2*pi,15),'splinefunction','cyclical');
+            EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1');
+            EEG = uf_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(0,2*pi,15),'splinefunction','cyclical');
         case 'custom'
-            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1');
-            EEG = dc_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(-10,10,5),'splinefunction',spl.function);
+            EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1');
+            EEG = uf_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(-10,10,5),'splinefunction',spl.function);
     end
     
-    EEGepoch = dc_epoch(EEG,'timelimits',[0 1]);
-    EEGepoch = dc_glmfit_nodc(EEGepoch);
-    unfold = dc_condense(EEGepoch);
-    unfoldconverted = dc_getParam(unfold,'predictAt',{{'splineA',spl.values}});
+    EEGepoch = uf_epoch(EEG,'timelimits',[0 1]);
+    EEGepoch = uf_glmfit_nodc(EEGepoch);
+    unfold = uf_condense(EEGepoch);
+    unfoldconverted = uf_getParam(unfold,'predictAt',{{'splineA',spl.values}});
     dc  =  unfoldconverted.beta_nodc(:,:,1);
     result = squeeze(unfoldconverted.beta_nodc(:,:,2:end) +dc);
     

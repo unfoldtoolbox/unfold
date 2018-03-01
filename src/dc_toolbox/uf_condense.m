@@ -1,4 +1,4 @@
-function output = dc_condense(EEG,varargin)
+function output = uf_condense(EEG,varargin)
 %Returns an "unfold"-struct that contains the predictor betas over time
 %and accompanying information. This structure is further used in all
 %plotting functions
@@ -28,7 +28,7 @@ function output = dc_condense(EEG,varargin)
 %
 %**Example:**
 %
-%unfold = dc_condense(EEG)
+%unfold = uf_condense(EEG)
 %
 %unfold.param(X):
 %
@@ -36,7 +36,7 @@ function output = dc_condense(EEG,varargin)
 %* value: value of the predictor, e.g. '50'
 % * event: event of the variable, e.g.: 'eventA'
 
-assert(isfield(EEG.deconv,'beta_nodc')|isfield(EEG.deconv,'beta_dc'),'Input Error: Could not find beta-estimates. Did you run dc_glmfit?')
+assert(isfield(EEG.deconv,'beta_nodc')|isfield(EEG.deconv,'beta_dc'),'Input Error: Could not find beta-estimates. Did you run uf_glmfit?')
 if isfield(EEG.deconv,'beta_nodc')
     nchan = size(EEG.deconv.beta_nodc,1);
 elseif isfield(EEG.deconv,'beta_dc')
@@ -69,15 +69,15 @@ elseif cfg.deconv == -1 % auto detect, recursive call
     assert(beta_dcExists | beta_nodcExists,'either beta_dc or beta_nodc need to exist. Did you fit the model already?')
     %-------------- Recursive part
     if beta_dcExists && beta_nodcExists
-        output1 = dc_condense(EEG,'channel',cfg.channel,'deconv',1);
-        output2 = dc_condense(EEG,'channel',cfg.channel,'deconv',0);
+        output1 = uf_condense(EEG,'channel',cfg.channel,'deconv',1);
+        output2 = uf_condense(EEG,'channel',cfg.channel,'deconv',0);
 
         output = output1;
         output.beta_nodc = output2.beta_nodc;
     elseif beta_dcExists
-        output = dc_condense(EEG,'channel',cfg.channel,'deconv',1);
+        output = uf_condense(EEG,'channel',cfg.channel,'deconv',1);
     else
-        output = dc_condense(EEG,'channel',cfg.channel,'deconv',0);
+        output = uf_condense(EEG,'channel',cfg.channel,'deconv',0);
     end
     return
     %-------------- End Recursive part
@@ -88,7 +88,7 @@ end
 % find out which (if any) parameters are modeled by splines, we only want to add the
 % combined spline estimate, not each individually.
 
-[splIdxList,paramList] = dc_getSplineidx(EEG);
+[splIdxList,paramList] = uf_getSplineidx(EEG);
 % nSpl = sum(ismember(paramList,splIdxList));
 % if nSpl == 0
 %     nSplineBetas = 0;

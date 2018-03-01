@@ -8,8 +8,8 @@ cfg = [];
 cfg.formula   = {'y~1',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
 cfg.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
 
-EEGsim = dc_designmat(EEGsim,cfg);
-EEGsim = dc_timeexpandDesignmat(EEGsim,'timelimits',[-0.5 0.5],'method','stick');
+EEGsim = uf_designmat(EEGsim,cfg);
+EEGsim = uf_timeexpandDesignmat(EEGsim,'timelimits',[-0.5 0.5],'method','stick');
 
 %%
 
@@ -17,7 +17,7 @@ tAll = table();
 for method = {'lsmr','lsqr','matlab'}
    t1 = tic;
    
-   EEGsolved = dc_glmfit(EEGsim,'method',method{1},'channel',[1:3]);
+   EEGsolved = uf_glmfit(EEGsim,'method',method{1},'channel',[1:3]);
    t2 = toc(t1);
    
    t = table(t2,method(1));
@@ -31,7 +31,7 @@ tAll = table();
 for precond = [0 1]
    t1 = tic;
    
-   EEGsolved = dc_glmfit(EEGsim,'method','lsmr','precondition',precond,'channel',1);
+   EEGsolved = uf_glmfit(EEGsim,'method','lsmr','precondition',precond,'channel',1);
    t2 = toc(t1);
    
    t = table(t2,precond);

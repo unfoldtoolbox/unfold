@@ -1,4 +1,4 @@
-function [] = dc_plotParam2d(unfold,varargin)
+function [] = uf_plotParam2d(unfold,varargin)
 %Function not yet ready (sorry)
 % This function plots an imagesc plot of time vs. parameter of choice
 %
@@ -35,7 +35,7 @@ for p = 1:length(paramIdx)
     if any(strcmp(unfold.deconv.variabletypes,'continuous'))
         cfg.auto_n = 100;
         cfg.auto_method = 'linear';
-        unfold = dc_getParam(unfold,cfg);
+        unfold = uf_getParam(unfold,cfg);
     end
     figure
     varName = unfold.deconv.variablenames(paramIdx(p));

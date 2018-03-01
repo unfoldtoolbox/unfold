@@ -1,4 +1,4 @@
-function [EEG,spl,nanlist] = dc_designmat_spline(EEG,varargin)
+function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
 % Helper function to generate spline-part of designmatrix
 %
 %

@@ -1,4 +1,4 @@
-function varargout = dc_unfold2csv(unfold,varargin)
+function varargout = uf_unfold2csv(unfold,varargin)
 % Exports betas in an organized csv file to be opened in another tool
 % returns a data-table
 %

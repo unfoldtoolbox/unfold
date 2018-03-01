@@ -1,4 +1,4 @@
-function [WinRej] = dc_continuousArtifactDetect(EEG,varargin)
+function [WinRej] = uf_continuousArtifactDetect(EEG,varargin)
 %Reject commonly recorded artifactual potentials (c.r.a.p.)
 % This function has been altered very much by Benedikt Ehinger
 % I removed all the filter-features

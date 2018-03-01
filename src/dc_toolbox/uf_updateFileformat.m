@@ -1,11 +1,11 @@
-function unfold = dc_updateFileformat(unfold)
+function unfold = uf_updateFileformat(unfold)
 % updates the unfold file struct to some changes in variable names
 unfold.deconv = rename_stru(unfold.deconv,'dcX','Xdc');
-unfold.deconv = rename_stru(unfold.deconv,'dcX_termidx','Xdc_terms2cols');
+unfold.deconv = rename_stru(unfold.deconv,'dcX_termidx','Xuf_terms2cols');
 unfold.deconv = rename_stru(unfold.deconv,'dcBeta','beta_dc');
 unfold.deconv = rename_stru(unfold.deconv,'XBeta','beta_nodc');
 unfold.deconv = rename_stru(unfold.deconv,'dcBasis','timebasis');
-unfold.deconv = rename_stru(unfold.deconv,'dcX_termidx','Xdc_terms2cols');
+unfold.deconv = rename_stru(unfold.deconv,'dcX_termidx','Xuf_terms2cols');
 unfold.deconv = rename_stru(unfold.deconv,'dcBasistime','times');
 unfold.deconv = rename_stru(unfold.deconv,'col2eventtypes','cols2eventtypes');
 

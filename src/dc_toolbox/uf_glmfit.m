@@ -1,4 +1,4 @@
-function [EEG,beta] = dc_glmfit(EEG,varargin)
+function [EEG,beta] = uf_glmfit(EEG,varargin)
 %% Fit the fullX designmatrix on the data and returns beta and stats
 % This function solves the Equation X*beta = EEG.data, with X = Designmat.
 % There are multiple algorithms implemented, a slow iterative algorithm
@@ -58,10 +58,10 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 % n-timesplines, n-fourierbasis or samples)
 %
 %*Examples:*
-% EEG = dc_glmfit(EEG); EEG = dc_glmfit(EEG,'method','matlab');
+% EEG = uf_glmfit(EEG); EEG = uf_glmfit(EEG,'method','matlab');
 %
 
-fprintf('\ndc_glmfit(): Fitting deconvolution model...');
+fprintf('\nuf_glmfit(): Fitting deconvolution model...');
 
 
 cfg = finputcheck(varargin,...
@@ -223,7 +223,7 @@ elseif strcmp(cfg.method,'glmnet')
         
     end
     beta = beta([2:end 1],:); %put the dc-intercept last
-    EEG = dc_designmat_addcol(EEG,ones(1,size(EEG.deconv.Xdc,1)),'glmnet-DC-Correction');
+    EEG = uf_designmat_addcol(EEG,ones(1,size(EEG.deconv.Xdc,1)),'glmnet-DC-Correction');
     
     
     

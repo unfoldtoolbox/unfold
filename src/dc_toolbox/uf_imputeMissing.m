@@ -1,4 +1,4 @@
-function [EEG] = dc_imputeMissing(EEG,varargin)
+function [EEG] = uf_imputeMissing(EEG,varargin)
 % Deal with predictors for which some values are missing in design matrix
 % You can either impute missing values or remove the predictors events for 
 % which some values are missing

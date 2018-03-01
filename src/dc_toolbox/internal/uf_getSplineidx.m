@@ -1,4 +1,4 @@
-function [splIdxListAll,paramList] = dc_getSplineidx(EEG)
+function [splIdxListAll,paramList] = uf_getSplineidx(EEG)
 %returns a list of the splines in EEG and a parameter list where only the
 % first index of the spline remains
 %
@@ -12,7 +12,7 @@ function [splIdxListAll,paramList] = dc_getSplineidx(EEG)
 %*Example:*
 % A designmatrix with 2 normal predictors, a spline with 5 knots
 %| and another normal predictor.
-%| Call [splIdxList,paramList] = dc_get_splines(EEG)
+%| Call [splIdxList,paramList] = uf_get_splines(EEG)
 %| splIdxList = [3 4 5 6 7]
 %| paramList= [1 2 3 8]
 

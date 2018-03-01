@@ -1,4 +1,4 @@
-function dc_plotEventHistogram(EEG,varargin)
+function uf_plotEventHistogram(EEG,varargin)
 % Function that plots histogram of all events in the EEG.event structure
 %
 %Arguments:
@@ -7,7 +7,7 @@ function dc_plotEventHistogram(EEG,varargin)
 %Return:
 %
 %*Example:*
-% dc_plotEventHistogram(EEG,'eventA')
+% uf_plotEventHistogram(EEG,'eventA')
 
 cfg = finputcheck(varargin,...
     {'eventtypes',   'cell', [], {};...

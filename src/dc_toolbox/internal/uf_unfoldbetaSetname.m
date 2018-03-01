@@ -1,4 +1,4 @@
-function [betaSetName] = dc_unfoldbetaSetname(unfold,varargin)
+function [betaSetName] = uf_unfoldbetaSetname(unfold,varargin)
 % Find out whether we want beta_dc, beta_nodc and if there are other fields
 % that have the same size that we should plot as columns.
 

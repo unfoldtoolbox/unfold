@@ -1,4 +1,4 @@
-function EEG = dc_continuousArtifactExclude(EEG,varargin)
+function EEG = uf_continuousArtifactExclude(EEG,varargin)
 %Function to exclude (artifactual) continuous data from being modeled
 % This function inputs a rejection vector and excludes the content from
 % being modeled in the design matrix. That means it sets all predictor
@@ -16,7 +16,7 @@ function EEG = dc_continuousArtifactExclude(EEG,varargin)
 % We want to exclude three sections that are supposedly artifactual
 %| cfgReject = [];
 %| cfgReject.winrej = [10,50; 100,120; 300,310];
-%| EEG = dc_artefactRemoveDesignmat(cfgReject,EEG)
+%| EEG = uf_artefactRemoveDesignmat(cfgReject,EEG)
 
 cfg = finputcheck(varargin,...
     {'winrej',   'integer', [], [];...

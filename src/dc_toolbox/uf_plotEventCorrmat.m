@@ -1,4 +1,4 @@
-function corrOut = dc_plotEventCorrmat(EEG,varargin)
+function corrOut = uf_plotEventCorrmat(EEG,varargin)
 % Plots a correlation matrix of the event structure
 %
 %Arguments:

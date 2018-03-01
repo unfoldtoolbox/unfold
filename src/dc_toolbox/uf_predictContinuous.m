@@ -1,4 +1,4 @@
-function output = dc_getParam(unfold,varargin)
+function output = uf_getParam(unfold,varargin)
 %% Evaluates a continuous/spline parameter at specific values
 % For example you get an beta for par1 at 3 for a continuous
 % variable. The output then would be the respective values 30,60 and
@@ -38,7 +38,7 @@ if(ischar(cfg)); error(cfg);end
 % check if function has been run before
 % this will lead to mistakes and errors because some betas will not be the betas we expect anymore - don't allow that!
 if any(cellfun(@(x)~isempty(x),strfind({unfold.param.type},'converted')))
-    error('cannot run dc_getParam twice. Run dc_condense again first')
+    error('cannot run uf_getParam twice. Run uf_condense again first')
 end
 
 
@@ -75,7 +75,7 @@ elseif cfg.deconv == -1 % auto detect, recursive call
             cfg.deconv = 1;
             unfold_tmp = unfold;
             unfold_tmp.beta = unfold.(f{1});
-            output_tmp = dc_getParam(unfold_tmp,cfg); %------- recursive call
+            output_tmp = uf_getParam(unfold_tmp,cfg); %------- recursive call
             if ~exist('output','var')
                 output = output_tmp;
                 output = rmfield(output,'beta'); %delete the temporary beta field
@@ -93,7 +93,7 @@ end
 % Array of the sorts: {{'parName',linspace(0,10,5)},{'parname2',1:5}}
 predValueSelectList = cfg.predictAt;
 predNameList = cellfun(@(x)x{1},predValueSelectList,'UniformOutput',0);
-[~,paramList] = dc_getSplineidx(unfold);
+[~,paramList] = uf_getSplineidx(unfold);
 if cfg.deconv == 1
     beta = unfold.beta;
 elseif cfg.deconv == 0

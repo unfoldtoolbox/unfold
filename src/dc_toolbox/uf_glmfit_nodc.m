@@ -1,4 +1,4 @@
-function [EEG] = dc_glmfit_nodc(EEG,varargin)
+function [EEG] = uf_glmfit_nodc(EEG,varargin)
 %A function to solve the inverse problem without deconvolution
 % Currently it solves the pseudo-inverse of EEG.deconv.X and multiplies it
 % to all channels.
@@ -11,7 +11,7 @@ function [EEG] = dc_glmfit_nodc(EEG,varargin)
 %  EEG.devon.beta
 %
 %*Example:*
-% EEG = dc_glmfit_nodeconv(EEG)
+% EEG = uf_glmfit_nodeconv(EEG)
 %
 
 

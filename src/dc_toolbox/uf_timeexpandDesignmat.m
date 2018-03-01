@@ -1,4 +1,4 @@
-function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
+function [EEG] = uf_timeexpandDesignmat(EEG,varargin)
 %Timeexpand / Deconvolve Designmatrix This function takes the designmatrix
 % (saved in EEG.deconv.X, a EEG.points times nPredictor matrix) and makes
 % copies over time (in the range of the windowlength).
@@ -23,12 +23,12 @@ function [EEG] = dc_timeexpandDesignmat(EEG,varargin)
 %   * EEG.deconv.Xdc - the designmatrix for all time points
 %   * EEG.deconv.timebasis - the basis set for splines / fourier. This is used later to recover the values in the time-domain, not the basis-function domain
 %   * EEG.deconv.basisTime - the time of the deconv-window in seconds
-%   * EEG.Xdc_terms2cols - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor
+%   * EEG.Xuf_terms2cols - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor
 %
 %*Example:*
-%       EEG = dc_timeexpandDesignmat(EEG,'method','splines','windowlength',128,'timeexpandparam',30)
+%       EEG = uf_timeexpandDesignmat(EEG,'method','splines','windowlength',128,'timeexpandparam',30)
 
-fprintf('\ndc_timeexpandDesignmat(): Timeexpanding the designmatrix...\n');
+fprintf('\nuf_timeexpandDesignmat(): Timeexpanding the designmatrix...\n');
 
 cfg = finputcheck(varargin,...
     { 'method',         'string' ,  {'full','splines','spline','fourier','stick'}, 'stick';
@@ -328,6 +328,6 @@ end
 EEG.deconv.Xdc = Xdc;
 EEG.deconv.timebasis = basis;
 EEG.deconv.times = cfg.windowtimes; % in s, this is different to eeglab, but makes more sense
-EEG.deconv.Xdc_terms2cols = sort(repmat(1:length(EEG.deconv.colnames),1,size(EEG.deconv.timebasis,1)));
+EEG.deconv.Xuf_terms2cols = sort(repmat(1:length(EEG.deconv.colnames),1,size(EEG.deconv.timebasis,1)));
 fprintf('...done\n')
 end

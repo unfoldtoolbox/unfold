@@ -1,4 +1,4 @@
-function dc_plotDesignmat(EEG,varargin)
+function uf_plotDesignmat(EEG,varargin)
 %Plots the designmatrix
 %If the matrix is very large (the timeexpanded/Xdc matrix) we do not plot
 %everything, but only the middle 1000s. We also try to zoom in
@@ -13,9 +13,9 @@ function dc_plotDesignmat(EEG,varargin)
 %   cfg.figure (1/0): Open a new figure (default 1)
 %
 %*Example:*
-% dc_plot_designmat(EEG)
+% uf_plot_designmat(EEG)
 %
-% dc_plot_designmat(EEG,'timeexpand',1) %plot the timeexpanded X
+% uf_plot_designmat(EEG,'timeexpand',1) %plot the timeexpanded X
 
 % Secret option: 'addContData'
 cfg = finputcheck(varargin,...

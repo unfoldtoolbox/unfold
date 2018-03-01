@@ -1,4 +1,4 @@
-function [varargout] = dc_plotParamTopo(unfold,varargin)
+function [varargout] = uf_plotParamTopo(unfold,varargin)
 %Generates topoplots over time. each row is a predictor or predictor-value-combination
 %
 %Arguments:
@@ -28,7 +28,7 @@ function [varargout] = dc_plotParamTopo(unfold,varargin)
 %   structure of all plotting axes.
 %
 %*Examples:*
-%  dc_plotParamTopo(EEG,'plotParam',{'FactorX','FactorC'})
+%  uf_plotParamTopo(EEG,'plotParam',{'FactorX','FactorC'})
 
 
 cfg = finputcheck(varargin,...

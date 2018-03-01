@@ -1,4 +1,4 @@
-function ax = dc_plot2nd(d2nd,varargin)
+function ax = uf_plot2nd(d2nd,varargin)
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[];
     'baseline','real',[],[];
@@ -45,7 +45,7 @@ if cfg.singlesubjects
         end
         d2nd2.beta = d2nd2.beta(:,:,:);
         
-        g = dc_plotParam(d2nd2,cfgPlot);
+        g = uf_plotParam(d2nd2,cfgPlot);
         
         
         % Make the lines black & transparent
@@ -77,7 +77,7 @@ if cfg.singlesubjects
             if s >1
                 cfg.gramm = g;
             end
-            g = dc_plotParam(d2nd2,cfgPlot);
+            g = uf_plotParam(d2nd2,cfgPlot);
         end
         
         
@@ -100,5 +100,5 @@ d2nd2.beta_nodc = mean(d2nd2.beta_nodc(:,:,:,:),4);
 if length(d2nd2.deconv) >1
     d2nd2.deconv  = d2nd2.deconv(1);
 end
-ax = dc_plotParam(d2nd2,cfgPlot);
+ax = uf_plotParam(d2nd2,cfgPlot);
 

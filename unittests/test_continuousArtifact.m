@@ -1,7 +1,7 @@
 function test_continuousArtifact()
 %%
 EEG = simulate_test_case(5,'noise',0,'basis','box');
-EEG = dc_designmat(EEG,'formula','y~1+continuousA','eventtypes','stimulusA');
+EEG = uf_designmat(EEG,'formula','y~1+continuousA','eventtypes','stimulusA');
 
 cfgClean = [];
 cfgClean.amplitudeThreshold=150;
@@ -14,17 +14,17 @@ cfgClean.channels=1;
 EEG.data(1,500) = 1000;
 EEG.data(1,505) = 1000;
 EEG.data(1,525) = 1000;
-winrej = dc_continuousArtifactDetect(EEG,cfgClean);
+winrej = uf_continuousArtifactDetect(EEG,cfgClean);
 
 resultMat = [492 513; 517 533];
 
 if ~near(winrej,resultMat)
     error('problems with continuous artefact detection')
 end
-EEG = dc_timeexpandDesignmat(EEG,'timelimits',[-1,2]);
+EEG = uf_timeexpandDesignmat(EEG,'timelimits',[-1,2]);
 
 % now we delete it based on the continous design matrix
-EEG2 = dc_continuousArtifactExclude(EEG,'winrej',winrej);
+EEG2 = uf_continuousArtifactExclude(EEG,'winrej',winrej);
 
 t1 = ~all(all(EEG2.deconv.Xdc(winrej(1,1):winrej(1,2),:)==0));
 t2 = ~all(all(EEG2.deconv.Xdc(winrej(2,1):winrej(2,2),:)==0));

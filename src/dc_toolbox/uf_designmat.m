@@ -1,11 +1,11 @@
-function [EEG] = dc_designmat(EEG,varargin)
+function [EEG] = uf_designmat(EEG,varargin)
 % Generate Designmatrix out of EEG.event structure and a cfg.formula
 % Input an EEG event structure and you will get an EEG.deconv.X field with
 % the designmatrix.
 % If you add multiple eventtypess+formulas as cell-arrays , this function will iteratively
 % call itself and combine it to one big designmatrix.
 % The designmatrix is not yet ready to do deconvolution, use
-% dc_timeexpandDesignmat for this.
+% uf_timeexpandDesignmat for this.
 %
 %Arguments:
 %
@@ -86,7 +86,7 @@ function [EEG] = dc_designmat(EEG,varargin)
 %|   cfgDesign.spline = { {{'fixpos_x',10},{'fixpos_y',10}} , {} };
 %|   cfgDesign.categorical = {'level_predictability','target_fixation'};
 %|
-%|   EEG = dc_addDesignmat(EEG,cfgDesign);
+%|   EEG = uf_addDesignmat(EEG,cfgDesign);
 %
 
 cfg = finputcheck(varargin,...
@@ -129,7 +129,7 @@ if iscell(cfg.formula)
             
             %do the summersault
             
-            EEG2 = dc_designmat(EEG,cfgSingle);
+            EEG2 = uf_designmat(EEG,cfgSingle);
             
             if k == 1
                 
@@ -417,7 +417,7 @@ EEG.deconv.eventtypes = {cfg.eventtypes};
 EEG.deconv.splines = [];
 if ~isempty(cfg.spline)
     for s = 1:length(cfg.spline)
-        [EEG, ~,nanlist] = dc_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
+        [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
         EEG.deconv.X(nanlist,:) = 0;
     end
 end
