@@ -35,14 +35,21 @@ t2.fixDurPrevious = diff([nan(1);t2.time]);
 nanrows = any(isnan(t2{:,:}),2);
 corrData = corr(t2{~nanrows,:});
 if cfg.figure
+    escapeString = @(tStr)regexprep(tStr,'(_)','\\$1');
+    
     figure,
     imagesc(corrData)
     set(gca,'YTick',1:length(corrData))
-    set(gca,'YTickLabel',t2.Properties.VariableNames)
+    
+    
+    set(gca,'YTickLabel',escapeString(t2.Properties.VariableNames))
     set(gca,'XTick',1:length(corrData))
-    set(gca,'XTickLabel',t2.Properties.VariableNames)
+    set(gca,'XTickLabel',escapeString(t2.Properties.VariableNames))
     
     
     caxis([-1 1]),colorbar
 end
 corrOut = array2table(corr(t2{~isnan(t2.fixDurCurrent) & ~isnan(t2.fixDurPrevious),:}),'VariableNames',t2.Properties.VariableNames,'RowNames',t2.Properties.VariableNames);
+
+set(gca,'XTickLabelRotation',45);
+

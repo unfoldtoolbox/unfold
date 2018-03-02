@@ -15,7 +15,7 @@ function [varargout] = uf_plotParam(ufresult,varargin)
 %       0 to 10, so 5 lines would be plotted. Default are 7 lines
 %       from min to max
 %
-%    'unfold' ([-1 0 1]):default: -1; whether to plot ufresult.beta (1) or
+%    'deconv' ([-1 0 1]):default: -1; whether to plot ufresult.beta (1) or
 %       ufresult.beta_nodc(0) or everything/autodetect (-1). Autodetect would
 %       also detect same-shaped other predictors. If e.g. you want to compare
 %       multiple runs from different algorithms or similar
@@ -50,7 +50,7 @@ function [varargout] = uf_plotParam(ufresult,varargin)
 % parse inputs
 cfg = finputcheck(varargin,...
     {'predictAt','cell',[],{{'',[]}};
-    'unfold','integer',[-1 0 1],-1;
+    'deconv','integer',[-1 0 1],-1;
     'channel','',[],[];
     'add_intercept','boolean',[],0;
     'add_marginal', 'boolean', [],0;
@@ -86,7 +86,7 @@ assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept 
 
 if ~isempty(cfg.predictAt{1}{1})
     fprintf('Evaluating parameters at auto or specified values');
-    ufresult = uf_predictContinuous(ufresult,cfg);
+    ufresult = uf_predictContinuous(ufresult,'deconv',cfg.deconv);
 end
 %% Prepare data
 % select parameters to plot, or else plot all available

@@ -5,7 +5,7 @@ function output = uf_condense(EEG,varargin)
 %
 %Arguments:
 %   EEG(struct): A Struct containing EEG.unfold.beta_dc
-%   cfg.unfold (integer): 1, use EEG.unfold.beta_dc, the deconvolved betas
+%   cfg.deconv (integer): 1, use EEG.unfold.beta_dc, the deconvolved betas
 %                         0, use EEG.unfold.beta_nodc, betas without
 %                         deconvolution
 %                         -1 (default), autocheck which fields are avaiable
@@ -44,7 +44,7 @@ elseif isfield(EEG.unfold,'beta_dc')
 end
     
 cfg = finputcheck(varargin,...
-    { 'unfold', 'integer',[-1 0 1],-1;
+    { 'deconv', 'integer',[-1 0 1],-1;
       'channel','integer',[],1:nchan;
       'convertSplines','',[],[];
     },'mode','error');
@@ -61,23 +61,23 @@ end
 beta_dcExists   = isfield(EEG.unfold,'beta_dc')&& isnumeric(EEG.unfold.beta_dc);
 beta_nodcExists = isfield(EEG.unfold,'beta_nodc') && isnumeric(EEG.unfold.beta_nodc);
 
-if cfg.unfold == 1
+if cfg.deconv == 1
     assert(beta_dcExists,'beta_dc missing or not numeric')
-elseif cfg.unfold == 0
+elseif cfg.deconv== 0
     assert(beta_nodcExists,'beta_nodc missing or not numeric')
-elseif cfg.unfold == -1 % auto detect, recursive call
+elseif cfg.deconv == -1 % auto detect, recursive call
     assert(beta_dcExists | beta_nodcExists,'either beta_dc or beta_nodc need to exist. Did you fit the model already?')
     %-------------- Recursive part
     if beta_dcExists && beta_nodcExists
-        output1 = uf_condense(EEG,'channel',cfg.channel,'unfold',1);
-        output2 = uf_condense(EEG,'channel',cfg.channel,'unfold',0);
+        output1 = uf_condense(EEG,'channel',cfg.channel,'deconv',1);
+        output2 = uf_condense(EEG,'channel',cfg.channel,'deconv',0);
 
         output = output1;
         output.beta_nodc = output2.beta_nodc;
     elseif beta_dcExists
-        output = uf_condense(EEG,'channel',cfg.channel,'unfold',1);
+        output = uf_condense(EEG,'channel',cfg.channel,'deconv',1);
     else
-        output = uf_condense(EEG,'channel',cfg.channel,'unfold',0);
+        output = uf_condense(EEG,'channel',cfg.channel,'deconv',0);
     end
     return
     %-------------- End Recursive part
@@ -112,7 +112,7 @@ type = name;
 loopRunner = 1;
 %% go trough all parameters in parameterList
 for pred = paramList
-    if cfg.unfold
+    if cfg.deconv
         signal(:,:,loopRunner) = EEG.unfold.beta_dc(cfg.channel,:,pred)*EEG.unfold.timebasis;
     else
         signal(:,:,loopRunner) = EEG.unfold.beta_nodc(cfg.channel,:,pred)*pinv(EEG.unfold.timebasis)';
@@ -141,7 +141,7 @@ end
 
 output = struct();
 output.unfold = EEG.unfold;
-if cfg.unfold
+if cfg.deconv
     output.beta = signal;
 else
     output.beta_nodc = signal;

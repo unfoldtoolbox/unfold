@@ -23,7 +23,7 @@ function [EEG] = uf_timeexpandDesignmat(EEG,varargin)
 %   * EEG.unfold.Xdc - the designmatrix for all time points
 %   * EEG.unfold.timebasis - the basis set for splines / fourier. This is used later to recover the values in the time-domain, not the basis-function domain
 %   * EEG.unfold.basisTime - the time of the unfold-window in seconds
-%   * EEG.Xuf_terms2cols - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor
+%   * EEG.Xdc_terms2cols - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor
 %
 %*Example:*
 %       EEG = uf_timeexpandDesignmat(EEG,'method','splines','windowlength',128,'timeexpandparam',30)
@@ -328,6 +328,6 @@ end
 EEG.unfold.Xdc = Xdc;
 EEG.unfold.timebasis = basis;
 EEG.unfold.times = cfg.windowtimes; % in s, this is different to eeglab, but makes more sense
-EEG.unfold.Xuf_terms2cols = sort(repmat(1:length(EEG.unfold.colnames),1,size(EEG.unfold.timebasis,1)));
+EEG.unfold.Xdc_terms2cols = sort(repmat(1:length(EEG.unfold.colnames),1,size(EEG.unfold.timebasis,1)));
 fprintf('...done\n')
 end

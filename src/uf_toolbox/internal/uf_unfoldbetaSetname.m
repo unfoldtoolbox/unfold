@@ -4,13 +4,13 @@ function [betaSetName] = uf_unfoldbetaSetname(ufresult,varargin)
 
 % parse inputs
 cfg = finputcheck(varargin,...
-    {'unfold','integer',[0,1,-1],-1, ... % -1 is autodetect
+    {'deconv','integer',[0,1,-1],-1, ... % -1 is autodetect
     'dataField','string','',''...
     },'mode','ignore');
 
 nBetaSets = 1;
 betaSetName = [];
-if cfg.unfold == -1
+if cfg.deconv == -1
     assert(isfield(ufresult,'beta')|isfield(ufresult,'beta_nodc'),'error: to use autodetect at least the field ufresult.beta  or ufresult.beta_nodc needs to exist')
     fn = fieldnames(ufresult);
     
@@ -28,7 +28,7 @@ if cfg.unfold == -1
             betaSetName = [betaSetName f(1)];
         end
     end
-elseif cfg.unfold==0
+elseif cfg.deconv==0
     betaSetName = {'beta_nodc'};
 else
     betaSetName = {'beta'};

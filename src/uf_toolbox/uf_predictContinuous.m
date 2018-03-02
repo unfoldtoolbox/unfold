@@ -28,7 +28,7 @@ function output = uf_predictContinuous(ufresult,varargin)
 
 cfg = finputcheck(varargin,...
     {'predictAt','cell',[],{{'',[]}};
-    'unfold','integer',[-1,0,1],-1;
+    'deconv','integer',[-1,0,1],-1;
     'auto_method','string',{'quantile','linear','average'},'quantile';
     'auto_n','integer',[],10;
     },'mode','error');
@@ -45,15 +45,15 @@ end
 beta_dcExists   = isfield(ufresult,'beta')&& isnumeric(ufresult.beta);
 beta_nodcExists = isfield(ufresult,'beta_nodc') && isnumeric(ufresult.beta_nodc);
 
-if cfg.unfold == 1
+if cfg.deconv == 1
     assert(beta_dcExists,'beta_dc missing or not numeric')
     
     
-elseif cfg.unfold == 0
+elseif cfg.deconv== 0
     assert(beta_nodcExists,'beta_nodc missing or not numeric')
     
     
-elseif cfg.unfold == -1 % auto detect, recursive call
+elseif cfg.deconv == -1 % auto detect, recursive call
     
     assert(isfield(ufresult,'beta')|isfield(ufresult,'beta_nodc'),'error: to use autodetect at least the field ufresult.beta  or ufresult.beta_nodc needs to exist')
     fn = fieldnames(ufresult);
@@ -72,7 +72,7 @@ elseif cfg.unfold == -1 % auto detect, recursive call
         if length(sizeBeta) == length(size(ufresult.(f{1}))) &&  all(sizeBeta == size(ufresult.(f{1})))
             
             % overwrite the "beta" field and use that
-            cfg.unfold = 1;
+            cfg.deconv = 1;
             ufresult_tmp = ufresult;
             ufresult_tmp.beta = ufresult.(f{1});
             output_tmp = uf_predictContinuous(ufresult_tmp,cfg); %------- recursive call
@@ -94,9 +94,9 @@ end
 predValueSelectList = cfg.predictAt;
 predNameList = cellfun(@(x)x{1},predValueSelectList,'UniformOutput',0);
 [~,paramList] = uf_getSplineidx(ufresult);
-if cfg.unfold == 1
+if cfg.deconv == 1
     beta = ufresult.beta;
-elseif cfg.unfold == 0
+elseif cfg.deconv== 0
     
     beta = ufresult.beta_nodc;
 end
@@ -208,7 +208,7 @@ end
 epochNew(1) = [];
 betaNew(:,:,1) = [];
 
-if cfg.unfold
+if cfg.deconv
     ufresult.beta = betaNew;
 else
     ufresult.beta_nodc = betaNew;

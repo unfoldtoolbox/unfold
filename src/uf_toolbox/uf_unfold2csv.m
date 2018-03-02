@@ -3,7 +3,7 @@ function varargout = uf_unfold2csv(ufresult,varargin)
 % returns a data-table
 %
 %Arguments:
-%   cfg.unfold (boolean): Use the unfold betas (unfold.beta_dc) or the
+%   cfg.deconv (boolean): Use the unfold betas (unfold.beta_dc) or the
 %                         no-unfold betas(unfold.beta_nodc)
 %   cfg.channel (integer): (Default: All channels) Limit to a list of specific channels
 %
@@ -16,7 +16,7 @@ function varargout = uf_unfold2csv(ufresult,varargin)
 
 
 cfg = finputcheck(varargin,...
-    { 'unfold', 'boolean',[],1;
+    { 'deconv', 'boolean',[],1;
     'channel','integer',[],[];
     'filename','string',[],'';
     },'mode','ignore');
@@ -25,9 +25,9 @@ if(ischar(cfg)); error(cfg);end
 
 %% generate empty output structure
 
-if cfg.unfold == 1
+if cfg.deconv == 1
     data = ufresult.beta;
-elseif cfg.unfold == 0
+elseif cfg.deconv== 0
     data = ufresult.beta_nodc;
 end
 
@@ -69,9 +69,9 @@ end
 
 % construct table
 t = table(predEvent(:),predName(:),predValue(:),channels(:),time(:),data(:),'VariableNames',{'event','predictor','predictorvalue','channel','time','data'});
-if cfg.unfold == 1
+if cfg.deconv == 1
     t.method = repmat({'deconvolution'},size(t,1),1);
-elseif cfg.unfold == 0
+elseif cfg.deconv == 0
     t.test = repmat({'no-deconvolution'},size(t,1),1);
 end
 

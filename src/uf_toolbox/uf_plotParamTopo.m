@@ -13,6 +13,8 @@ function [varargout] = uf_plotParamTopo(ufresult,varargin)
 %               the 'pure' effect of a independent variable is plotted but
 %               more of an ERP-like plot is generated
 %
+% 'n_topos' :(15) number of topographies to plot
+%
 % 'channel' : plot only a subset of channels
 %
 % 'baseline' (2 integers): default none; Performs a baseline corrections on the interval (in seconds = ufresult.times units) given.
@@ -34,7 +36,8 @@ function [varargout] = uf_plotParamTopo(ufresult,varargin)
 cfg = finputcheck(varargin,...
     {'predictAt','cell',[],{{'',[]}};
     'add_intercept','boolean',[],0;
-    'plotParam','cell',[],{};
+    'plotParam','',[],{};
+    'n_topos','integer',[],15,
     'baseline','real',[min(ufresult.times) max(ufresult.times)],[];...
     'betaSetName','string',fieldnames(ufresult),'beta';
     'channel','integer',[],[];

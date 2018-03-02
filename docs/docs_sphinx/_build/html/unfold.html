@@ -222,7 +222,7 @@ plotting functions</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>EEG</strong> (<em>struct</em>) &#8211; A Struct containing EEG.unfold.beta_dc</li>
-<li><strong>cfg.unfold</strong> (<em>integer</em>) &#8211; 1, use EEG.unfold.beta_dc, the deconvolved betas
+<li><strong>cfg.deconv</strong> (<em>integer</em>) &#8211; 1, use EEG.unfold.beta_dc, the deconvolved betas
 0, use EEG.unfold.beta_nodc, betas without
 deconvolution
 -1 (default), autocheck which fields are avaiable
@@ -948,7 +948,7 @@ to convolve. In case of &#8216;full&#8217;, the parameter is not used.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cfg.unfold</strong> (<em>boolean</em>) &#8211; Use the unfold betas (unfold.beta_dc) or the
+<li><strong>cfg.deconv</strong> (<em>boolean</em>) &#8211; Use the unfold betas (unfold.beta_dc) or the
 no-unfold betas(unfold.beta_nodc)</li>
 <li><strong>cfg.channel</strong> (<em>integer</em>) &#8211; (Default: All channels) Limit to a list of specific channels</li>
 <li><strong>cfg.filename</strong> &#8211; filename for the csv file. if empty, only returns table</li>

@@ -83,7 +83,7 @@ for p = 1:length(paramIdx)
         c = max(abs(caxis));
         caxis([-c c])
     end
-    text(1,-0.05,sprintf('Intercept added?: %i \nBetaSetName: %s',cfg.add_intercept,cfg.betaSetName),'units','normalized')
+vline(0,':k')
     
     
 end

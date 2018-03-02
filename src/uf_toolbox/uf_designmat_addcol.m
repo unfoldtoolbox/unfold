@@ -17,6 +17,6 @@ assert(size(EEG.unfold.Xdc,1) == length(newrow),'New row does not have same size
 
 EEG.unfold.Xdc(:,end+1) = newrow;
 EEG.unfold.colnames(end+1) = {label};
-EEG.unfold.Xuf_terms2cols(end+1) = length(EEG.unfold.colnames);
+EEG.unfold.Xdc_terms2cols(end+1) = length(EEG.unfold.colnames);
 EEG.unfold.eventtypes(end+1) = {nan};
 EEG.unfold.cols2eventtypes(end+1) = length(EEG.unfold.eventtypes);
