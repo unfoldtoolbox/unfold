@@ -39,7 +39,7 @@ if cfg.singlesubjects
         d2nd2 = d2nd;
         
         d2nd2.param = repmat(d2nd2.param,1,size(d2nd.beta,4));
-        % d2nd2.deconv.X = ones(1,size(d2nd2.param,2));
+        % d2nd2.unfold.X = ones(1,size(d2nd2.param,2));
         if isfield(d2nd,'beta_nodc')
             d2nd2.beta_nodc = d2nd2.beta_nodc(:,:,:);
         end
@@ -67,7 +67,7 @@ if cfg.singlesubjects
         end
         
     else % withspline
-        %% plot deconv vs nodeconv
+        %% plot unfold vs nodeconv
         % this works with splines but is slooooww
         
         for s = 1:size(d2nd.beta,4)
@@ -97,8 +97,8 @@ end
 d2nd2 = d2nd;
 d2nd2.beta = mean(d2nd2.beta(:,:,:,:),4);
 d2nd2.beta_nodc = mean(d2nd2.beta_nodc(:,:,:,:),4);
-if length(d2nd2.deconv) >1
-    d2nd2.deconv  = d2nd2.deconv(1);
+if length(d2nd2.unfold) >1
+    d2nd2.unfold  = d2nd2.unfold(1);
 end
 ax = uf_plotParam(d2nd2,cfgPlot);
 

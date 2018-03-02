@@ -4,9 +4,9 @@ function output = uf_condense(EEG,varargin)
 %plotting functions
 %
 %Arguments:
-%   EEG(struct): A Struct containing EEG.deconv.beta_dc
-%   cfg.deconv (integer): 1, use EEG.deconv.beta_dc, the deconvolved betas
-%                         0, use EEG.deconv.beta_nodc, betas without
+%   EEG(struct): A Struct containing EEG.unfold.beta_dc
+%   cfg.unfold (integer): 1, use EEG.unfold.beta_dc, the deconvolved betas
+%                         0, use EEG.unfold.beta_nodc, betas without
 %                         deconvolution
 %                         -1 (default), autocheck which fields are avaiable
 %                         and returns both
@@ -20,9 +20,9 @@ function output = uf_condense(EEG,varargin)
 %
 %Return:
 %   ufresult.beta= (nchans x time x parameters)
-%   ufresult.beta_nodc = (nchans x time x parameters) (only if deconv=0 or -1)
+%   ufresult.beta_nodc = (nchans x time x parameters) (only if unfold=0 or -1)
 %   ufresult.param = (struct size: parameters) each field contains the values of the respective parameter.
-%   ufresult.deconv = EEG.deconv
+%   ufresult.unfold = EEG.unfold
 %   ufresult.times = EEG.times
 %   ufresult.chanlocs = EEG.chanlocs
 %
@@ -36,15 +36,15 @@ function output = uf_condense(EEG,varargin)
 %* value: value of the predictor, e.g. '50'
 %* event: event of the variable, e.g.: 'eventA'
 
-assert(isfield(EEG.deconv,'beta_nodc')|isfield(EEG.deconv,'beta_dc'),'Input Error: Could not find beta-estimates. Did you run uf_glmfit?')
-if isfield(EEG.deconv,'beta_nodc')
-    nchan = size(EEG.deconv.beta_nodc,1);
-elseif isfield(EEG.deconv,'beta_dc')
-    nchan = size(EEG.deconv.beta_dc,1);
+assert(isfield(EEG.unfold,'beta_nodc')|isfield(EEG.unfold,'beta_dc'),'Input Error: Could not find beta-estimates. Did you run uf_glmfit?')
+if isfield(EEG.unfold,'beta_nodc')
+    nchan = size(EEG.unfold.beta_nodc,1);
+elseif isfield(EEG.unfold,'beta_dc')
+    nchan = size(EEG.unfold.beta_dc,1);
 end
     
 cfg = finputcheck(varargin,...
-    { 'deconv', 'integer',[-1 0 1],-1;
+    { 'unfold', 'integer',[-1 0 1],-1;
       'channel','integer',[],1:nchan;
       'convertSplines','',[],[];
     },'mode','error');
@@ -58,26 +58,26 @@ if isfield(EEG,'nbchan')
     assert(all(ismember(cfg.channel,1:nchan)))
 end
 
-beta_dcExists   = isfield(EEG.deconv,'beta_dc')&& isnumeric(EEG.deconv.beta_dc);
-beta_nodcExists = isfield(EEG.deconv,'beta_nodc') && isnumeric(EEG.deconv.beta_nodc);
+beta_dcExists   = isfield(EEG.unfold,'beta_dc')&& isnumeric(EEG.unfold.beta_dc);
+beta_nodcExists = isfield(EEG.unfold,'beta_nodc') && isnumeric(EEG.unfold.beta_nodc);
 
-if cfg.deconv == 1
+if cfg.unfold == 1
     assert(beta_dcExists,'beta_dc missing or not numeric')
-elseif cfg.deconv == 0
+elseif cfg.unfold == 0
     assert(beta_nodcExists,'beta_nodc missing or not numeric')
-elseif cfg.deconv == -1 % auto detect, recursive call
+elseif cfg.unfold == -1 % auto detect, recursive call
     assert(beta_dcExists | beta_nodcExists,'either beta_dc or beta_nodc need to exist. Did you fit the model already?')
     %-------------- Recursive part
     if beta_dcExists && beta_nodcExists
-        output1 = uf_condense(EEG,'channel',cfg.channel,'deconv',1);
-        output2 = uf_condense(EEG,'channel',cfg.channel,'deconv',0);
+        output1 = uf_condense(EEG,'channel',cfg.channel,'unfold',1);
+        output2 = uf_condense(EEG,'channel',cfg.channel,'unfold',0);
 
         output = output1;
         output.beta_nodc = output2.beta_nodc;
     elseif beta_dcExists
-        output = uf_condense(EEG,'channel',cfg.channel,'deconv',1);
+        output = uf_condense(EEG,'channel',cfg.channel,'unfold',1);
     else
-        output = uf_condense(EEG,'channel',cfg.channel,'deconv',0);
+        output = uf_condense(EEG,'channel',cfg.channel,'unfold',0);
     end
     return
     %-------------- End Recursive part
@@ -93,15 +93,15 @@ end
 % if nSpl == 0
 %     nSplineBetas = 0;
 % else
-%     nSplineBetas = -nSpl + sum( cellfun(@(x)size(x.basis,1),EEG.deconv.splines) );
+%     nSplineBetas = -nSpl + sum( cellfun(@(x)size(x.basis,1),EEG.unfold.splines) );
 % end
 % if ~cfg.convertSplines
-paramList = 1:size(EEG.deconv.X,2);
+paramList = 1:size(EEG.unfold.X,2);
 % end
 
 
-signal = nan(length(cfg.channel),length(EEG.deconv.times),length(paramList));
-times = EEG.deconv.times;
+signal = nan(length(cfg.channel),length(EEG.unfold.times),length(paramList));
+times = EEG.unfold.times;
 
 % initialize vectors
 value = nan(1,size(signal,3));
@@ -112,15 +112,15 @@ type = name;
 loopRunner = 1;
 %% go trough all parameters in parameterList
 for pred = paramList
-    if cfg.deconv
-        signal(:,:,loopRunner) = EEG.deconv.beta_dc(cfg.channel,:,pred)*EEG.deconv.timebasis;
+    if cfg.unfold
+        signal(:,:,loopRunner) = EEG.unfold.beta_dc(cfg.channel,:,pred)*EEG.unfold.timebasis;
     else
-        signal(:,:,loopRunner) = EEG.deconv.beta_nodc(cfg.channel,:,pred)*pinv(EEG.deconv.timebasis)';
+        signal(:,:,loopRunner) = EEG.unfold.beta_nodc(cfg.channel,:,pred)*pinv(EEG.unfold.timebasis)';
     end
     
     % change name incase of spline and no conversion
     if ismember(pred,splIdxList)
-        colname = EEG.deconv.colnames(pred);
+        colname = EEG.unfold.colnames(pred);
         
         
         splt = regexp(colname,'([-]?[\d]*\.?[\d]*)$','tokens');
@@ -130,18 +130,18 @@ for pred = paramList
         %             name(loopRunner)= splt(1);
     else
         value(loopRunner) = nan;
-        name(loopRunner)= EEG.deconv.colnames(pred);
+        name(loopRunner)= EEG.unfold.colnames(pred);
     end
-    event(loopRunner)= EEG.deconv.eventtypes(EEG.deconv.cols2eventtypes(pred));
-    type(loopRunner) = EEG.deconv.variabletypes(EEG.deconv.cols2variablenames(pred));
+    event(loopRunner)= EEG.unfold.eventtypes(EEG.unfold.cols2eventtypes(pred));
+    type(loopRunner) = EEG.unfold.variabletypes(EEG.unfold.cols2variablenames(pred));
     loopRunner = loopRunner+1;
 %     end
 
 end
 
 output = struct();
-output.deconv = EEG.deconv;
-if cfg.deconv
+output.unfold = EEG.unfold;
+if cfg.unfold
     output.beta = signal;
 else
     output.beta_nodc = signal;

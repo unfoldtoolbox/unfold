@@ -77,8 +77,8 @@ for type = {'default','cyclical','custom'}
         
         figure('name',cfgSim.type)
         subplot(2,1,1)
-        Xspline = spl.function(spl.values,EEG.deconv.splines{1}.knots);
-        Xspline(:,EEG.deconv.splines{1}.removedSplineIdx) = [];
+        Xspline = spl.function(spl.values,EEG.unfold.splines{1}.knots);
+        Xspline(:,EEG.unfold.splines{1}.removedSplineIdx) = [];
         plot(dc + Xspline*squeeze(ufresult.beta_nodc(:,:,2:end)),'Linewidth',2)
         hold on
         plot(dc + Xspline.*squeeze(ufresult.beta_nodc(:,:,2:end))',':','Linewidth',2)

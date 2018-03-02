@@ -3,7 +3,7 @@ function [splIdxListAll,paramList] = uf_getSplineidx(EEG)
 % first index of the spline remains
 %
 %Arguments:
-%   EEG: eeglab set with EEG.deconv.spl.
+%   EEG: eeglab set with EEG.unfold.spl.
 %
 %Returns:
 % splIdxList:  Empty if no splines, else contains the column indices of the designmatrix X where there are splines
@@ -17,21 +17,21 @@ function [splIdxListAll,paramList] = uf_getSplineidx(EEG)
 %| paramList= [1 2 3 8]
 
 
-assert(isfield(EEG,'deconv')&&isfield(EEG.deconv,'splines'),'could not find EEG.deconv.splines')
+assert(isfield(EEG,'unfold')&&isfield(EEG.unfold,'splines'),'could not find EEG.unfold.splines')
 
-numParam = size(EEG.deconv.X,2);
+numParam = size(EEG.unfold.X,2);
 splIdxListAll = [];
 paramList = 1:numParam;
 
 
-splineVar = find(strcmp(EEG.deconv.variabletypes,'spline'));
-splineCol = EEG.deconv.cols2variablenames;
-splineCol(~ismember(EEG.deconv.cols2variablenames,splineVar)) = 0;
+splineVar = find(strcmp(EEG.unfold.variabletypes,'spline'));
+splineCol = EEG.unfold.cols2variablenames;
+splineCol(~ismember(EEG.unfold.cols2variablenames,splineVar)) = 0;
 
-if isfield(EEG.deconv,'splines') && ~isempty(EEG.deconv.splines)
+if isfield(EEG.unfold,'splines') && ~isempty(EEG.unfold.splines)
     for splIdx = 1:length(splineVar)
         splIdxList = find(splineCol == splineVar(splIdx));
-%         splIdxList = find(cellfun(@check_spline,EEG.deconv.colnames(:),repmat({splIdx},length(EEG.deconv.colnames),1)));
+%         splIdxList = find(cellfun(@check_spline,EEG.unfold.colnames(:),repmat({splIdx},length(EEG.unfold.colnames),1)));
         paramList = setdiff(paramList,splIdxList(2:end)); % we want to evaluate the sopline signal only once
         splIdxListAll = [splIdxListAll splIdxList];
     end

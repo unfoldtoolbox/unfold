@@ -14,9 +14,9 @@ for type = {'mean','median','marginal','drop'}
 
     switch type{1}
         case 'mean'
-            assert(all(nanmean(EEG.deconv.X) - nanmean(EEGimp.deconv.X)< 10^-10),'error, mean imputation showed larger error')
+            assert(all(nanmean(EEG.unfold.X) - nanmean(EEGimp.unfold.X)< 10^-10),'error, mean imputation showed larger error')
         case 'drop'
-            tmp = EEGimp.deconv.X(stimCix(5:8),:);
+            tmp = EEGimp.unfold.X(stimCix(5:8),:);
             assert(all(tmp(:)==0),'error, drop imputation did something wrong')
         otherwise
             
@@ -48,7 +48,7 @@ end
 
 
 function check_nan(EEG)
-if any(isnan(EEG.deconv.X(:)))
+if any(isnan(EEG.unfold.X(:)))
     error('imputeMissing has some kind of problem')
 end
 end

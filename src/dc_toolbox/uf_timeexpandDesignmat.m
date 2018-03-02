@@ -1,6 +1,6 @@
 function [EEG] = uf_timeexpandDesignmat(EEG,varargin)
 %Timeexpand / Deconvolve Designmatrix This function takes the designmatrix
-% (saved in EEG.deconv.X, a EEG.points times nPredictor matrix) and makes
+% (saved in EEG.unfold.X, a EEG.points times nPredictor matrix) and makes
 % copies over time (in the range of the windowlength).
 %
 %Arguments:
@@ -20,9 +20,9 @@ function [EEG] = uf_timeexpandDesignmat(EEG,varargin)
 %       to convolve. In case of 'full', the parameter is not used.
 %
 %Returns:
-%   * EEG.deconv.Xdc - the designmatrix for all time points
-%   * EEG.deconv.timebasis - the basis set for splines / fourier. This is used later to recover the values in the time-domain, not the basis-function domain
-%   * EEG.deconv.basisTime - the time of the deconv-window in seconds
+%   * EEG.unfold.Xdc - the designmatrix for all time points
+%   * EEG.unfold.timebasis - the basis set for splines / fourier. This is used later to recover the values in the time-domain, not the basis-function domain
+%   * EEG.unfold.basisTime - the time of the unfold-window in seconds
 %   * EEG.Xuf_terms2cols - A unique specifier defining which of the deconvolution-additional-columns belongs to which predictor
 %
 %*Example:*
@@ -49,7 +49,7 @@ end
 
 
 assert(cfg.timelimits(1)<cfg.timelimits(2),'Timelimits are not ordered correctly or are equal')
-assert(~any(isnan(EEG.deconv.X(:))),'Warning NAN values found in designmatrix. will not continue')
+assert(~any(isnan(EEG.unfold.X(:))),'Warning NAN values found in designmatrix. will not continue')
 
 
 % Taken and modified from the epoch-eeglab function
@@ -71,33 +71,33 @@ if cfg.windowlength>10000
 end
 
 
-assert(isfield(EEG,'deconv'),'Could not find the deconv field: EEG.deconv')
-assert(isfield(EEG.deconv,'X'),'Could not find the designmatrix: EEG.deconv.X')
+assert(isfield(EEG,'unfold'),'Could not find the unfold field: EEG.unfold')
+assert(isfield(EEG.unfold,'X'),'Could not find the designmatrix: EEG.unfold.X')
 
-% empty out the EEG.deconv field
+% empty out the EEG.unfold field
 
 rmList = {'beta','beta_dc','beta_nodc','beta_dcCustomrow'};
-rmList = rmList(ismember(rmList,fieldnames(EEG.deconv)));
-EEG.deconv = rmfield(EEG.deconv,rmList);
+rmList = rmList(ismember(rmList,fieldnames(EEG.unfold)));
+EEG.unfold = rmfield(EEG.unfold,rmList);
 
 
 % this generates the stick-matrix
-eventvec = zeros(size(EEG.deconv.X,2),EEG.pnts);
+eventvec = zeros(size(EEG.unfold.X,2),EEG.pnts);
 for e = 1:length(EEG.event)
     
     % This is needed for multiple event support. Multiple events can arrise
     % at the same latency. They would overwrite if we do not specify which
     % columns to copy over.
     ty = EEG.event(e).type;
-    evtIx = find(cellfun(@(dcTy)any(strcmp(dcTy,ty)),EEG.deconv.eventtypes));
+    evtIx = find(cellfun(@(dcTy)any(strcmp(dcTy,ty)),EEG.unfold.eventtypes));
     if isempty(evtIx)
         % Trigger is not in design
         continue
     end
-    s = ismember(EEG.deconv.cols2eventtypes,evtIx);
+    s = ismember(EEG.unfold.cols2eventtypes,evtIx);
     
     % Copy over the correct columns at the right time
-    eventvec(s,round(EEG.event(e).latency)) = EEG.deconv.X(e,s);
+    eventvec(s,round(EEG.event(e).latency)) = EEG.unfold.X(e,s);
     
     
 end
@@ -325,9 +325,9 @@ end
 
 
 
-EEG.deconv.Xdc = Xdc;
-EEG.deconv.timebasis = basis;
-EEG.deconv.times = cfg.windowtimes; % in s, this is different to eeglab, but makes more sense
-EEG.deconv.Xuf_terms2cols = sort(repmat(1:length(EEG.deconv.colnames),1,size(EEG.deconv.timebasis,1)));
+EEG.unfold.Xdc = Xdc;
+EEG.unfold.timebasis = basis;
+EEG.unfold.times = cfg.windowtimes; % in s, this is different to eeglab, but makes more sense
+EEG.unfold.Xuf_terms2cols = sort(repmat(1:length(EEG.unfold.colnames),1,size(EEG.unfold.timebasis,1)));
 fprintf('...done\n')
 end

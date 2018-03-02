@@ -28,7 +28,7 @@ function output = uf_predictContinuous(ufresult,varargin)
 
 cfg = finputcheck(varargin,...
     {'predictAt','cell',[],{{'',[]}};
-    'deconv','integer',[-1,0,1],-1;
+    'unfold','integer',[-1,0,1],-1;
     'auto_method','string',{'quantile','linear','average'},'quantile';
     'auto_n','integer',[],10;
     },'mode','error');
@@ -45,15 +45,15 @@ end
 beta_dcExists   = isfield(ufresult,'beta')&& isnumeric(ufresult.beta);
 beta_nodcExists = isfield(ufresult,'beta_nodc') && isnumeric(ufresult.beta_nodc);
 
-if cfg.deconv == 1
+if cfg.unfold == 1
     assert(beta_dcExists,'beta_dc missing or not numeric')
     
     
-elseif cfg.deconv == 0
+elseif cfg.unfold == 0
     assert(beta_nodcExists,'beta_nodc missing or not numeric')
     
     
-elseif cfg.deconv == -1 % auto detect, recursive call
+elseif cfg.unfold == -1 % auto detect, recursive call
     
     assert(isfield(ufresult,'beta')|isfield(ufresult,'beta_nodc'),'error: to use autodetect at least the field ufresult.beta  or ufresult.beta_nodc needs to exist')
     fn = fieldnames(ufresult);
@@ -72,7 +72,7 @@ elseif cfg.deconv == -1 % auto detect, recursive call
         if length(sizeBeta) == length(size(ufresult.(f{1}))) &&  all(sizeBeta == size(ufresult.(f{1})))
             
             % overwrite the "beta" field and use that
-            cfg.deconv = 1;
+            cfg.unfold = 1;
             ufresult_tmp = ufresult;
             ufresult_tmp.beta = ufresult.(f{1});
             output_tmp = uf_predictContinuous(ufresult_tmp,cfg); %------- recursive call
@@ -94,9 +94,9 @@ end
 predValueSelectList = cfg.predictAt;
 predNameList = cellfun(@(x)x{1},predValueSelectList,'UniformOutput',0);
 [~,paramList] = uf_getSplineidx(ufresult);
-if cfg.deconv == 1
+if cfg.unfold == 1
     beta = ufresult.beta;
-elseif cfg.deconv == 0
+elseif cfg.unfold == 0
     
     beta = ufresult.beta_nodc;
 end
@@ -109,23 +109,23 @@ for currPred= 1:length(paramList)
     % if we are at the last predictor, this one goes to the end of the
     % designmatrix
     if currPred == length(paramList)
-        predIDX_next = size(ufresult.deconv.X,2);
+        predIDX_next = size(ufresult.unfold.X,2);
     else
         %else it goes to the next predictor
         predIDX_next = paramList(currPred+1)-1;
     end
-    variableIdx = ufresult.deconv.cols2variablenames(predIDX);
+    variableIdx = ufresult.unfold.cols2variablenames(predIDX);
     
     b = beta(:,:,predIDX:predIDX_next);
     
     e = ufresult.param(predIDX);
     
-    if strcmp(ufresult.deconv.variabletypes{variableIdx},'spline')
+    if strcmp(ufresult.unfold.variabletypes{variableIdx},'spline')
         
-        splName = cellfun(@(x)x.name,ufresult.deconv.splines,'UniformOutput',0);
-        splIdx = find(strcmp(splName,ufresult.deconv.variablenames{variableIdx}));
+        splName = cellfun(@(x)x.name,ufresult.unfold.splines,'UniformOutput',0);
+        splIdx = find(strcmp(splName,ufresult.unfold.variablenames{variableIdx}));
         
-        spl = ufresult.deconv.splines{splIdx};
+        spl = ufresult.unfold.splines{splIdx};
         % If we found the spline_value given value in the splines, then choose
         % that one
         customSplineValue = strcmp(predNameList,spl.name);
@@ -173,14 +173,14 @@ for currPred= 1:length(paramList)
             epochNew(end+1) = eNew;
         end
         
-    elseif strcmp(ufresult.deconv.variabletypes{variableIdx},'continuous')
+    elseif strcmp(ufresult.unfold.variabletypes{variableIdx},'continuous')
         % we have either a categorical or a continuous predictor here
-        customContValue = strcmp(predNameList,ufresult.deconv.colnames(predIDX(1)));
+        customContValue = strcmp(predNameList,ufresult.unfold.colnames(predIDX(1)));
         if any(customContValue)
             contValueSelect = predValueSelectList{customContValue}{2};
             
         else
-            values = ufresult.deconv.X(:,predIDX(1));
+            values = ufresult.unfold.X(:,predIDX(1));
             % we do not have access at this point to which 'X' entry belongs to that event.
             % Thus we discard every 0 value and hope a bit, that it does not matter because 0 is the intercept anyway.
             % This is supoptimal and I'm sorry if it creates inconveniences.
@@ -208,7 +208,7 @@ end
 epochNew(1) = [];
 betaNew(:,:,1) = [];
 
-if cfg.deconv
+if cfg.unfold
     ufresult.beta = betaNew;
 else
     ufresult.beta_nodc = betaNew;

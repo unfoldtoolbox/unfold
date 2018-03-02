@@ -72,10 +72,10 @@ EEG = uf_glmfit_nodc(EEG); %does not overwrite
 %%
 ufresult = uf_condense(EEG);
 
-multWith = ones(1,size(EEG.deconv.X,2));
-for col = 1:size(EEG.deconv.X,2)
-    ix = ismember({EEG.urevent.type},EEG.deconv.eventtypes{EEG.deconv.cols2eventtypes(col)});
-    multWith(col) = mean(EEG.deconv.X(ix,col),1);
+multWith = ones(1,size(EEG.unfold.X,2));
+for col = 1:size(EEG.unfold.X,2)
+    ix = ismember({EEG.urevent.type},EEG.unfold.eventtypes{EEG.unfold.cols2eventtypes(col)});
+    multWith(col) = mean(EEG.unfold.X(ix,col),1);
 end
 %%
 
@@ -105,7 +105,7 @@ ufresult = uf_predictContinuous(ufresult,cfg);
 cfg = [];
 cfg.channel = 1;
 cfg.sameyaxis = 'all';
-cfg.deconv = -1;
+cfg.unfold = -1;
 cfg.plotSeparate = 'event';
 cfg.plotParam = {'3_(Intercept)','3_continuousA','splineA','splineB'};
 cfg.add_marginal = 0;

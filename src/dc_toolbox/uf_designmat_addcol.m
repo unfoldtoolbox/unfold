@@ -1,6 +1,6 @@
 function EEG = uf_designmat_addcol(EEG,newrow,label)
 %uf_designmat_addcol
-% Adds a single custom column to the deconv-Designmat "Xdc"
+% Adds a single custom column to the unfold-Designmat "Xdc"
 %
 %Arguments:
 %   newrow (array): The column to add to the Xdc designmat
@@ -8,15 +8,15 @@ function EEG = uf_designmat_addcol(EEG,newrow,label)
 %
 %Return:
 %   EEG-Struct
-%   * deconv.Xdc added column
-%   * deconv.colnames added label
+%   * unfold.Xdc added column
+%   * unfold.colnames added label
 
 
-assert(isfield(EEG.deconv,'Xdc'),'could not find deconv.Xdc, run uf_timeexpandDesignmat before')
-assert(size(EEG.deconv.Xdc,1) == length(newrow),'New row does not have same size as deconv.Xdc')
+assert(isfield(EEG.unfold,'Xdc'),'could not find unfold.Xdc, run uf_timeexpandDesignmat before')
+assert(size(EEG.unfold.Xdc,1) == length(newrow),'New row does not have same size as unfold.Xdc')
 
-EEG.deconv.Xdc(:,end+1) = newrow;
-EEG.deconv.colnames(end+1) = {label};
-EEG.deconv.Xuf_terms2cols(end+1) = length(EEG.deconv.colnames);
-EEG.deconv.eventtypes(end+1) = {nan};
-EEG.deconv.cols2eventtypes(end+1) = length(EEG.deconv.eventtypes);
+EEG.unfold.Xdc(:,end+1) = newrow;
+EEG.unfold.colnames(end+1) = {label};
+EEG.unfold.Xuf_terms2cols(end+1) = length(EEG.unfold.colnames);
+EEG.unfold.eventtypes(end+1) = {nan};
+EEG.unfold.cols2eventtypes(end+1) = length(EEG.unfold.eventtypes);
