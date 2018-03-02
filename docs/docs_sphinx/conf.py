@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# deconv documentation build configuration file, created by
+# unfold documentation build configuration file, created by
 # sphinx-quickstart on Wed Dec 14 11:44:03 2016.
 #
 # This file is execfile()d with the current directory set to its
