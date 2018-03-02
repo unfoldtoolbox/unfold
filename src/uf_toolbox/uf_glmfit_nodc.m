@@ -1,6 +1,6 @@
-function [EEG] = dc_glmfit_nodc(EEG,varargin)
+function [EEG] = uf_glmfit_nodc(EEG,varargin)
 %A function to solve the inverse problem without deconvolution
-% Currently it solves the pseudo-inverse of EEG.deconv.X and multiplies it
+% Currently it solves the pseudo-inverse of EEG.unfold.X and multiplies it
 % to all channels.
 %
 %Arguments:
@@ -11,7 +11,7 @@ function [EEG] = dc_glmfit_nodc(EEG,varargin)
 %  EEG.devon.beta
 %
 %*Example:*
-% EEG = dc_glmfit_nodeconv(EEG)
+% EEG = uf_glmfit_nodeconv(EEG)
 %
 
 
@@ -25,13 +25,13 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
-X = EEG.deconv.X;
+X = EEG.unfold.X;
 
 
 %reshape instead of squeeze to keep the mxn matrix even when m or n is 1
-if ~isfield(EEG.deconv,'timebasis')
+if ~isfield(EEG.unfold,'timebasis')
     warning('deconvolution time-basis not found, assuming stick-functions / full')
-    EEG.deconv.timebasis = eye(size(EEG.data,2));
+    EEG.unfold.timebasis = eye(size(EEG.data,2));
 end
     
 if strcmp(cfg.method,'pinv')
@@ -101,8 +101,8 @@ elseif strcmp(cfg.method,'lsmr')
     
 end
 
-EEG.deconv.beta_nodc = beta;
-EEG.deconv.times = EEG.times/1000; %because seconds is better than ms!
+EEG.unfold.beta_nodc = beta;
+EEG.unfold.times = EEG.times/1000; %because seconds is better than ms!
 
 
 
@@ -115,7 +115,7 @@ for c = 1:EEG.nbchan
     % This is X^-1 * (time-basisFunction * Data) => We move the data first
     % in the same basis-domain i.e. splines, fourier or stick (which would
     % be the identity matrix) before running the regression
-    beta(c,:,:)= (Xinv*(EEG.deconv.timebasis*reshape(EEG.data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
+    beta(c,:,:)= (Xinv*(EEG.unfold.timebasis*reshape(EEG.data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
 
    
  

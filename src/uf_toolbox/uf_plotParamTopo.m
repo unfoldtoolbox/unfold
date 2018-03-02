@@ -1,9 +1,9 @@
-function [varargout] = dc_plotParamTopo(unfold,varargin)
+function [varargout] = uf_plotParamTopo(ufresult,varargin)
 %Generates topoplots over time. each row is a predictor or predictor-value-combination
 %
 %Arguments:
 % 'plotParam' : cell array of parameters to be plotted, if empty plots all
-% 'pred_value': only used for continuous / spline predictors. 
+% 'predictAt': only used for continuous / spline predictors. 
 %               a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
 %               This would split up the parName-predictor into 5 bins from
 %               0 to 10, so 5 rows of topoplots would be plotted. Default are 7 lines
@@ -13,14 +13,16 @@ function [varargout] = dc_plotParamTopo(unfold,varargin)
 %               the 'pure' effect of a independent variable is plotted but
 %               more of an ERP-like plot is generated
 %
+% 'n_topos' :(15) number of topographies to plot
+%
 % 'channel' : plot only a subset of channels
 %
-% 'baseline' (2 integers): default none; Performs a baseline corrections on the interval (in seconds = unfold.times units) given.
+% 'baseline' (2 integers): default none; Performs a baseline corrections on the interval (in seconds = ufresult.times units) given.
 %
 % 'caxis' ('same',default:[]) if 'same', generates the same coloraxis based
 %       on the 95% percentile of the selected beta-values. can be
 %       customized to whichever caxis e.g. [-3 5]
-% 'betaSetName'   : Default 'beta'. Can be any field of the unfold-struct
+% 'betaSetName'   : Default 'beta'. Can be any field of the ufresult-struct
 %
 % 'figure'    : plot in new figure (1) or old (0), default: (1)
 %
@@ -28,15 +30,16 @@ function [varargout] = dc_plotParamTopo(unfold,varargin)
 %   structure of all plotting axes.
 %
 %*Examples:*
-%  dc_plotParamTopo(EEG,'plotParam',{'FactorX','FactorC'})
+%  uf_plotParamTopo(EEG,'plotParam',{'FactorX','FactorC'})
 
 
 cfg = finputcheck(varargin,...
-    {'pred_value','cell',[],{{'',[]}};
+    {'predictAt','cell',[],{{'',[]}};
     'add_intercept','boolean',[],0;
-    'plotParam','cell',[],{};
-    'baseline','real',[min(unfold.times) max(unfold.times)],[];...
-    'betaSetName','string',fieldnames(unfold),'beta';
+    'plotParam','',[],{};
+    'n_topos','integer',[],15,
+    'baseline','real',[min(ufresult.times) max(ufresult.times)],[];...
+    'betaSetName','string',fieldnames(ufresult),'beta';
     'channel','integer',[],[];
     'caxis','',[],'same';
     'figure','boolean',[0 1],1;
@@ -49,22 +52,22 @@ if cfg.add_intercept
 end
 
 
-data = unfold.(cfg.betaSetName);
+data = ufresult.(cfg.betaSetName);
 
 if isempty(cfg.channel)
    cfg.channel = 1:size(data,1);
 end
 if isempty(cfg.plotParam)
-    param = 1:length(unfold.param);
+    param = 1:length(ufresult.param);
 else
-    param = find(ismember({unfold.param(:).name},cfg.plotParam));
+    param = find(ismember({ufresult.param(:).name},cfg.plotParam));
 end
 
 data = data(cfg.channel,:,param);
 
 % Baseline Correction
 if ~isempty(cfg.baseline)
-   data= bsxfun(@minus,data ,mean(data(:,(unfold.times>=cfg.baseline(1))& (unfold.times<cfg.baseline(2)),:),2));
+   data= bsxfun(@minus,data ,mean(data(:,(ufresult.times>=cfg.baseline(1))& (ufresult.times<cfg.baseline(2)),:),2));
 end
 
 % caculate common coloraxis
@@ -75,18 +78,18 @@ end
 
 % plot the topoplots
 cfg.butterfly = 'no';
-ax = plot_topobutter(data,unfold.times,unfold.chanlocs(cfg.channel),cfg);
+ax = plot_topobutter(data,ufresult.times,ufresult.chanlocs(cfg.channel),cfg);
 
 % plot row-names
 for k = 1:length(param)
     ax.topo.topo{k}.image{1}.Units = 'normalized';
     % get the values for the rowname
-    val = round(unfold.param(param(k)).value,2,'significant');
+    val = round(ufresult.param(param(k)).value,2,'significant');
     
     if isnan(val)
        val = []; 
     end
-    str = sprintf('[%s]: %s: %g',strjoin_custom(unfold.param(param(k)).event),unfold.param(param(k)).name,val);
+    str = sprintf('[%s]: %s: %g',strjoin_custom(ufresult.param(param(k)).event),ufresult.param(param(k)).name,val);
     t = text(ax.topo.topo{k}.image{1},0,1.1,10,str,'Units','normalized','HorizontalAlignment','left');
     
     % we want them on top, else they can be behind the topos
@@ -104,7 +107,7 @@ n_topo = size(ax.topo.topo{1}.image,2);
 if isfield(cfg,'time')
     timelim = cfg.time;
 else
-    timelim = [min(unfold.times),max(unfold.times)];
+    timelim = [min(ufresult.times),max(ufresult.times)];
 end
 
 topotimes = linspace(timelim(1),timelim(2),n_topo+1);

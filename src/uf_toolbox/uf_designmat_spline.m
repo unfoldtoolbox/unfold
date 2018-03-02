@@ -1,4 +1,4 @@
-function [EEG,spl,nanlist] = dc_designmat_spline(EEG,varargin)
+function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
 % Helper function to generate spline-part of designmatrix
 %
 %
@@ -114,19 +114,19 @@ spl.colnames = cellfun(@(x,signPoint,y)sprintf('%s_%.*f',x,signPoint,y),rawColna
 
 %% Add the spline to the EEG-data
 
-EEG.deconv.splines{end+1} = spl;
+EEG.unfold.splines{end+1} = spl;
 
 nanlist = isnan(spl.paramValues);
 spl.X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
-EEG.deconv.X = [EEG.deconv.X spl.X]; % add spline columns
+EEG.unfold.X = [EEG.unfold.X spl.X]; % add spline columns
 
 
-EEG.deconv.colnames = [EEG.deconv.colnames  spl.colnames'];
-EEG.deconv.variablenames = [EEG.deconv.variablenames {spl.name}];
+EEG.unfold.colnames = [EEG.unfold.colnames  spl.colnames'];
+EEG.unfold.variablenames = [EEG.unfold.variablenames {spl.name}];
 
 
-EEG.deconv.cols2variablenames = [EEG.deconv.cols2variablenames repmat(length(EEG.deconv.variablenames),1, spl.nSplines)];
-EEG.deconv.cols2eventtypes = [EEG.deconv.cols2eventtypes repmat(EEG.deconv.cols2eventtypes(1),1,size(spl.X,2))];
-EEG.deconv.variabletypes = [EEG.deconv.variabletypes 'spline'];
+EEG.unfold.cols2variablenames = [EEG.unfold.cols2variablenames repmat(length(EEG.unfold.variablenames),1, spl.nSplines)];
+EEG.unfold.cols2eventtypes = [EEG.unfold.cols2eventtypes repmat(EEG.unfold.cols2eventtypes(1),1,size(spl.X,2))];
+EEG.unfold.variabletypes = [EEG.unfold.variabletypes 'spline'];
 %predType = [predType repmat({'spline'},1,spl.nSplines)];
 

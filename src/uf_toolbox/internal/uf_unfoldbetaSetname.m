@@ -1,4 +1,4 @@
-function [betaSetName] = dc_unfoldbetaSetname(unfold,varargin)
+function [betaSetName] = uf_unfoldbetaSetname(ufresult,varargin)
 % Find out whether we want beta_dc, beta_nodc and if there are other fields
 % that have the same size that we should plot as columns.
 
@@ -11,19 +11,19 @@ cfg = finputcheck(varargin,...
 nBetaSets = 1;
 betaSetName = [];
 if cfg.deconv == -1
-    assert(isfield(unfold,'beta')|isfield(unfold,'beta_nodc'),'error: to use autodetect at least the field unfold.beta  or unfold.beta_nodc needs to exist')
-    fn = fieldnames(unfold);
+    assert(isfield(ufresult,'beta')|isfield(ufresult,'beta_nodc'),'error: to use autodetect at least the field ufresult.beta  or ufresult.beta_nodc needs to exist')
+    fn = fieldnames(ufresult);
     
-    if isfield(unfold,'beta')
-        sizeBeta = size(unfold.beta);
+    if isfield(ufresult,'beta')
+        sizeBeta = size(ufresult.beta);
     else
-        sizeBeta = size(unfold.beta_nodc);
+        sizeBeta = size(ufresult.beta_nodc);
     end
     for f = fn'
         if strcmp(f,'times')
             continue
         end
-        if length(sizeBeta) == length(size(unfold.(f{1}))) &&  all(sizeBeta == size(unfold.(f{1})))
+        if length(sizeBeta) == length(size(ufresult.(f{1}))) &&  all(sizeBeta == size(ufresult.(f{1})))
             nBetaSets = nBetaSets+1;
             betaSetName = [betaSetName f(1)];
         end

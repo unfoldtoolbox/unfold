@@ -1,46 +1,46 @@
-function output = dc_beta2unfold(EEG,varargin)
-%Returns an "unfold"-struct that contains the predictor betas over time
+function output = uf_condense(EEG,varargin)
+%Returns an "ufresult"-struct that contains the predictor betas over time
 %and accompanying information. This structure is further used in all
 %plotting functions
 %
 %Arguments:
-%   EEG(struct): A Struct containing EEG.deconv.beta_dc
-%   cfg.deconv (integer): 1, use EEG.deconv.beta_dc, the deconvolved betas
-%                         0, use EEG.deconv.beta_nodc, betas without
+%   EEG(struct): A Struct containing EEG.unfold.beta_dc
+%   cfg.deconv (integer): 1, use EEG.unfold.beta_dc, the deconvolved betas
+%                         0, use EEG.unfold.beta_nodc, betas without
 %                         deconvolution
 %                         -1 (default), autocheck which fields are avaiable
 %                         and returns both
 %   cfg.channel(array): Restrict the beta-output to a subset of
 %                         channels. Default is all channels
-%   cfg.pred_value(cell): Only necessary if splines are used. One entry per parameter:
+%   cfg.predictAt(cell): Only necessary if splines are used. One entry per parameter:
 %       {{'par1',[10 20 30]},{'par2',[0,1,2]}}.
 %       This evaluates parameter 1 at the values 10,20 and 30. Parameter 2
 %       at 0, 1 and 2. Default behaviour: evaluates 7 linearly spaced values between the min + max. of the
 %       parameterdomain
 %
 %Return:
-%   unfold.beta= (nchans x time x parameters)
-%   unfold.beta_nodc = (nchans x time x parameters) (only if deconv=0 or -1)
-%   unfold.param = (struct size: parameters) each field contains the values of the respective parameter.
-%   unfold.deconv = EEG.deconv
-%   unfold.times = EEG.times
-%   unfold.chanlocs = EEG.chanlocs
+%   ufresult.beta= (nchans x time x parameters)
+%   ufresult.beta_nodc = (nchans x time x parameters) (only if unfold=0 or -1)
+%   ufresult.param = (struct size: parameters) each field contains the values of the respective parameter.
+%   ufresult.unfold = EEG.unfold
+%   ufresult.times = EEG.times
+%   ufresult.chanlocs = EEG.chanlocs
 %
 %**Example:**
 %
-%unfold = dc_beta2unfold(EEG)
+%ufresult = uf_condense(EEG)
 %
-%unfold.param(X):
+%ufresult.param(X):
 %
 %* name: name of the variable, e.g.: 'continuousA'
 %* value: value of the predictor, e.g. '50'
-% * event: event of the variable, e.g.: 'eventA'
+%* event: event of the variable, e.g.: 'eventA'
 
-assert(isfield(EEG.deconv,'beta_nodc')|isfield(EEG.deconv,'beta_dc'),'Input Error: Could not find beta-estimates. Did you run dc_glmfit?')
-if isfield(EEG.deconv,'beta_nodc')
-    nchan = size(EEG.deconv.beta_nodc,1);
-elseif isfield(EEG.deconv,'beta_dc')
-    nchan = size(EEG.deconv.beta_dc,1);
+assert(isfield(EEG.unfold,'beta_nodc')|isfield(EEG.unfold,'beta_dc'),'Input Error: Could not find beta-estimates. Did you run uf_glmfit?')
+if isfield(EEG.unfold,'beta_nodc')
+    nchan = size(EEG.unfold.beta_nodc,1);
+elseif isfield(EEG.unfold,'beta_dc')
+    nchan = size(EEG.unfold.beta_dc,1);
 end
     
 cfg = finputcheck(varargin,...
@@ -58,26 +58,26 @@ if isfield(EEG,'nbchan')
     assert(all(ismember(cfg.channel,1:nchan)))
 end
 
-beta_dcExists   = isfield(EEG.deconv,'beta_dc')&& isnumeric(EEG.deconv.beta_dc);
-beta_nodcExists = isfield(EEG.deconv,'beta_nodc') && isnumeric(EEG.deconv.beta_nodc);
+beta_dcExists   = isfield(EEG.unfold,'beta_dc')&& isnumeric(EEG.unfold.beta_dc);
+beta_nodcExists = isfield(EEG.unfold,'beta_nodc') && isnumeric(EEG.unfold.beta_nodc);
 
 if cfg.deconv == 1
     assert(beta_dcExists,'beta_dc missing or not numeric')
-elseif cfg.deconv == 0
+elseif cfg.deconv== 0
     assert(beta_nodcExists,'beta_nodc missing or not numeric')
 elseif cfg.deconv == -1 % auto detect, recursive call
     assert(beta_dcExists | beta_nodcExists,'either beta_dc or beta_nodc need to exist. Did you fit the model already?')
     %-------------- Recursive part
     if beta_dcExists && beta_nodcExists
-        output1 = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',1);
-        output2 = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',0);
+        output1 = uf_condense(EEG,'channel',cfg.channel,'deconv',1);
+        output2 = uf_condense(EEG,'channel',cfg.channel,'deconv',0);
 
         output = output1;
         output.beta_nodc = output2.beta_nodc;
     elseif beta_dcExists
-        output = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',1);
+        output = uf_condense(EEG,'channel',cfg.channel,'deconv',1);
     else
-        output = dc_beta2unfold(EEG,'channel',cfg.channel,'deconv',0);
+        output = uf_condense(EEG,'channel',cfg.channel,'deconv',0);
     end
     return
     %-------------- End Recursive part
@@ -88,20 +88,20 @@ end
 % find out which (if any) parameters are modeled by splines, we only want to add the
 % combined spline estimate, not each individually.
 
-[splIdxList,paramList] = dc_getSplineidx(EEG);
+[splIdxList,paramList] = uf_getSplineidx(EEG);
 % nSpl = sum(ismember(paramList,splIdxList));
 % if nSpl == 0
 %     nSplineBetas = 0;
 % else
-%     nSplineBetas = -nSpl + sum( cellfun(@(x)size(x.basis,1),EEG.deconv.splines) );
+%     nSplineBetas = -nSpl + sum( cellfun(@(x)size(x.basis,1),EEG.unfold.splines) );
 % end
 % if ~cfg.convertSplines
-paramList = 1:size(EEG.deconv.X,2);
+paramList = 1:size(EEG.unfold.X,2);
 % end
 
 
-signal = nan(length(cfg.channel),length(EEG.deconv.times),length(paramList));
-times = EEG.deconv.times;
+signal = nan(length(cfg.channel),length(EEG.unfold.times),length(paramList));
+times = EEG.unfold.times;
 
 % initialize vectors
 value = nan(1,size(signal,3));
@@ -113,14 +113,14 @@ loopRunner = 1;
 %% go trough all parameters in parameterList
 for pred = paramList
     if cfg.deconv
-        signal(:,:,loopRunner) = EEG.deconv.beta_dc(cfg.channel,:,pred)*EEG.deconv.timebasis;
+        signal(:,:,loopRunner) = EEG.unfold.beta_dc(cfg.channel,:,pred)*EEG.unfold.timebasis;
     else
-        signal(:,:,loopRunner) = EEG.deconv.beta_nodc(cfg.channel,:,pred)*pinv(EEG.deconv.timebasis)';
+        signal(:,:,loopRunner) = EEG.unfold.beta_nodc(cfg.channel,:,pred)*pinv(EEG.unfold.timebasis)';
     end
     
     % change name incase of spline and no conversion
     if ismember(pred,splIdxList)
-        colname = EEG.deconv.colnames(pred);
+        colname = EEG.unfold.colnames(pred);
         
         
         splt = regexp(colname,'([-]?[\d]*\.?[\d]*)$','tokens');
@@ -130,17 +130,17 @@ for pred = paramList
         %             name(loopRunner)= splt(1);
     else
         value(loopRunner) = nan;
-        name(loopRunner)= EEG.deconv.colnames(pred);
+        name(loopRunner)= EEG.unfold.colnames(pred);
     end
-    event(loopRunner)= EEG.deconv.eventtypes(EEG.deconv.cols2eventtypes(pred));
-    type(loopRunner) = EEG.deconv.variabletypes(EEG.deconv.cols2variablenames(pred));
+    event(loopRunner)= EEG.unfold.eventtypes(EEG.unfold.cols2eventtypes(pred));
+    type(loopRunner) = EEG.unfold.variabletypes(EEG.unfold.cols2variablenames(pred));
     loopRunner = loopRunner+1;
 %     end
 
 end
 
 output = struct();
-output.deconv = EEG.deconv;
+output.unfold = EEG.unfold;
 if cfg.deconv
     output.beta = signal;
 else

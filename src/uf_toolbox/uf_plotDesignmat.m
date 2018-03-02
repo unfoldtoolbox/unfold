@@ -1,4 +1,4 @@
-function dc_plotDesignmat(EEG,varargin)
+function uf_plotDesignmat(EEG,varargin)
 %Plots the designmatrix
 %If the matrix is very large (the timeexpanded/Xdc matrix) we do not plot
 %everything, but only the middle 1000s. We also try to zoom in
@@ -6,16 +6,16 @@ function dc_plotDesignmat(EEG,varargin)
 %
 %Arguments:
 %   cfg.timeexpand' (boolean):
-%        0: Plots EEG.deconv.X (default)
-%        1: Plots EEG.deconv.Xdc
+%        0: Plots EEG.unfold.X (default)
+%        1: Plots EEG.unfold.Xdc
 %   cfg.logColor(boolean): plot the color on logscale (default 0)
 %   cfg.sort(boolean): Sort the designmatrix
 %   cfg.figure (1/0): Open a new figure (default 1)
 %
 %*Example:*
-% dc_plot_designmat(EEG)
+% uf_plot_designmat(EEG)
 %
-% dc_plot_designmat(EEG,'timeexpand',1) %plot the timeexpanded X
+% uf_plot_designmat(EEG,'timeexpand',1) %plot the timeexpanded X
 
 % Secret option: 'addContData'
 cfg = finputcheck(varargin,...
@@ -36,7 +36,7 @@ if cfg.timeexpand
     % there may not be any experimental events around to see.
 
     
-    modeledEvents = [EEG.deconv.eventtypes{:}];
+    modeledEvents = [EEG.unfold.eventtypes{:}];
     eventstruct = EEG.event;
     eventstruct(~ismember({eventstruct.type},modeledEvents)) = [];
     ix_midEvent = round(length(eventstruct)/2); % take "center" event
@@ -53,12 +53,12 @@ if cfg.timeexpand
     end
     time_ix = find(EEG.times > time_lim(1) & EEG.times < time_lim(2));
     yAxis = EEG.times(time_ix)/1000;
-    X = EEG.deconv.Xdc(time_ix,:);
+    X = EEG.unfold.Xdc(time_ix,:);
     shiftByOne = 0; % dont shift the XTicks by one
 
 else
     yAxisLabel = 'event number';
-    X = EEG.deconv.X;
+    X = EEG.unfold.X;
     yAxis = 1:size(X,1);
     shiftByOne = 1;  % shift the XTicks by one
     
@@ -75,7 +75,7 @@ if cfg.sort
 end
 
 nPred = size(X,2);
-nPredTheory = length(EEG.deconv.colnames);
+nPredTheory = length(EEG.unfold.colnames);
 
 if cfg.figure
     figure
@@ -99,9 +99,9 @@ set(gca,'clim',[-cl cl])
 r = linspace(0,nPred,nPredTheory*2+1);
 set(ax,'XTick',r(2+shiftByOne:2:end))
 
-eventlabtmp = cellfun(@(x)['evt:' strjoin(x,'+')],EEG.deconv.eventtypes,'UniformOutput',0);
-eventlabels = eventlabtmp(EEG.deconv.cols2eventtypes);
-predlabels = EEG.deconv.colnames;
+eventlabtmp = cellfun(@(x)['evt:' strjoin(x,'+')],EEG.unfold.eventtypes,'UniformOutput',0);
+eventlabels = eventlabtmp(EEG.unfold.cols2eventtypes);
+predlabels = EEG.unfold.colnames;
 
 % escape underscores
 escapeString = @(tStr)regexprep(tStr,'(_)','\\$1');
@@ -128,7 +128,7 @@ if cfg.timeexpand && cfg.addContData
     subplot(1,20,1)
     plot(EEG.data(1,:),EEG.times/1000)
     %     zoom yon
-    %     zoom(length(yAxis)./(size(EEG.deconv.timebasis,1)*25))
+    %     zoom(length(yAxis)./(size(EEG.unfold.timebasis,1)*25))
     %     pan yon
     set(gca,'YTickLabel','','XTickLabel','')
     linkaxes([ax,gca],'y' )
@@ -140,7 +140,7 @@ if cfg.timeexpand
     % warning('auto-zoom to useful resolution (25x the stimulus-window)')
     % warning('XXX could be dimension 2 for splines?')
     % zoom yon
-    % zoom(length(yAxis)./(size(EEG.deconv.timebasis,1)*25))
+    % zoom(length(yAxis)./(size(EEG.unfold.timebasis,1)*25))
     
     axes(ax)
     pan yon

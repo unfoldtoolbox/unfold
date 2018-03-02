@@ -1,10 +1,10 @@
-function varargout = dc_unfold2csv(unfold,varargin)
+function varargout = uf_unfold2csv(ufresult,varargin)
 % Exports betas in an organized csv file to be opened in another tool
 % returns a data-table
 %
 %Arguments:
-%   cfg.deconv (boolean): Use the deconv betas (deconv.beta_dc) or the
-%                         no-deconv betas(deconv.beta_nodc)
+%   cfg.deconv (boolean): Use the unfold betas (unfold.beta_dc) or the
+%                         no-unfold betas(unfold.beta_nodc)
 %   cfg.channel (integer): (Default: All channels) Limit to a list of specific channels
 %
 %   cfg.filename: filename for the csv file. if empty, only returns table
@@ -26,9 +26,9 @@ if(ischar(cfg)); error(cfg);end
 %% generate empty output structure
 
 if cfg.deconv == 1
-    data = unfold.beta;
-elseif cfg.deconv == 0
-    data = unfold.beta_nodc;
+    data = ufresult.beta;
+elseif cfg.deconv== 0
+    data = ufresult.beta_nodc;
 end
 
 % remove channels with only nan (non-fitted)
@@ -45,22 +45,22 @@ nchan = size(data,1);
 ntime = size(data,2);
 npred = size(data,3);
 
-predName= repmat({unfold.param(:).name}',1,ntime,nchan);
+predName= repmat({ufresult.param(:).name}',1,ntime,nchan);
 predName= permute(predName,[3 2 1]);
 
-predValue= repmat([unfold.param(:).value]',1,ntime,nchan);
+predValue= repmat([ufresult.param(:).value]',1,ntime,nchan);
 predValue= permute(predValue,[3 2 1]);
 
-predEvent= repmat({unfold.param(:).event}',1,ntime,nchan);
+predEvent= repmat({ufresult.param(:).event}',1,ntime,nchan);
 predEvent= permute(predEvent,[3 2 1]);
 predEvent = cellfun(@(x)strjoin(x),predEvent,'UniformOutput',0);
 
 
-time   = repmat([unfold.times]',1,nchan,npred);
+time   = repmat([ufresult.times]',1,nchan,npred);
 time   = permute(time,[2 1 3]);
 
-if isfield(unfold,'chanlocs') && ~isempty(unfold.chanlocs)
-    channels = repmat({unfold.chanlocs(~rmchan).labels}',1,ntime,npred);
+if isfield(ufresult,'chanlocs') && ~isempty(ufresult.chanlocs)
+    channels = repmat({ufresult.chanlocs(~rmchan).labels}',1,ntime,npred);
 else
     channels = repmat(1:nchan,1,ntime,npred);
 end

@@ -1,4 +1,4 @@
-function dc_plotEventHistogram(EEG,varargin)
+function uf_plotEventHistogram(EEG,varargin)
 % Function that plots histogram of all events in the EEG.event structure
 %
 %Arguments:
@@ -7,7 +7,7 @@ function dc_plotEventHistogram(EEG,varargin)
 %Return:
 %
 %*Example:*
-% dc_plotEventHistogram(EEG,'eventA')
+% uf_plotEventHistogram(EEG,'eventA')
 
 cfg = finputcheck(varargin,...
     {'eventtypes',   'cell', [], {};...
@@ -19,7 +19,9 @@ if isempty(cfg.eventtypes)
 else
     t2 = struct2table(EEG.event(ismember({EEG.event(:).type},cfg.eventtypes)));
 end
-VarNames = t2.Properties.VariableNames;
+escapeString = @(tStr)regexprep(tStr,'(_)','\\$1');
+
+VarNames = escapeString(t2.Properties.VariableNames);
 removeList = {'channel','bvtime','bvmknum','code','urevent'};
 for k = length(VarNames):-1:1
     if any(strcmp(VarNames{k},removeList))
@@ -28,9 +30,10 @@ for k = length(VarNames):-1:1
 end
 figure,
 
+
 for k = 1:length(VarNames)
     subplot(1,length(VarNames),k)
-    data = t2{:,strcmp(t2.Properties.VariableNames,VarNames{k})};
+    data = t2{:,strcmp(escapeString(t2.Properties.VariableNames),VarNames{k})};
     if iscell(data)
         data =data(cellfun(@(x)~isempty(x),data));
         if all(cellfun(@(x)isnumeric(x),data))
@@ -47,7 +50,7 @@ for k = 1:length(VarNames)
     else
         
         [xcounts,centersBar] = hist(data,20); % when numeric, we cann add how many bins
-        [f,xi] = ksdensity(data);
+        [f,xi] = ksdensity(data,[]);
         bar(centersBar,xcounts,'EdgeColor','none','FaceColor',[0 .5 .5])
         xbefore = xlim;
         hold all

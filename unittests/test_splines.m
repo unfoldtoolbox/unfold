@@ -57,35 +57,35 @@ for type = {'default','cyclical','custom'}
     %% fit
     switch cfgSim.type
         case 'default'
-            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1+spl(splineA,10)');
+            EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1+spl(splineA,10)');
         case 'cyclical'
-            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1');
-            EEG = dc_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(0,2*pi,15),'splinefunction','cyclical');
+            EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1');
+            EEG = uf_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(0,2*pi,15),'splinefunction','cyclical');
         case 'custom'
-            EEG = dc_designmat(EEG,'eventtypes','stimulus','formula','y~1');
-            EEG = dc_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(-10,10,5),'splinefunction',spl.function);
+            EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1');
+            EEG = uf_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(-10,10,5),'splinefunction',spl.function);
     end
     
-    EEGepoch = dc_epoch(EEG,'timelimits',[0 1]);
-    EEGepoch = dc_glmfit_nodc(EEGepoch);
-    unfold = dc_beta2unfold(EEGepoch);
-    unfoldconverted = dc_getParam(unfold,'pred_value',{{'splineA',spl.values}});
-    dc  =  unfoldconverted.beta_nodc(:,:,1);
-    result = squeeze(unfoldconverted.beta_nodc(:,:,2:end) +dc);
+    EEGepoch = uf_epoch(EEG,'timelimits',[0 1]);
+    EEGepoch = uf_glmfit_nodc(EEGepoch);
+    ufresult = uf_condense(EEGepoch);
+    ufresultconverted = uf_predictContinuous(ufresult,'predictAt',{{'splineA',spl.values}});
+    dc  =  ufresultconverted.beta_nodc(:,:,1);
+    result = squeeze(ufresultconverted.beta_nodc(:,:,2:end) +dc);
     
     if cfgSim.plot
         
         figure('name',cfgSim.type)
         subplot(2,1,1)
-        Xspline = spl.function(spl.values,EEG.deconv.splines{1}.knots);
-        Xspline(:,EEG.deconv.splines{1}.removedSplineIdx) = [];
-        plot(dc + Xspline*squeeze(unfold.beta_nodc(:,:,2:end)),'Linewidth',2)
+        Xspline = spl.function(spl.values,EEG.unfold.splines{1}.knots);
+        Xspline(:,EEG.unfold.splines{1}.removedSplineIdx) = [];
+        plot(dc + Xspline*squeeze(ufresult.beta_nodc(:,:,2:end)),'Linewidth',2)
         hold on
-        plot(dc + Xspline.*squeeze(unfold.beta_nodc(:,:,2:end))',':','Linewidth',2)
+        plot(dc + Xspline.*squeeze(ufresult.beta_nodc(:,:,2:end))',':','Linewidth',2)
         
         % original data vs recovery
         subplot(2,1,2)
-        plot(dc+ Xspline*squeeze(unfold.beta_nodc(:,:,2:end)),'Linewidth',2)
+        plot(dc+ Xspline*squeeze(ufresult.beta_nodc(:,:,2:end)),'Linewidth',2)
         hold on
         plot(EEG.data,'--','Linewidth',2)
         

@@ -1,20 +1,20 @@
-function EEG_epoch = dc_epoch(EEG,varargin)
-%% Epoch the data according to the deconv structure
+function EEG_epoch = uf_epoch(EEG,varargin)
+%% Epoch the data according to the unfold structure
 % Deconvolution works on continuous data, thus to compare it to the
 % "normal" use-case, we have to epoch it. Because the data has not been
 % cleaned yet, we do this in this function. We additionally remove trials
-% from deconv.X that were removed during epoching.
+% from unfold.X that were removed during epoching.
 %
 %Arguments:
 %   cfg.winrej (integer): A (2xn) array with n from-to pairs of samples to be excluded from further processing
 %   cfg.timelimits (float): min+max of the epoch in seconds
-%   EEG (eeglab): the EEG set, need to have EEG.deconv.Xdc compatible with the size of EEG.data
+%   EEG (eeglab): the EEG set, need to have EEG.unfold.Xdc compatible with the size of EEG.data
 %
 %Returns:
 %   Epoched EEG file to cfg.timelimits
 %
 %*Example:*
-% EEG_epoch = dc_epoch(EEG,'winrej',winrej,'timelimits',cfgTimeexpand.timelimits)
+% EEG_epoch = uf_epoch(EEG,'winrej',winrej,'timelimits',cfgTimeexpand.timelimits)
 %
 
 
@@ -53,12 +53,12 @@ if ~isempty(cfg.winrej)
     fprintf('Deleting %i events due to data cleaning \n',sum(removeEvent))
     % delete the event, but also the designmat entry
     EEG.event(removeEvent==1) = [];
-    EEG.deconv.X(removeEvent==1,:) = [];
+    EEG.unfold.X(removeEvent==1,:) = [];
 end
 
 %% Epoch the data
 EEG.urevent = EEG.event;
-[EEG_epoch,event_ind] = pop_epoch(EEG,[EEG.deconv.eventtypes{:}],cfg.timelimits);
+[EEG_epoch,event_ind] = pop_epoch(EEG,[EEG.unfold.eventtypes{:}],cfg.timelimits);
 fprintf('Recalculating the EEG_epoch field using eeg_checkset, might take some time \n')
 EEG_epoch             = eeg_checkset(EEG_epoch,'eventconsistency'); % needed to add EEG_epoch.epoch field, don't ask why
 
@@ -69,9 +69,9 @@ EEG_epoch             = eeg_checkset(EEG_epoch,'eventconsistency'); % needed to 
 % Thus we need to get the eventtypes once more and select only the matching
 % ones
 
-eventType = [EEG.deconv.eventtypes{:}];
+eventType = [EEG.unfold.eventtypes{:}];
 eventType = eventType(~cellfun(@(x)isnan(x(1)),eventType));
 convertIND = find(ismember({EEG.event(:).type},eventType));
-EEG_epoch.deconv.X = EEG_epoch.deconv.X(convertIND(event_ind),:);
+EEG_epoch.unfold.X = EEG_epoch.unfold.X(convertIND(event_ind),:);
 
 EEG_epoch.urevent = EEG.urevent(event_ind);

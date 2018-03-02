@@ -1,4 +1,4 @@
-function [EEG,beta] = dc_glmfit(EEG,varargin)
+function [EEG,beta] = uf_glmfit(EEG,varargin)
 %% Fit the fullX designmatrix on the data and returns beta and stats
 % This function solves the Equation X*beta = EEG.data, with X = Designmat.
 % There are multiple algorithms implemented, a slow iterative algorithm
@@ -50,11 +50,11 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 %                  details from the solver used
 %
 %   save_memory_or_time: Deprecated, has been renamed to 'method'
-%   EEG:  the EEG set, need to have EEG.deconv.Xdc compatible with
+%   EEG:  the EEG set, need to have EEG.unfold.Xdc compatible with
 %         the size of EEG.data
 %
 %Return:
-% EEG.deconv.beta: array (nchan x ntime x npred) (ntime could be
+% EEG.unfold.beta: array (nchan x ntime x npred) (ntime could be
 % n-timesplines, n-fourierbasis or samples)
 %
 %*Examples:*
@@ -62,7 +62,7 @@ function [EEG,beta] = dc_glmfit(EEG,varargin)
 % EEG = dc_glmfit(EEG,'method','matlab','channel',[3 5]);
 %
 
-fprintf('\ndc_glmfit(): Fitting deconvolution model...');
+fprintf('\nuf_glmfit(): Fitting deconvolution model...');
 
 
 cfg = finputcheck(varargin,...
@@ -79,14 +79,14 @@ if(ischar(cfg)); error(cfg);end
 
 
 assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
-assert(size(EEG.deconv.Xdc,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.deconv.Xdc),size(EEG.data))
-assert(~any(isnan(EEG.deconv.Xdc(:))),'Warning NAN values found in designmatrix. will not continue')
+assert(size(EEG.unfold.Xdc,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.unfold.Xdc),size(EEG.data))
+assert(~any(isnan(EEG.unfold.Xdc(:))),'Warning NAN values found in designmatrix. will not continue')
 
-X = EEG.deconv.Xdc;
+X = EEG.unfold.Xdc;
 
 disp('solving the equation system');
 t = tic;
-beta = nan(size(EEG.deconv.Xdc,2),EEG.nbchan);
+beta = nan(size(EEG.unfold.Xdc,2),EEG.nbchan);
 data = EEG.data;
 
 %% Remove data that is unnecessary for the fit
@@ -156,7 +156,7 @@ elseif strcmp(cfg.method,'lsmr')
         end
         fprintf('... %i iterations, took %.1fs',ITN,toc(t))
         %beta(:,e) =
-        %lsqr(EEG.deconv.Xdc,sparse(double(EEG.data(e,:)')),[],30);
+        %lsqr(EEG.unfold.Xdc,sparse(double(EEG.data(e,:)')),[],30);
         
     end
     
@@ -183,13 +183,13 @@ elseif strcmp(cfg.method,'par-lsmr')
         % use iterative solver for least-squares problems (lsmr)
         [beta(:,e),ISTOP,ITN] = lsmr(parXdc.Value,parData.Value(:,e),[],10^-10,10^-10,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
         if ISTOP == 7
-            warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations. You can either try to increase the number of iterations using the option ''lsmriterations'' or it might be, that your model is highly collinear and difficult to estimate. Check the designmatrix EEG.deconv.X for collinearity.'])
+            warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations. You can either try to increase the number of iterations using the option ''lsmriterations'' or it might be, that your model is highly collinear and difficult to estimate. Check the designmatrix EEG.unfold.X for collinearity.'])
             
         end
         fprintf('... took %i iterations and %.1fs',ITN,toc(t))
         
         %beta(:,e) =
-        %lsqr(EEG.deconv.Xdc,sparse(double(EEG.data(e,:)')),[],30);
+        %lsqr(EEG.unfold.Xdc,sparse(double(EEG.data(e,:)')),[],30);
         
     end
     
@@ -219,13 +219,13 @@ elseif strcmp(cfg.method,'glmnet')
         %find best cv-lambda coefficients
         beta(:,e) = cvglmnetCoef(fit,'lambda_1se')';
         fit.glmnet_fit = [];
-        EEG.deconv.glmnet(e) = fit;
+        EEG.unfold.glmnet(e) = fit;
         fprintf('... took %.1fs',toc(t))
         
     end
     beta = beta([2:end 1],:); %put the dc-intercept last
     normfactor = [normfactor 1];
-    EEG = dc_designmat_addcol(EEG,ones(1,size(EEG.deconv.Xdc,1)),'glmnet-DC-Correction');
+    EEG = uf_designmat_addcol(EEG,ones(1,size(EEG.unfold.Xdc,1)),'glmnet-DC-Correction');
     
     
     
@@ -245,21 +245,21 @@ beta = beta'; % I prefer channels X betas (easier to multiply things to)
 % end
 
 % We need to remove customrows, as they were not timeexpanded.
-eventcell = cellfun(@(x)iscell(x(1)),EEG.deconv.eventtypes)*1;
-eventnan = cellfun(@(x)isnan(x(1)),EEG.deconv.eventtypes(~eventcell));
+eventcell = cellfun(@(x)iscell(x(1)),EEG.unfold.eventtypes)*1;
+eventnan = cellfun(@(x)isnan(x(1)),EEG.unfold.eventtypes(~eventcell));
 eventnan = find(~eventcell);
 
 
-betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.deconv.timebasis,1),sum(~ismember(EEG.deconv.cols2eventtypes,eventnan)));
+betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.unfold.timebasis,1),sum(~ismember(EEG.unfold.cols2eventtypes,eventnan)));
 
 
 
-EEG.deconv.beta_dc = betaOut;
+EEG.unfold.beta_dc = betaOut;
 if length(eventnan)>0
     %     EEG.betaCustomrow = beta(end+1-length(eventnan):end);
-    EEG.deconv.beta_dcCustomrow = beta(:,end+1-length(eventnan):end);
+    EEG.unfold.beta_dcCustomrow = beta(:,end+1-length(eventnan):end);
 end
-EEG.deconv.channel = cfg.channel;
+EEG.unfold.channel = cfg.channel;
 
 end
 

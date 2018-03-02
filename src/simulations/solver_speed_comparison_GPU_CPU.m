@@ -1,9 +1,9 @@
-% Load any arbitrary large EEG after the dc_timeexpand step
+% Load any arbitrary large EEG after the uf_timeexpand step
 cfg = [];
 cfg.sizemult = [1 4];
 cfg.sizemult = [1 1];
 
-X = EEG.deconv.Xdc;
+X = EEG.unfold.Xdc;
 X = repmat(X,cfg.sizemult);
 y = double(EEG.data(1,:)');
 

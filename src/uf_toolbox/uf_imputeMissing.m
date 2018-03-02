@@ -1,4 +1,4 @@
-function [EEG] = dc_imputeMissing(EEG,varargin)
+function [EEG] = uf_imputeMissing(EEG,varargin)
 % Deal with predictors for which some values are missing in design matrix
 % You can either impute missing values or remove the predictors events for 
 % which some values are missing
@@ -16,7 +16,7 @@ function [EEG] = dc_imputeMissing(EEG,varargin)
 %  * 'median'   : (Default) fill in the median value
 %
 % Returns:
-% EEG.deconv.X in which missing NAN-values were imputed ('marginal', 'mean',
+% EEG.unfold.X in which missing NAN-values were imputed ('marginal', 'mean',
 % 'median') or in which the events with missing predictor information were 
 % removed ('drop'), which means put to 0
 
@@ -27,12 +27,12 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
-assert(length(EEG.event) == size(EEG.deconv.X,1),'error: EEG.event structure not as long as EEG.deconv.X')
+assert(length(EEG.event) == size(EEG.unfold.X,1),'error: EEG.event structure not as long as EEG.unfold.X')
 
 %% find columns of design matrix with missing predictor information (NaNs)
-missingColumn = find(any(isnan(EEG.deconv.X)));
+missingColumn = find(any(isnan(EEG.unfold.X)));
 if ~isempty(missingColumn)
-    fprintf('\nMissing values in the following column(s): %s \n',strjoin(EEG.deconv.colnames(missingColumn),','))
+    fprintf('\nMissing values in the following column(s): %s \n',strjoin(EEG.unfold.colnames(missingColumn),','))
 else
     fprintf('\nNo missing values found in event structure\n')
     return
@@ -42,18 +42,18 @@ end
 for pred = missingColumn
       
     %% find rows containing the event type
-    cols2eventtypes = EEG.deconv.cols2eventtypes(pred);
-    eventrows = strcmp(EEG.deconv.eventtypes{cols2eventtypes},{EEG.event(:).type})';
+    cols2eventtypes = EEG.unfold.cols2eventtypes(pred);
+    eventrows = strcmp(EEG.unfold.eventtypes{cols2eventtypes},{EEG.event(:).type})';
    
     %% get rows of this predictor with NaNs
-    nanvals = isnan(EEG.deconv.X(:,pred));
+    nanvals = isnan(EEG.unfold.X(:,pred));
     % consider only NaNs that are in "eventrows":
     nanIDX    =  nanvals & eventrows; 
     notnanIDX = ~nanvals & eventrows;
     
     %% get the "good" data (for interpolation)
     % take all values from predictor column that are in eventrows and *not* missing (not NaNs)
-    X_pred = EEG.deconv.X(notnanIDX,pred);    
+    X_pred = EEG.unfold.X(notnanIDX,pred);    
     
     nNAN = sum(nanIDX); % number of missing values
     perc = nNAN/length(eventrows)*100;  
@@ -63,16 +63,16 @@ for pred = missingColumn
 
     %% user feedback
     if perc > 5
-        warning([num2str(perc) '% of the values in predictor: ',EEG.deconv.colnames{pred},' are missing! This could bias your analysis'])
+        warning([num2str(perc) '% of the values in predictor: ',EEG.unfold.colnames{pred},' are missing! This could bias your analysis'])
     end
-    fprintf('\nimputing %.2f%% of values for predictor \"%s\" using method: \"%s\" \n',perc,EEG.deconv.colnames{pred},cfg.method) 
+    fprintf('\nimputing %.2f%% of values for predictor \"%s\" using method: \"%s\" \n',perc,EEG.unfold.colnames{pred},cfg.method) 
     % bugfix OD: this should not be an "else", since the feedback should also been given in the case above with > 5% missing
      
     %% now deal with missing values   
     switch cfg.method
         case 'drop'
             % in case of drop, we want to remove the whole event
-            EEG.deconv.X(nanIDX,:) = 0; 
+            EEG.unfold.X(nanIDX,:) = 0; 
             continue
         case 'marginal'
             imputedValues(:) = datasample(X_pred,nNAN);
@@ -81,5 +81,5 @@ for pred = missingColumn
         case 'median'
             imputedValues(:) = median(X_pred);
     end
-    EEG.deconv.X(nanIDX,pred) = imputedValues(:);
+    EEG.unfold.X(nanIDX,pred) = imputedValues(:);
 end

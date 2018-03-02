@@ -1,4 +1,4 @@
-function ax = dc_plot2nd(d2nd,varargin)
+function ax = uf_plot2nd(d2nd,varargin)
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[];
     'baseline','real',[],[];
@@ -39,13 +39,13 @@ if cfg.singlesubjects
         d2nd2 = d2nd;
         
         d2nd2.param = repmat(d2nd2.param,1,size(d2nd.beta,4));
-        % d2nd2.deconv.X = ones(1,size(d2nd2.param,2));
+        % d2nd2.unfold.X = ones(1,size(d2nd2.param,2));
         if isfield(d2nd,'beta_nodc')
             d2nd2.beta_nodc = d2nd2.beta_nodc(:,:,:);
         end
         d2nd2.beta = d2nd2.beta(:,:,:);
         
-        g = dc_plotParam(d2nd2,cfgPlot);
+        g = uf_plotParam(d2nd2,cfgPlot);
         
         
         % Make the lines black & transparent
@@ -67,7 +67,7 @@ if cfg.singlesubjects
         end
         
     else % withspline
-        %% plot deconv vs nodeconv
+        %% plot unfold vs nodeconv
         % this works with splines but is slooooww
         
         for s = 1:size(d2nd.beta,4)
@@ -77,7 +77,7 @@ if cfg.singlesubjects
             if s >1
                 cfg.gramm = g;
             end
-            g = dc_plotParam(d2nd2,cfgPlot);
+            g = uf_plotParam(d2nd2,cfgPlot);
         end
         
         
@@ -97,8 +97,8 @@ end
 d2nd2 = d2nd;
 d2nd2.beta = mean(d2nd2.beta(:,:,:,:),4);
 d2nd2.beta_nodc = mean(d2nd2.beta_nodc(:,:,:,:),4);
-if length(d2nd2.deconv) >1
-    d2nd2.deconv  = d2nd2.deconv(1);
+if length(d2nd2.unfold) >1
+    d2nd2.unfold  = d2nd2.unfold(1);
 end
-ax = dc_plotParam(d2nd2,cfgPlot);
+ax = uf_plotParam(d2nd2,cfgPlot);
 

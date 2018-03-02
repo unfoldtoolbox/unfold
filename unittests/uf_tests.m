@@ -1,4 +1,4 @@
-function dc_tests()
+function uf_tests()
 %This function runs the main dc-functions with a lot of parameter pairings
 %(~10.000) and tests whether errors occur
 % It also runs the tests in this folder 
@@ -6,11 +6,17 @@ function dc_tests()
 % original signal is and throws an error if the difference is too large
 
 %separate tests
+test_addmarginals
 test_continuousArtifact
-test_imputeMissing
 test_designmat
 test_glmfit
+test_imputeMissing
+test_splines
 test_timeexpandDesignmat
+
+
+
+
 
 % Multi-Test
 cfg = struct();
@@ -24,7 +30,7 @@ cfg.glmfit.method={'lsmr','matlab','pinv'};
 cfg.glmfit.channel = 1;
 % cfg.beta2EEG.convertSplines = [0,1]; % deprecated with the new spline
 % implementation
-cfg.beta2EEG.deconv = [-1,0,1];
+cfg.beta2EEG.unfold = [-1,0,1];
 cfg.beta2EEG.channel = 1;
 
     function Y = allcomb_wrapper(varargin)
@@ -59,32 +65,32 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
             cfgDesignLoop = cfgDesign;
             cfgDesignLoop.coding = d{1};
             cfgDesignLoop.splinespacing = d{2};
-            EEGd = dc_designmat(EEG,cfgDesignLoop);
+            EEGd = uf_designmat(EEG,cfgDesignLoop);
             
             for t = timeexpand'
                 
-                EEGt = dc_timeexpandDesignmat(EEGd,'timelimits',t{1},'method',t{2},'timeexpandparam',t{3},'sparse',t{4});
+                EEGt = uf_timeexpandDesignmat(EEGd,'timelimits',t{1},'method',t{2},'timeexpandparam',t{3},'sparse',t{4});
                 
                 for g = glmfit'
-                    EEGg= dc_glmfit(EEGt,'method',g{1},'channel',g{2});
-                    assert(~any(isnan(EEGg.deconv.beta_dc(:))),'error, found nan after fit');
+                    EEGg= uf_glmfit(EEGt,'method',g{1},'channel',g{2});
+                    assert(~any(isnan(EEGg.unfold.beta_dc(:))),'error, found nan after fit');
                     for b = beta2EEG'
                         EEGb = EEGg;
                         if b{1} == 0
-                            EEGb = dc_epoch(EEGb,'timelimits',t{1});
-                            EEGb = dc_glmfit_nodc(EEGb);
+                            EEGb = uf_epoch(EEGb,'timelimits',t{1});
+                            EEGb = uf_glmfit_nodc(EEGb);
                         end
-                        unfold = dc_beta2unfold(EEGb,'deconv',b{1},'channel',b{2});
+                        ufresult = uf_condense(EEGb,'unfold',b{1},'channel',b{2});
                         if strcmp(t{2},'stick') && testCase==14 && b{2} == 1 && all(t{1} == [-0.5,1.5])
                             if ~isfield(EEGb,'urevent') || isempty(EEG.urevent)
-                                EEGb.urevent = EEG.event; % this field is populated in dc_epoch
+                                EEGb.urevent = EEG.event; % this field is populated in uf_epoch
                             end
-                            multWith = ones(1,size(EEGb.deconv.X,2));
-                            for col = 1:size(EEGb.deconv.X,2)
-                                ix = ismember({EEGb.urevent.type},EEGb.deconv.eventtypes{EEGb.deconv.cols2eventtypes(col)});
-                                multWith(col) = mean(EEGb.deconv.X(ix,col),1);
+                            multWith = ones(1,size(EEGb.unfold.X,2));
+                            for col = 1:size(EEGb.unfold.X,2)
+                                ix = ismember({EEGb.urevent.type},EEGb.unfold.eventtypes{EEGb.unfold.cols2eventtypes(col)});
+                                multWith(col) = mean(EEGb.unfold.X(ix,col),1);
                             end
-                            beta = bsxfun(@times,squeeze(unfold.beta),multWith);
+                            beta = bsxfun(@times,squeeze(ufresult.beta),multWith);
                             orgSig = [zeros(5,5),EEGb.sim.separateSignal,zeros(5,5)];
                             resid = abs(beta - orgSig');
                             % normalize
@@ -144,19 +150,19 @@ end
 %     timelimits = [-0.5,1.5];
 
 %     %%
-%     % EEG = dc_epoch(EEG,'timelimits',timelimits);
-%     % EEG = dc_glmfit_nodc(EEG); %does not overwrite
+%     % EEG = uf_epoch(EEG,'timelimits',timelimits);
+%     % EEG = uf_glmfit_nodc(EEG); %does not overwrite
 %
 %     %%
 %
-%     % unfold_epoch = dc_beta2EEG(EEG,'deconv',0);
+%     % ufresult_epoch = uf_beta2EEG(EEG,'unfold',0);
 %
-%     multWith = ones(1,size(EEG.deconv.X,2));
-%     for col = 1:size(EEG.deconv.X,2)
-%         ix = ismember({EEG.urevent.type},EEG.deconv.eventtypes{EEG.deconv.cols2eventtypes(col)});
-%         multWith(col) = mean(EEG.deconv.X(ix,col),1);
+%     multWith = ones(1,size(EEG.unfold.X,2));
+%     for col = 1:size(EEG.unfold.X,2)
+%         ix = ismember({EEG.urevent.type},EEG.unfold.eventtypes{EEG.unfold.cols2eventtypes(col)});
+%         multWith(col) = mean(EEG.unfold.X(ix,col),1);
 %     end
-%     unfold.beta*multWith;
+%     ufresult.beta*multWith;
 % end
 
 end

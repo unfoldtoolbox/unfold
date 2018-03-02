@@ -79,9 +79,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#removing-artefactual-data">Removing artefactual data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-unfold">Fields of <code class="docutils literal"><span class="pre">EEG.unfold()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-splines">Fields of <code class="docutils literal"><span class="pre">deconv.splines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold-splines">Fields of <code class="docutils literal"><span class="pre">unfold.splines()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -127,9 +127,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#removing-artefactual-data">Removing artefactual data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-unfold">Fields of <code class="docutils literal"><span class="pre">EEG.unfold()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-splines">Fields of <code class="docutils literal"><span class="pre">deconv.splines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold-splines">Fields of <code class="docutils literal"><span class="pre">unfold.splines()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -173,9 +173,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#removing-artefactual-data">Removing artefactual data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-deconv">Fields of <code class="docutils literal"><span class="pre">EEG.deconv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-eeg-unfold">Fields of <code class="docutils literal"><span class="pre">EEG.unfold()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold">Fields of <code class="docutils literal"><span class="pre">unfold()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-deconv-splines">Fields of <code class="docutils literal"><span class="pre">deconv.splines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold-splines">Fields of <code class="docutils literal"><span class="pre">unfold.splines()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -247,8 +247,8 @@
 </div>
 <div class="section" id="explanation-of-all-variable-fields">
 <h1>Explanation of all variable fields<a class="headerlink" href="#explanation-of-all-variable-fields" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="fields-of-eeg-deconv">
-<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">EEG.deconv()</span></code><a class="headerlink" href="#fields-of-eeg-deconv" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fields-of-eeg-unfold">
+<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">EEG.unfold()</span></code><a class="headerlink" href="#fields-of-eeg-unfold" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
 <dt>splines</dt>
 <dd>all information on the splines are saved in here (see below). Splines are a bit more involved to describe, additional information needs to be saved</dd>
@@ -290,8 +290,8 @@
 <h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">unfold()</span></code><a class="headerlink" href="#fields-of-unfold" title="Permalink to this headline">¶</a></h2>
 <p>the unfold structure is the output of <code class="xref mat mat-func docutils literal"><span class="pre">dc_beta2unfold()</span></code>. This function removes the time-splines if used and possibly evaluates splines at (automatically) specific quantiles.</p>
 <dl class="docutils">
-<dt>deconv</dt>
-<dd>same as EEG.deconv</dd>
+<dt>unfold</dt>
+<dd>same as EEG.unfold</dd>
 <dt>times</dt>
 <dd>same as EEG.times, thus the epoch-time in ms</dd>
 <dt>chanlocs</dt>
@@ -304,8 +304,8 @@
 <dd>the betas with deconvolution [channel x time x predictors]</dd>
 </dl>
 </div>
-<div class="section" id="fields-of-deconv-splines">
-<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">deconv.splines()</span></code><a class="headerlink" href="#fields-of-deconv-splines" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fields-of-unfold-splines">
+<h2>Fields of <code class="xref mat mat-func docutils literal"><span class="pre">unfold.splines()</span></code><a class="headerlink" href="#fields-of-unfold-splines" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
 <dt>paramValues</dt>
 <dd>the parameter values of each event, e.g. for saccade amplitude: [1.3, 2.3, 6, 1.2 ...]</dd>
@@ -320,7 +320,7 @@
 <dt>name</dt>
 <dd>name of the spline</dd>
 <dt>colnames</dt>
-<dd>column names that the spline will get in EEG.deconv.X</dd>
+<dd>column names that the spline will get in EEG.unfold.X</dd>
 </dl>
 </div>
 </div>
@@ -338,7 +338,7 @@
     </p>
     <p>
         &copy; Copyright 2017, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Nov 22, 2017.<br/>
+      Last updated on Mar 02, 2018.<br/>
     </p>
   </div>
 </footer>

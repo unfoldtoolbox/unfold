@@ -1,11 +1,11 @@
-function [EEG] = dc_designmat(EEG,varargin)
+function [EEG] = uf_designmat(EEG,varargin)
 % Generate Designmatrix out of EEG.event structure and a cfg.formula
-% Input an EEG event structure and you will get an EEG.deconv.X field with
+% Input an EEG event structure and you will get an EEG.unfold.X field with
 % the designmatrix.
 % If you add multiple eventtypess+formulas as cell-arrays , this function will iteratively
 % call itself and combine it to one big designmatrix.
 % The designmatrix is not yet ready to do deconvolution, use
-% dc_timeexpandDesignmat for this.
+% uf_timeexpandDesignmat for this.
 %
 %Arguments:
 %
@@ -61,7 +61,7 @@ function [EEG] = dc_designmat(EEG,varargin)
 %                   Reference coding is also known as treatment coding
 %
 %Returns:
-%     EEG: Returns the EEG structure with the additional fields in EEG.deconv
+%     EEG: Returns the EEG structure with the additional fields in EEG.unfold
 %
 %     * X:          The design matrix
 %     * colnames:     For each column of 'X', which predictor it represents
@@ -86,7 +86,7 @@ function [EEG] = dc_designmat(EEG,varargin)
 %|   cfgDesign.spline = { {{'fixpos_x',10},{'fixpos_y',10}} , {} };
 %|   cfgDesign.categorical = {'level_predictability','target_fixation'};
 %|
-%|   EEG = dc_addDesignmat(EEG,cfgDesign);
+%|   EEG = uf_addDesignmat(EEG,cfgDesign);
 %
 
 cfg = finputcheck(varargin,...
@@ -129,18 +129,18 @@ if iscell(cfg.formula)
             
             %do the summersault
             
-            EEG2 = dc_designmat(EEG,cfgSingle);
+            EEG2 = uf_designmat(EEG,cfgSingle);
             
             if k == 1
                 
-                deconvAll = EEG2.deconv;
+                deconvAll = EEG2.unfold;
             else
                 %% combine them, rename variables if necessary
                 deconvAll = combine_deconvsets(deconvAll,EEG2,k);
             end
             
         end
-        EEG.deconv = deconvAll;
+        EEG.unfold = deconvAll;
         %exit the program early
         return
     else
@@ -161,7 +161,7 @@ end
 fprintf('\nModeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
 %%
 % First of all save the formula
-EEG.deconv.formula = {cfg.formula};
+EEG.unfold.formula = {cfg.formula};
 %% Regexp the formula
 catRegexp = 'cat\((.+?)\)';
 splRegexp = 'spl\((.+?)(,.+?)+?\)';
@@ -314,10 +314,10 @@ else
     if strcmp(cfg.codingschema,'effects')
         % if we want effects coding, we should remove the mean from the
         % continuous variables as well
-        EEG.deconv.effects_mean= nan(1,length(F.VariableNames)-1);% -1 because of the fake-'y'
+        EEG.unfold.effects_mean= nan(1,length(F.VariableNames)-1);% -1 because of the fake-'y'
         for pred = find(~categorical(1:end-1))%the last one is the fake-'y'
             predMean = nanmean(t_clean{:,pred});
-            EEG.deconv.effects_mean(pred) = predMean;
+            EEG.unfold.effects_mean(pred) = predMean;
             t_clean{:,pred} = t_clean{:,pred} - predMean;
         end
         
@@ -380,13 +380,13 @@ end
 %%
 % We need to kick out all events that we are not interested in, but keep
 % the general event matrix structur the same (e.g. we can still use
-% EEG.event(25) and have the entries in EEG.deconv.X(25,:) matching!
+% EEG.event(25) and have the entries in EEG.unfold.X(25,:) matching!
 % Kicking out ==> putting completly to 0.
 X(removeIndex,:) = 0;
 
 
 
-EEG.deconv.X = X;
+EEG.unfold.X = X;
 
 
 
@@ -401,33 +401,33 @@ end
 varLabel = {'intercept','continuous','categorical','interaction','spline'};
 
 
-EEG.deconv.variabletypes = [varLabel(varType+1)];
-EEG.deconv.variablenames = variablenames;
+EEG.unfold.variabletypes = [varLabel(varType+1)];
+EEG.unfold.variablenames = variablenames;
 
 
-EEG.deconv.colnames = colnames;
-EEG.deconv.cols2variablenames= cols2variablenames;
+EEG.unfold.colnames = colnames;
+EEG.unfold.cols2variablenames= cols2variablenames;
 
 
 
-EEG.deconv.cols2eventtypes = ones(1,size(X,2)); % This looks odd, but the function is recursively called if multiple events are detected. This number is the fixed in the recursive call to represent the actual cols2eventtypes
-EEG.deconv.eventtypes = {cfg.eventtypes};
+EEG.unfold.cols2eventtypes = ones(1,size(X,2)); % This looks odd, but the function is recursively called if multiple events are detected. This number is the fixed in the recursive call to represent the actual cols2eventtypes
+EEG.unfold.eventtypes = {cfg.eventtypes};
 
 %% Add the extra defined splines
-EEG.deconv.splines = [];
+EEG.unfold.splines = [];
 if ~isempty(cfg.spline)
     for s = 1:length(cfg.spline)
-        [EEG, ~,nanlist] = dc_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
-        EEG.deconv.X(nanlist,:) = 0;
+        [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
+        EEG.unfold.X(nanlist,:) = 0;
     end
 end
 
 
 
 % Designmat Checks
-if any(any(isnan(EEG.deconv.X)))
+if any(any(isnan(EEG.unfold.X)))
     warning('NaNs detected in designmat, try to impute them before fitting the model')
-    fprintf(['nans found in: ',EEG.deconv.colnames{any(isnan(EEG.deconv.X))}])
+    fprintf(['nans found in: ',EEG.unfold.colnames{any(isnan(EEG.unfold.X))}])
     fprintf('\n')
     
 end
@@ -449,8 +449,8 @@ function deconvAll = combine_deconvsets(deconvAll,EEG2,k)
 setA = deconvAll.variablenames;
 setA = cellfun(@(x)strsplit(x,':'),setA,'UniformOutput',0);
 
-currnames= EEG2.deconv.variablenames;
-colnames = EEG2.deconv.colnames;
+currnames= EEG2.unfold.variablenames;
+colnames = EEG2.unfold.colnames;
 
 for curridx = 1:length(currnames)
     
@@ -467,7 +467,7 @@ for curridx = 1:length(currnames)
         %maineffect/intercept
        newname = sprintf('%i_%s',k,currnameext{1});
         % which columns belong to this predictor    
-        c2var = EEG2.deconv.cols2variablenames;
+        c2var = EEG2.unfold.cols2variablenames;
         
         % find all columns, could be more than variablenames because of
         % dummy coding
@@ -515,24 +515,24 @@ for curridx = 1:length(currnames)
     currnames{curridx} = newname;
     
 end
-EEG2.deconv.variablenames = currnames;
-EEG2.deconv.colnames = colnames;
+EEG2.unfold.variablenames = currnames;
+EEG2.unfold.colnames = colnames;
 
 
 
 
-deconvAll.X(:,(end+1):(end+size(EEG2.deconv.X,2))) = EEG2.deconv.X;
-deconvAll.colnames = [deconvAll.colnames,EEG2.deconv.colnames];
-deconvAll.formula = [deconvAll.formula EEG2.deconv.formula];
-deconvAll.eventtypes = [deconvAll.eventtypes EEG2.deconv.eventtypes];
-deconvAll.cols2eventtypes = [deconvAll.cols2eventtypes EEG2.deconv.cols2eventtypes+max(deconvAll.cols2eventtypes)];
-deconvAll.variablenames = [deconvAll.variablenames EEG2.deconv.variablenames];
-deconvAll.variabletypes = [deconvAll.variabletypes EEG2.deconv.variabletypes];
-deconvAll.splines = [deconvAll.splines EEG2.deconv.splines];
+deconvAll.X(:,(end+1):(end+size(EEG2.unfold.X,2))) = EEG2.unfold.X;
+deconvAll.colnames = [deconvAll.colnames,EEG2.unfold.colnames];
+deconvAll.formula = [deconvAll.formula EEG2.unfold.formula];
+deconvAll.eventtypes = [deconvAll.eventtypes EEG2.unfold.eventtypes];
+deconvAll.cols2eventtypes = [deconvAll.cols2eventtypes EEG2.unfold.cols2eventtypes+max(deconvAll.cols2eventtypes)];
+deconvAll.variablenames = [deconvAll.variablenames EEG2.unfold.variablenames];
+deconvAll.variabletypes = [deconvAll.variabletypes EEG2.unfold.variabletypes];
+deconvAll.splines = [deconvAll.splines EEG2.unfold.splines];
 %Add the current maximum
-EEG2.deconv.cols2variablenames = EEG2.deconv.cols2variablenames+max(deconvAll.cols2variablenames);
+EEG2.unfold.cols2variablenames = EEG2.unfold.cols2variablenames+max(deconvAll.cols2variablenames);
 
-% find the ones that where 0 in EEG2.deconv.cols2variablenames
+% find the ones that where 0 in EEG2.unfold.cols2variablenames
 % and reset them to 0 (0 meaning the intercept)
-deconvAll.cols2variablenames = [deconvAll.cols2variablenames EEG2.deconv.cols2variablenames];
+deconvAll.cols2variablenames = [deconvAll.cols2variablenames EEG2.unfold.cols2variablenames];
 end

@@ -71,7 +71,7 @@ we offer several functions to compare deconvolved and non-deconvolved analyses. 
 
 Explanation of all variable fields
 ==================================
-Fields of `EEG.deconv`
+Fields of `EEG.unfold`
 ----------------------
 
 
@@ -132,8 +132,8 @@ Fields of `unfold`
 ----------------------
 the unfold structure is the output of `dc_beta2unfold`. This function removes the time-splines if used and possibly evaluates splines at (automatically) specific quantiles.
 
-deconv
-  same as EEG.deconv
+unfold
+  same as EEG.unfold
 
 times
   same as EEG.times, thus the epoch-time in ms
@@ -150,7 +150,7 @@ beta_nodc
 beta
   the betas with deconvolution [channel x time x predictors]
 
-Fields of `deconv.splines`
+Fields of `unfold.splines`
 ------------------------------------
 paramValues
   the parameter values of each event, e.g. for saccade amplitude: [1.3, 2.3, 6, 1.2 ...]
@@ -170,4 +170,4 @@ name
   name of the spline
 
 colnames
-  column names that the spline will get in EEG.deconv.X
+  column names that the spline will get in EEG.unfold.X
