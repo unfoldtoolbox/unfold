@@ -224,7 +224,9 @@ elseif strcmp(cfg.method,'glmnet')
         
     end
     beta = beta([2:end 1],:); %put the dc-intercept last
+    if cfg.precondition
     normfactor = [normfactor 1];
+    end
     EEG = uf_designmat_addcol(EEG,ones(1,size(EEG.unfold.Xdc,1)),'glmnet-DC-Correction');
     
     
