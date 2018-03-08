@@ -19,6 +19,9 @@ function [EEG] = uf_imputeMissing(EEG,varargin)
 % EEG.unfold.X in which missing NAN-values were imputed ('marginal', 'mean',
 % 'median') or in which the events with missing predictor information were 
 % removed ('drop'), which means put to 0
+%
+% Example:
+%   EEG = uf_imputeMissing(EEG)
 
 fprintf('\n%s(): Looking for missing predictor information...',mfilename)
 

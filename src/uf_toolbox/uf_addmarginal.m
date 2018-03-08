@@ -1,13 +1,16 @@
 function ufresult = uf_addmarginal(ufresult,varargin)
-%add the marginal of the other predictors (i.e. continuous & spline
-%predictors) to the beta estimates.
+%% add the marginal of the other predictors (i.e. continuous & spline predictors) to the beta estimates.
 % Important: If dummy-coded (i.e. non-effect coded) predictors and
 % interactions exist, they are NOT added to the marginal effect. I.e. the
 % output of the method returns the average ERP evaluated at the average of
 % all spline/continuous predictors, keeping the categorical/interaction
 % structure untouched.
 %
+% Arguments:
+%   cfg.channel: (all) Calculate only for a subset of channels (numeric)
+%   cfg.betaSetname: ("beta") string that indicates which unfold.(field) to use
 %
+% Example
 % For instance the model 1 + cat(facA) + continuousB
 % has the betas: intercept, facA==1, continuousB-Slope
 %
@@ -34,6 +37,8 @@ function ufresult = uf_addmarginal(ufresult,varargin)
 %
 % Note that mean(continuousB) does not need to be a number we evaluated in
 % the uf_predictContinuous step.
+
+
 
 
 

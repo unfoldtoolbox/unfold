@@ -1,10 +1,23 @@
 function [EEG] = uf_glmfit_nodc(EEG,varargin)
-%A function to solve the inverse problem without deconvolution
-% Currently it solves the pseudo-inverse of EEG.unfold.X and multiplies it
-% to all channels.
+%% A function to solve the inverse problem without deconvolution
+% Simple function to do massive univariate linear model. The function
+% expects EEG.data to be (CHAN,TIME,EPOCH) with EPOCH the same number as
+% EEG.unfold.X. 
+%
+% It is recommended to use uf_epoch for epoching, because you need to remove rows
+% from EEG.unfold.X if the epoching function removed trials. Also cleaning
+% of data is taken care of in uf_epoch
 %
 %Arguments:
-%   No arguments right now ('').
+%   cfg.method (string): (default pinv) 'glmnet','pinv','matlab','lsmr' are available. See
+%      the uf_glmfit function for further information. By making use of
+%      pinv, the linear model needs to be solved only once and can be
+%      applied to all electrodes. The other solves iteratively solve for
+%      each electtrode.
+%
+%  cfg.channel: (all) subselect a set of channels (in numbers, not strings)
+%  cfg.glmnetalpha (1): used for glmnet --> see uf_glmfit
+%  cfg.debug: used for matlab solver 
 %
 %Return:
 %  Returns a matrix (channel x pnts x predictors) of betas saved into

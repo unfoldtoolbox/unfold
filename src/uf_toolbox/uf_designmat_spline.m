@@ -1,6 +1,14 @@
 function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
 % Helper function to generate spline-part of designmatrix
 %
+% Argument:
+%   cfg.paramValues
+%   cfg.nsplines
+%   cfg.knotsequence
+%   cfg.splinespacing
+%   cfg.splinefunction (bi-cubic): You can specify your own spline
+%        function. This in principle also allows to make use of polynomial
+%        regression
 %
 cfg = finputcheck(varargin,...
     {'name',   'string', [], 'spline_default';...

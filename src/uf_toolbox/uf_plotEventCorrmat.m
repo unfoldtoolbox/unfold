@@ -1,13 +1,18 @@
 function corrOut = uf_plotEventCorrmat(EEG,varargin)
 % Plots a correlation matrix of the event structure
+% Its possible to subselect the eventtype
+% Planned feature: allow to plot only the EEG.unfold.X field
 %
 %Arguments:
 %   eventtypes (cell): Subselect the eventtypes, by default chooses all
 %   figure (0/1): whether the corrmat should be plotted (default) or only
 %               returned
 %
-%Return:
+%Returns:
 %   correlationMatrix
+%
+%Example:
+% uf_plotEventCorrmat(EEG)
 
 
 cfg = finputcheck(varargin,...
