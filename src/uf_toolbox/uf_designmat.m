@@ -1,39 +1,49 @@
 function [EEG] = uf_designmat(EEG,varargin)
-% Generate Designmatrix out of EEG.event structure and a cfg.formula
+%% Generate Designmatrix out of EEG.event structure and a formula
 % Input an EEG event structure and you will get an EEG.unfold.X field with
-% the designmatrix.
-% If you add multiple eventtypess+formulas as cell-arrays , this function will iteratively
+% the designmatrix (plus accompanying fields describing the design).
+% If you add multiple eventtypess+formulas as cell-arrays, this function will iteratively
 % call itself and combine it to one big designmatrix.
 % The designmatrix is not yet ready to do deconvolution, use
 % uf_timeexpandDesignmat for this.
 %
 %Arguments:
 %
-%   cfg.formula(string):     Formula in the wilkinson format. In addition
-%                   one can specify 'cat(X)' so that X is interpreted as a
+%   cfg.formula(string):  Formula in the wilkinson format. In addition to
+%                   the matlab default, one can specify 'cat(X)' so that X is interpreted as a
 %                   categorical variable and therefore dummy/effect-coded.
 %                   Also using spl(Y,5) defines a "non-linear" predictor
 %                   using 5 b-cubic spline basis functions. The more
 %                   splines one uses, the higher the risk of overfitting
 %                   but also of course more flexible relations can be
-%                   fitted.
+%                   fitted. Custom spline functions are possible by using
+%                   uf_designmat_spline() after the initial call of
+%                   uf_designmat.
 %
 %                   Example with multiple formulas: {'y~A+spl(B,5)', 'y~x+cat(y)','y~1'}
 %
+%                   Be sure to define multiple eventtypes if you use
+%                   multiple formulas.
+%
 %                   Example with more complex formula:
 %                   {'y ~ stimulus_type + color * size + stimulus_type:color}'
+%
 %                   This formula would add the following main effects:
-%                   "Stimulus Type, color, size"
+%                   "stimulus_type, color, size"
 %                   and the following interactions:
-%                   "stimType:color, color:size"
+%                   "stimulus_type:color, color:size"
 %                   
 %                   To define the reference category, have a look at
 %                   cfg.categorical {cell} down below. By default matlab
-%                   decides on the reference category.
+%                   decides on the reference category. Warning: If you use
+%                   strings in your EEG.event field, matlab will make the
+%                   first occurance of a level the reference. This can lead
+%                   to problems when averaging over subjects. Please
+%                   specify the reference level down below.
 %
-%   cfg.eventtypes(cell of strings): cell array of strings, the formula is fit on these
+%   cfg.eventtypes(cell of strings or cell of cells of strings): the formula is fit on these
 %                  events. make sure that all fields are filled for all events
-%                  special-case: Multiple eventtypess (currently in TESTING mode)
+%                  special-case: Multiple eventtypess
 %                  You can fit multiple different formulas on different events
 %                  concurrently. The specification could be as follows:
 %                  {{'A1','A2','A3'},{'B'},{'C'}}.
@@ -86,18 +96,23 @@ function [EEG] = uf_designmat(EEG,varargin)
 %   A classical 2x2 factorial design with interaction
 %|   cfgDesign = [];
 %|   cfgDesign.eventtypes = {'fixation'};
-%|   cfgDesign.formula = 'y ~ level_predictability*target_fixation + 1';
-%|   cfgDesign.categorical = {'level_predictability','target_fixation'};
+%|   cfgDesign.formula = 'y ~ 1 + cat(level_predictability)*cat(target_fixation)';
+%|   
+%|   Specifying the reference category
+%|   cfgDesign = [];
+%|   cfgDesign.eventtypes = {'fixation'};
+%|   cfgDesign.formula = 'y ~ cat(level_predictability)*cat(target_fixation)+ 1';
+%|   cfgDesign.categorical = {'level_predictability',{'low','high'};      % level low   is reference 
+%|                            'target_fixation',     {'early','late'}};   % level early is reference 
 %|
-%|   Second Example
-%|   This extends the above example by two cases: A) We add non-parametric
-%    splines (n = 10) for the X and Y position of the current fixation. B)
-%    We add a second formula for a second event (StimOnset1/2) that only
-%    contains a constant (y~1).
+%|   Adding spline and multiple events
+%|   This extends the above example by two cases: A) We add a non-parametric
+%|    spline (n = 10) for the saccade amplitude B) We add a second formula 
+%|    for a second event (StimOnset1/2) that only contains a constant (y~1).
+%|
+%|   cfgDesign = [];
 %|   cfgDesign.eventtypes = {{'fixation'},{'StimOnset1','StimOnset2'}};
-%|   cfgDesign.formula = {'y ~ 1 + level_predictability*target_fixation','y~1'};
-%|   cfgDesign.spline = { {{'fixpos_x',10},{'fixpos_y',10}} , {} };
-%|   cfgDesign.categorical = {'level_predictability','target_fixation'};
+%|   cfgDesign.formula = {'y ~ 1 + cat(level_predictability)*cat(target_fixation) + spl(sac_amplitude,10)','y~1'};
 %|
 %|   EEG = uf_addDesignmat(EEG,cfgDesign);
 %

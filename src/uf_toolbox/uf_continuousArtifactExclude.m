@@ -1,11 +1,13 @@
 function EEG = uf_continuousArtifactExclude(EEG,varargin)
-%Function to exclude (artifactual) continuous data from being modeled
+%% Function to exclude (artifactual) continuous data from being modeled
 % This function inputs a rejection vector and excludes the content from
 % being modeled in the design matrix. That means it sets all predictor
 % values at the given times to 0.
 %
 %Arguments:
-%   cfg.winrej (integer): A (2xn) array with n from-to pairs of samples to be excluded from further processing
+%   cfg.winrej (integer): A (2xn) array with n from-to pairs of samples to
+%   be excluded from further processing This is the same output as from
+%   EEGlabs' eegplot rej
 %
 %Return:
 %   EEG-Structure
@@ -20,7 +22,7 @@ function EEG = uf_continuousArtifactExclude(EEG,varargin)
 
 cfg = finputcheck(varargin,...
     {'winrej',   'integer', [], [];...
-    },'mode','ignore');
+    },'mode','error');
 if(ischar(cfg)); error(cfg);end
 
 rej = [];

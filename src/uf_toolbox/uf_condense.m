@@ -1,7 +1,10 @@
 function output = uf_condense(EEG,varargin)
+%% Condense results in new structure. Apply timebasis (if necessary) 
 %Returns an "ufresult"-struct that contains the predictor betas over time
 %and accompanying information. This structure is further used in all
-%plotting functions
+%plotting functions. This function also applys the timebasis (if you
+%specified something else than the default 'stick' in
+%uf_timeexpandDesignmat()
 %
 %Arguments:
 %   EEG(struct): A Struct containing EEG.unfold.beta_dc
@@ -12,11 +15,6 @@ function output = uf_condense(EEG,varargin)
 %                         and returns both
 %   cfg.channel(array): Restrict the beta-output to a subset of
 %                         channels. Default is all channels
-%   cfg.predictAt(cell): Only necessary if splines are used. One entry per parameter:
-%       {{'par1',[10 20 30]},{'par2',[0,1,2]}}.
-%       This evaluates parameter 1 at the values 10,20 and 30. Parameter 2
-%       at 0, 1 and 2. Default behaviour: evaluates 7 linearly spaced values between the min + max. of the
-%       parameterdomain
 %
 %Return:
 %   ufresult.beta= (nchans x time x parameters)
@@ -46,14 +44,10 @@ end
 cfg = finputcheck(varargin,...
     { 'deconv', 'integer',[-1 0 1],-1;
       'channel','integer',[],1:nchan;
-      'convertSplines','',[],[];
     },'mode','error');
 
 if(ischar(cfg)); error(cfg);end
 
-if ~isempty(cfg.convertSplines)
-    error('convertSplines has been deprecated. See issue #17')
-end
 if isfield(EEG,'nbchan')
     assert(all(ismember(cfg.channel,1:nchan)))
 end
@@ -89,15 +83,10 @@ end
 % combined spline estimate, not each individually.
 
 [splIdxList,paramList] = uf_getSplineidx(EEG);
-% nSpl = sum(ismember(paramList,splIdxList));
-% if nSpl == 0
-%     nSplineBetas = 0;
-% else
-%     nSplineBetas = -nSpl + sum( cellfun(@(x)size(x.basis,1),EEG.unfold.splines) );
-% end
-% if ~cfg.convertSplines
+
+
 paramList = 1:size(EEG.unfold.X,2);
-% end
+
 
 
 signal = nan(length(cfg.channel),length(EEG.unfold.times),length(paramList));
