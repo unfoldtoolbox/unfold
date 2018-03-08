@@ -154,6 +154,7 @@ if iscell(cfg.formula)
             
         end
         EEG.unfold = deconvAll;
+        check_rank(EEG.unfold.X)
         %exit the program early
         return
     else
@@ -603,4 +604,13 @@ EEG2.unfold.cols2variablenames = EEG2.unfold.cols2variablenames+max(deconvAll.co
 % find the ones that where 0 in EEG2.unfold.cols2variablenames
 % and reset them to 0 (0 meaning the intercept)
 deconvAll.cols2variablenames = [deconvAll.cols2variablenames EEG2.unfold.cols2variablenames];
+
+check_rank(deconvAll.X)
+end
+
+
+function check_rank(X)
+    if rank(X)<size(X,2)
+        warning('Rank is smaller than matrix size. Do you have two columns that are identical? Other linear dependencies can occur. Check for collinearity')
+    end
 end
