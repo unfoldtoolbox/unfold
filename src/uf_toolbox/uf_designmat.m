@@ -372,11 +372,22 @@ else
     
    catlev = cell(size(is_categorical));
     if sum(is_categorical)>0 && ~isempty(categoricalLevels)
-       % we need to sort the categoricalLevels to their respective model
-       % terms. The user could input the formula in a different order than
-       % the cfg..categorical cell-array
-       ix = cellfun(@(catpred)find(strcmp(F.PredictorNames,catpred)),categoricalLevelsOrder);
-       catlev(ix) = categoricalLevels;
+        % we need to sort the categoricalLevels to their respective model
+        % terms. The user could input the formula in a different order than
+        % the cfg..categorical cell-array
+        for pIDX = 1:length(categoricalLevelsOrder)
+            currCat = categoricalLevelsOrder{pIDX};
+            ix = find(strcmp(F.PredictorNames,currCat));
+            if isempty(ix)
+                error('could not match all cfg.categorical variablenames (%s)to the names in EEG.event',currCat)
+            end
+            
+            %make sure all levels specified occur in the parameter
+            dataFrameLevels = unique(t_clean.(currCat))';
+            assert(all(cellfun(@(x)any(strcmp(x,dataFrameLevels)),categoricalLevels{pIDX})),'Could not find the levels you specified in cfg.categorical for factor EEG.event.%s ',currCat)
+            
+            catlev(ix) = categoricalLevels(pIDX);
+        end
     end
     categoricalLevels = catlev;
 
