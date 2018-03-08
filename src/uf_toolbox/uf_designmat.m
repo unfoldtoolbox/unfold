@@ -26,6 +26,10 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   "Stimulus Type, color, size"
 %                   and the following interactions:
 %                   "stimType:color, color:size"
+%                   
+%                   To define the reference category, have a look at
+%                   cfg.categorical {cell} down below. By default matlab
+%                   decides on the reference category.
 %
 %   cfg.eventtypes(cell of strings): cell array of strings, the formula is fit on these
 %                  events. make sure that all fields are filled for all events
@@ -44,10 +48,19 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   Modeling aspect). Can be specified more conveniently
 %                   directly inside the formula
 %
-%   cfg.categorical(array): default [], which of the EEG.event fields
+%   cfg.categorical(cell-array): default {}, list of which of the EEG.event fields
 %                   should be treated as an categorical effect (thus
 %                   dummy/effect coded). You can also directly specify what
 %                   variables are categorical in the formula.
+%                   You can specify the order of the predictors. For
+%                   example:
+%                   {'predictorA',{'level3','level1','level2'};
+%                    'predictorB',{'level2','level1'}}
+%                   For predictorA, the level3 is now used as a reference
+%                   group. For predictorB the level2 is now used.
+%                   The second column of the cell array is optional. E.g.
+%                   {'predictorA','predictorB'} will make both predictors
+%                   as categorical
 %
 %   cfg.splinespacing (string): defines how the knots of the splines should be
 %                  placed. Possible values:
@@ -186,7 +199,31 @@ for s = 1:length(spl)
 end%% First check for unique variablenames
 cfg.spline = [cfg.spline spl];
 
-cfg.categorical = [cfg.categorical cellfun(@(x)x{1},cat,'UniformOutput',0)];
+% check categorical input and combine
+if ~isempty(cfg.categorical)&& size(cfg.categorical,2)>1 && iscell(cfg.categorical{1,2})
+    % if one categorical reference exists (a cell array), then all other
+    % second entries need to be cell arrays too
+    assert(all(cellfun(@(x)iscell(x),cfg.categorical(:,2))),'if you specify one category reference ordering you need to specify all others as well')
+    
+    categoricalLevels = [cfg.categorical(:,2)];
+    
+    % the matlab designmatrix function cannot handle {[0],[1]}, we need to
+    % transform to {'0' '1'}
+    numericix = cellfun(@(x)isnumeric(x{1}),categoricalLevels);
+    categoricalLevels(numericix) = cellfun(@(x)cellfun(@(y)num2str(y),x,'UniformOutput',0),categoricalLevels(numericix),'UniformOutput',0);
+    
+    
+    
+    categoricalLevelsOrder = [cfg.categorical(:,1)]; %this is needed later to reorder according to the formula
+    % we have saved the categoricalLevel information and can now remove it
+    % and proceed as planned
+    cfg.categorical = [cfg.categorical(:,1)]';
+else
+    categoricalLevels = []; % matlab should do the ordering
+end 
+
+
+cfg.categorical = unique([cfg.categorical cellfun(@(x)x{1},cat,'UniformOutput',0)]);
 
 % remove the 'cat()' from cat(eventA) so that only 'eventA' remains
 f2= regexprep(cfg.formula, catRegexp,'$1');
@@ -220,7 +257,6 @@ for e= 1:length(event)
     end
 end
 t = struct2table(event);
-
 
 
 
@@ -277,7 +313,18 @@ t_clean = t(:,tf);
 t_isnum = varfun(@isnumeric,t_clean,'output','uniform');
 for p = 1:size(t_clean,2)
     if t_isnum(p)
+        % categorical Levels
+        %due to a matlab bug, we have to change numeric categorical
+        %variables to string categorical variables. Else the reordering of
+        %the levels does not work.
         
+        if strcmp(t_clean.Properties.VariableNames{p},categoricalLevelsOrder(numericix)) %numericix from line ~210
+            is_nan = isnan(t_clean{:,p});
+            t_clean.(t_clean.Properties.VariableNames{p}) = arrayfun(@(x)num2str(x),t_clean{:,p},'UniformOutput',0);
+            t_clean{is_nan,p} = repmat({''},sum(is_nan),1);
+            fprintf('You gave a numeric variable (%s) and specified it as categorical. Due to a matlab-bug we have to convert the variable internally to strings. This should not give further problems \n',t_clean.Properties.VariableNames{p})
+        end
+
         continue
         
     elseif ~iscell(t_clean{:,p}) || ~all(cellfun(@isstr,t_clean{:,p}))
@@ -288,7 +335,7 @@ for p = 1:size(t_clean,2)
         fprintf('\n')
         error('Input Event Values have to be string or numeric. Event:%s was class: %s \n string found in %i out of %i events (sometimes one or a couple of events have NANS instead of strings) ',t.Properties.VariableNames{p},class(t_clean{:,p}),sum(cellfun(@isstr,t_clean{:,p})),size(t_clean,1))
     elseif all(cellfun(@isstr,t_clean{:,p}))
-        % If all of them arr strings, we need to check that this is a
+        % If all of them are strings, we need to check that this is a
         % categorical variable
         currVar = t_clean.Properties.VariableNames{p};
         if ~ismember(currVar,cfg.categorical)
@@ -310,12 +357,12 @@ else
     t_clean.zzz_response = zeros(size(t_clean,1),1); % needs to be last to use the designmatrix function
     
     
-    categorical = ismember(F.VariableNames,cfg.categorical);
+    is_categorical = ismember(F.VariableNames,cfg.categorical);
     if strcmp(cfg.codingschema,'effects')
         % if we want effects coding, we should remove the mean from the
         % continuous variables as well
         EEG.unfold.effects_mean= nan(1,length(F.VariableNames)-1);% -1 because of the fake-'y'
-        for pred = find(~categorical(1:end-1))%the last one is the fake-'y'
+        for pred = find(~is_categorical(1:end-1))%the last one is the fake-'y'
             predMean = nanmean(t_clean{:,pred});
             EEG.unfold.effects_mean(pred) = predMean;
             t_clean{:,pred} = t_clean{:,pred} - predMean;
@@ -323,9 +370,19 @@ else
         
     end
     
+   catlev = cell(size(is_categorical));
+    if sum(is_categorical)>0 && ~isempty(categoricalLevels)
+       % we need to sort the categoricalLevels to their respective model
+       % terms. The user could input the formula in a different order than
+       % the cfg..categorical cell-array
+       ix = cellfun(@(catpred)find(strcmp(F.PredictorNames,catpred)),categoricalLevelsOrder);
+       catlev(ix) = categoricalLevels;
+    end
+    categoricalLevels = catlev;
+
     [X,b,terms,cols2variablenames,colnames] = ...
         classreg.regr.modelutils.designmatrix(t_clean,'Model',F.Terms,...
-        'CategoricalVars',categorical,...
+        'CategoricalVars',is_categorical,'CategoricalLevels',categoricalLevels,...
         'PredictorVars',F.PredictorNames,'ResponseVar','zzz_response',...
         'DummyVarCoding',cfg.codingschema);
     terms = terms';
@@ -362,7 +419,7 @@ if sum(is_interaction)>0
     % Also add the interaction to the variableName List
     variablenames(end+1:(end+sum(is_interaction))) = colnames(is_interaction);
     variablenames(removeList) = [];
-    categorical(removeList) = [];
+    is_categorical(removeList) = [];
 end
 
 if has_intercept
@@ -393,7 +450,7 @@ EEG.unfold.X = X;
 % We want intercept = 0,continuos = 1, categorical = 2, interaction=3 and spline = 4, then add one and
 % index the labels
 
-varType = [double(categorical(1:end-1)) repmat(2,1,sum(is_interaction))] + 1; %the last categorical one is the fake 'y~',
+varType = [double(is_categorical(1:end-1)) repmat(2,1,sum(is_interaction))] + 1; %the last categorical one is the fake 'y~',
 if has_intercept
     varType = [0 varType];
 end

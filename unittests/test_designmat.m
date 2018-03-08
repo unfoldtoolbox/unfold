@@ -2,7 +2,7 @@ function test_designmat()
 % Multi-Test
 
 testCase = [15]
-    
+
 EEGsim = simulate_test_case(testCase,'noise',0,'basis','box');
 cfgDesign = [];
 
@@ -27,7 +27,7 @@ cfgDesign.formula{3} = 'a ~1+  spl(splineA ,5)'; % #3
 uf_designmat(EEGsim,cfgDesign);
 %% test two events with same predictorName
 for e = 1:length(EEGsim.event)
-   EEGsim.event(e).evt = e; 
+    EEGsim.event(e).evt = e;
 end
 EEG2 = uf_designmat(EEGsim,'eventtypes',{'stimulus1' 'stimulus2'},'formula',{'y~evt','y~evt'});
 assert(size(EEG2.unfold.X,2) == 4);
@@ -60,7 +60,7 @@ cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulu
 % fill in spline A for all events
 for e= 1:length(EEGsim.event)
     
-EEGsim.event(e).splineA = rand(1);
+    EEGsim.event(e).splineA = rand(1);
 end
 EEGtmp = uf_designmat(EEGsim,cfgDesign);
 
@@ -79,9 +79,9 @@ cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulu
 % fill in spline A for all events
 for e= 1:length(EEGsim.event)
     
-EEGsim.event(e).conditionA = randi(3)-1;
-EEGsim.event(e).conditionB = randi(3)-1;
-EEGsim.event(e).conditionC = randi(3)-1;
+    EEGsim.event(e).conditionA = randi(3)-1;
+    EEGsim.event(e).conditionB = randi(3)-1;
+    EEGsim.event(e).conditionC = randi(3)-1;
 end
 EEGtmp = uf_designmat(EEGsim,cfgDesign);
 
@@ -92,4 +92,30 @@ for k = 1:length(EEGtmp.unfold.variablenames)
     assert(strcmp(is,shouldBe{k}),sprintf('error in %s, should be %s',is,shouldBe{k}))
 end
 
+%% Test the categorical rereferencing
+EEGtest = EEGsim;
+EEGtest.event = EEGtest.event(1:3:end);
+catAlist = {'A','B','C'};
+catBlist = {1,2,3};
+for e= 1:length(EEGtest.event)
+    
+    EEGtest.event(e).catA= catAlist{mod(e,3)+1};
+    EEGtest.event(e).catB= catBlist{mod(e,3)+1};
+    
+end
+
+cfgDesign = [];
+cfgDesign.coding = 'dummy';
+cfgDesign.formula   = {'y~1+ cat(catA)+ catB'};
+cfgDesign.eventtypes = {'stimulus1'};
+cfgDesign.categorical = {'catA',{'B','C','A'};
+                         'catB',{2,3,1}};
+EEGtmp = uf_designmat(EEGtest,cfgDesign);
+
+shouldBe = {'(Intercept)'  'catA_C'  'catA_A'  'catB_3'  'catB_1'};
+for k = 1:length(EEGtmp.unfold.colnames)
+    is = EEGtmp.unfold.colnames{k};
+    assert(strcmp(is,shouldBe{k}),sprintf('error in %s, should be %s',is,shouldBe{k}))
+end
+assert(all(strcmp('categorical',EEGtmp.unfold.variabletypes) == [0 1 1]))
 end
