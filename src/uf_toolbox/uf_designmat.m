@@ -104,15 +104,13 @@ function [EEG] = uf_designmat(EEG,varargin)
 %|    spline (n = 10) for the saccade amplitude B) We add a second formula 
 %|    for a second event (StimOnset1/2) that only contains a constant (y~1).
 %|
-<<<<<<< HEAD
 %|   Second Example
 %|   This extends the above example by two cases: 
 %|     **A)** We add non-parametric splines (n = 10) for the X and Y position of the current fixation.
 %|     **B)** We add a second formula for a second event (StimOnset1/2) that only
-%    contains a constant (y~1).
-=======
+%|   contains a constant (y~1).
+%|
 %|   cfgDesign = [];
->>>>>>> cbba867fb7224589763361ff70e934817da12e10
 %|   cfgDesign.eventtypes = {{'fixation'},{'StimOnset1','StimOnset2'}};
 %|   cfgDesign.formula = {'y ~ 1 + cat(level_predictability)*cat(target_fixation) + spl(sac_amplitude,10)','y~1'};
 %|
