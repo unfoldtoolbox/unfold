@@ -51,7 +51,7 @@ html_theme_options = {
     # Global TOC depth for "site" navbar tab. (Default: 1)
     # Switching to -1 shows all levels.
     # No idea what this does
-    'globaltoc_depth': 2,
+    'globaltoc_depth': 1,
 
     # Include hidden TOCs in Site navbar?
     #
@@ -90,6 +90,8 @@ html_theme_options = {
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
 
+matlab_src_dir = os.path.abspath('../../')
+print('Matlab SRC directory',matlab_src_dir)
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -100,15 +102,15 @@ sys.path.insert(0, os.path.abspath('.'))
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinxcontrib.matlab',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-    'sphinxcontrib.matlab',
     'sphinx.ext.ifconfig',
     'sphinxcontrib.fulltoc'
 ]
-matlab_src_dir = os.path.abspath('../../')
+
 
 primary_domain = 'mat'
 # Add any paths that contain templates here, relative to this directory.
@@ -129,7 +131,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'unfold'
-copyright = u'2017, Benedikt Ehinger, Olaf Dimigen'
+copyright = u'2018, Benedikt Ehinger, Olaf Dimigen'
 author = u'Benedikt Ehinger, Olaf Dimigen'
 
 # The version info for the project you're documenting, acts as replacement for

@@ -16,3 +16,14 @@ iframe{
   height:1000px; /* couldnt find a better way */
   margin-bottom:10px;
 }
+
+.bs-sidenav .nav > li > a.current{
+  font-style: oblique;
+  background-color: #e5e3e9;
+}
+.toctree-l1{
+  font-weight:600;
+}
+.toctree-l2{
+  font-weight:400;
+}
