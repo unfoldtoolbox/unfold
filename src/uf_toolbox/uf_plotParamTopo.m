@@ -1,17 +1,12 @@
 function [varargout] = uf_plotParamTopo(ufresult,varargin)
-%Generates topoplots over time. each row is a predictor or predictor-value-combination
+%% Generates rows of topoplots over time. each row is a predictor 
+% If you are not interested in differences, but the predicted cells, it 
+% might be helpful to run dc_addmarginal() before. Then you do not only
+% plot the simple/main effect, but the intercept is added to the difference
+% resulting in both condition.
 %
 %Arguments:
 % 'plotParam' : cell array of parameters to be plotted, if empty plots all
-% 'predictAt': only used for continuous / spline predictors. 
-%               a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
-%               This would split up the parName-predictor into 5 bins from
-%               0 to 10, so 5 rows of topoplots would be plotted. Default are 7 lines
-%               from min to max (see code for more info)
-%
-% 'add_intercept' : (not yet supported) whether to add the intercept to each curve (thus not
-%               the 'pure' effect of a independent variable is plotted but
-%               more of an ERP-like plot is generated
 %
 % 'n_topos' :(15) number of topographies to plot
 %
@@ -34,9 +29,7 @@ function [varargout] = uf_plotParamTopo(ufresult,varargin)
 
 
 cfg = finputcheck(varargin,...
-    {'predictAt','cell',[],{{'',[]}};
-    'add_intercept','boolean',[],0;
-    'plotParam','',[],{};
+    {'plotParam','',[],{};
     'n_topos','integer',[],15,
     'baseline','real',[min(ufresult.times) max(ufresult.times)],[];...
     'betaSetName','string',fieldnames(ufresult),'beta';

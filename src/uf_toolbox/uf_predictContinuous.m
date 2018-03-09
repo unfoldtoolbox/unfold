@@ -1,11 +1,13 @@
 function output = uf_predictContinuous(ufresult,varargin)
 %% Evaluates a continuous/spline parameter at specific values
-% For example you get an beta for par1 at 3 for a continuous
-% variable. The output then would be the respective values 30,60 and
-% 90. Because model-estimates / parameters are defined for each time-point&electrode and can
+% This is similar to a predict function, but does not add the marginal of
+% the other parameters. For this please make use of uf_addmarignals().
+%
+% Because model-estimates / parameters are defined for each time-point&electrode and can
 % also encompass multiple betas (in the case of splines), this
 % becomes non trivial and thus this function.
-%
+% Note that this will overvwrite the ufresult.beta field
+
 %Arguments:
 %   cfg.predictAt(cell): One entry per parameter:
 %       {{'par1',[10 20 30]},{'par2',[0,1,2]}}.
@@ -16,14 +18,19 @@ function output = uf_predictContinuous(ufresult,varargin)
 %   cfg.auto_method(string): 'quantile' (default) or 'linear'.
 %       'quantile' - the auto_n values are placed on the quantile of the predictor
 %       'linear'   - the auto_n values are placed linearly over the range of the predictor
-%       'average'  - only evaluates at the average of the predictor
+%       'average'  - only evaluates at the average of the predictor. This
+%       is useful if you are interested in the marginal response
 %   cfg.auto_n (integer) : default 7; the number of automatically evaluated values
 %
 %Return:
 %   Result-Betas with evaluated betas at specified continuous values.
 %
 %*Example:*
-% TODO
+%    You calculated for a continuous variable "parameterA" a beta of 3. 
+%    You want to know what the predicted signal of parameterA = [10,20,30] is. 
+%    You call the function:
+%      ufresult = uf_predictContinuous(ufresult,'predictAt',{{'parameterA',[10 20 30]}}
+%    The output then would be the respective values 30,60 and 90. 
 
 
 cfg = finputcheck(varargin,...

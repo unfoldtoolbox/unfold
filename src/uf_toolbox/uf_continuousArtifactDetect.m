@@ -1,5 +1,5 @@
 function [WinRej] = uf_continuousArtifactDetect(EEG,varargin)
-%Reject commonly recorded artifactual potentials (c.r.a.p.)
+%% Reject commonly recorded artifactual potentials (c.r.a.p.)
 % This function has been altered very much by Benedikt Ehinger
 % I removed all the filter-features
 % I changed the input parser.
@@ -23,6 +23,9 @@ function [WinRej] = uf_continuousArtifactDetect(EEG,varargin)
 % 'windowsize':     - moving window width in msec (default 2000 ms)
 % 'stepsize':    - moving window step (default 1000 ms)
 % 'combineSegements':  - marked segment(s) closer than this value will be joined together.
+%
+%Example:
+% winrej = uf_continuousArtifactDetect(EEG)
 %
 %Reference:
 % ERP Boot Camp: Data Analysis Tutorials. Emily S. Kappenman, Marissa L. Gamble, and Steven J. Luck. UC Davis
@@ -66,7 +69,7 @@ cfg = finputcheck(varargin,...
     'channels','integer',[1:size(EEG.data,1)],1:size(EEG.data,1);
     'stepsize','integer',[],100;...
     'combineSegements','integer',[],[];...
-    },'mode','ignore');
+    },'mode','error');
 
 
 if(ischar(cfg)); error(cfg);end

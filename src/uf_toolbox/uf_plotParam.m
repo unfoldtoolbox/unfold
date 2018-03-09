@@ -11,9 +11,8 @@ function [varargout] = uf_plotParam(ufresult,varargin)
 %    'channel' (integer): Which channel to plot
 %
 %    'predictAt' (cell): a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
-%       This splits up the parName-predictor into 5 bins from
-%       0 to 10, so 5 lines would be plotted. Default are 7 lines
-%       from min to max
+%           This is a shortcut to uf_continuousPredict. We generally
+%           recommend to explicitly use the uf_continuousPredict function.
 %
 %    'deconv' ([-1 0 1]):default: -1; whether to plot ufresult.beta (1) or
 %       ufresult.beta_nodc(0) or everything/autodetect (-1). Autodetect would

@@ -80,7 +80,7 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
                             EEGb = uf_epoch(EEGb,'timelimits',t{1});
                             EEGb = uf_glmfit_nodc(EEGb);
                         end
-                        ufresult = uf_condense(EEGb,'unfold',b{1},'channel',b{2});
+                        ufresult = uf_condense(EEGb,'deconv',b{1},'channel',b{2});
                         if strcmp(t{2},'stick') && testCase==14 && b{2} == 1 && all(t{1} == [-0.5,1.5])
                             if ~isfield(EEGb,'urevent') || isempty(EEG.urevent)
                                 EEGb.urevent = EEG.event; % this field is populated in uf_epoch

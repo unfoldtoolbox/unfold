@@ -24,7 +24,7 @@
 % 13   	- Three events, one intercept, one 1x2 and one continuos, no overlap
 % 14   	- Three events, one intercept, one 1x2 and one continuos, with overlap
 
-testCase = 15
+testCase = 14
 
 
 EEG = simulate_test_case(testCase,'noise',0,'basis','hanning');
@@ -92,21 +92,16 @@ plot(ufresult.times,bsxfun(@times,squeeze(ufresult.beta_nodc),multWith),'-x'),ho
 plot(EEG.sim.sig.time,EEG.sim.separateSignal','-ok')
 title('epoched vs. orig')
 %% draw splinethings
+if 1==0
 ufresult = uf_condense(EEG);
 
 cfg = [];
 cfg.auto_method = 'linear'; %default quantile
 cfg.auto_n = 20;
-cfg.convertSplines = 1;
 
 ufresult = uf_predictContinuous(ufresult,cfg);
 
 
-cfg = [];
-cfg.channel = 1;
-cfg.sameyaxis = 'all';
-cfg.deconv = -1;
-cfg.plotSeparate = 'event';
-cfg.plotParam = {'3_(Intercept)','3_continuousA','splineA','splineB'};
-cfg.add_marginal = 0;
-ax = uf_plotParam(ufresult,cfg);
+
+ax = uf_plotParam(ufresult);
+end

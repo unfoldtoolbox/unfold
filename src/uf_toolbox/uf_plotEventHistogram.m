@@ -1,5 +1,6 @@
 function uf_plotEventHistogram(EEG,varargin)
 % Function that plots histogram of all events in the EEG.event structure
+% This function also adds a density estimate
 %
 %Arguments:
 %   cfg.eventtypes: Restrict the histogram to a specific eventtypes

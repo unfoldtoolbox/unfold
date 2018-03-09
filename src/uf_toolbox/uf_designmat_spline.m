@@ -1,7 +1,47 @@
 function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
 % Helper function to generate spline-part of designmatrix
 %
+% Argument:
+%   cfg.name(string): (optional, default: "spline_default") A name for the
+%           spline predictor
 %
+%   cfg.paramValues(double): The values of the predictor on which the
+%           splines should be calculated and evaluated.
+%           E.g. [-3 4,1,2,3, ... 4]
+%
+%   cfg.nsplines(integer): number of splines to use. too many lead to
+%               overfitting, to few to underfitting
+%
+%   cfg.knotsequence(real): optional (if nsplines is specified). Give the
+%               sequence of knots explicitly (else they are put on the
+%               quantiles or linearly (see splinespacing). An example would
+%               be [0,1,2,3,5,10,11,12,13]. This example could make sense
+%               if there is lots of data at predictor 0-5 and again at
+%               10-13.  To define the knotsequence explicitly is also
+%               useful when you directly want to estimate the same betas
+%               for all subjects. But beware of subject-specific ranges, not all
+%               subjects have the same range in their covariates.
+%
+%   cfg.splinespacing(string): (quantile) linear or quantile. The spacing
+%         of the knots along the 
+%
+%   cfg.splinefunction (functionhandle): You can specify your own spline
+%        function. This in principle also allows to make use of polynomial
+%        regression
+%
+%Returns:
+% EEG structure
+%   * unfold.X: new entries for the spline
+%   * unfold.splines: new entrie for the spline
+%   * in addition update to unfold: colnames, variablenames,cols2variablenames,cols2eventtypes,variabletypes
+% spl: Same as EEG.unfold.spline{end}
+% nanlist: the paramValues that were nan (same as 'isnan(spl.paramValues)' )
+%
+%Example:
+%   EEG = dc_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineB],'nsplines',10,'splinespacing','linear');
+%   EEG = dc_designmat_spline(EEG,'name','splineB','paramValues',[EEG.event.splineB],'knotsequence',linspace(0,2*pi,15),'splinefunction','cyclical');
+%
+
 cfg = finputcheck(varargin,...
     {'name',   'string', [], 'spline_default';...
     'paramValues','',[],[];...

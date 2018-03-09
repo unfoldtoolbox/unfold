@@ -1,20 +1,20 @@
 function uf_plotDesignmat(EEG,varargin)
-%Plots the designmatrix
+%% Plots the designmatrix
 %If the matrix is very large (the timeexpanded/Xdc matrix) we do not plot
-%everything, but only the middle 1000s. We also try to zoom in
-%automatically, but this fails sometimes
+%everything, but only the middle 60s. In addition (for timeexpand) we plot
+%the events as horizontal lines.
 %
 %Arguments:
 %   cfg.timeexpand' (boolean):
 %        0: Plots EEG.unfold.X (default)
 %        1: Plots EEG.unfold.Xdc
 %   cfg.logColor(boolean): plot the color on logscale (default 0)
-%   cfg.sort(boolean): Sort the designmatrix
+%   cfg.sort(boolean): Sort the designmatrix (only possible for X, not Xdc)
 %   cfg.figure (1/0): Open a new figure (default 1)
 %
 %*Example:*
 % uf_plot_designmat(EEG)
-%
+% uf_plot_designmat(EEG,'sort',1)
 % uf_plot_designmat(EEG,'timeexpand',1) %plot the timeexpanded X
 
 % Secret option: 'addContData'
@@ -189,7 +189,10 @@ if cfg.timeexpand
             
              end
         legend([legendlist{:,3}],[legendlist(:,1)])
+        else
+            warning('more than 1000 events found in the restricted timeframe, this makes matlab crash and we are not plotting them')
         end
+        
        
         
         % change ylim to zoom in to the event that is in middle of cut data

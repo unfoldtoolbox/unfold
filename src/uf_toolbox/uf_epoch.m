@@ -4,6 +4,7 @@ function EEG_epoch = uf_epoch(EEG,varargin)
 % "normal" use-case, we have to epoch it. Because the data has not been
 % cleaned yet, we do this in this function. We additionally remove trials
 % from unfold.X that were removed during epoching.
+% Afterwards you can use uf_glmfit_nodc to fit the model
 %
 %Arguments:
 %   cfg.winrej (integer): A (2xn) array with n from-to pairs of samples to be excluded from further processing

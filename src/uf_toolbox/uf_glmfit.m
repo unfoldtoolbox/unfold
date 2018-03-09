@@ -8,14 +8,14 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 %
 %Arguments:
 %   cfg.method (string):
-%    * "lsmr"      default; SAVES MEMORY an iterative solver is used, this is
+%    * "lsmr"      default; an iterative solver is used, this is
 %    very memory efficient, but is a lot slower than the 'time' option
 %    because each electrode has to be solved independently. The LSMR
 %    algorithm is used for sparse iterative solving.
 %
 %    * "par-lsmr"  same as lsmr, but uses parfor with ncpu-1. This does not
-%    seem to be any faster. Not recommended
-
+%    seem to be any faster at the moment (unsure why). Not recommended
+%
 %    * "matlab"    , uses matlabs native A/b solver. For moderate to big
 %    design-matrices it will need *a lot* of memory (40-60GB is easily
 %    reached)
@@ -50,7 +50,11 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 %   cfg.debug (boolean): 0, only with method:matlab, outputs additional
 %                  details from the solver used
 %
-%   save_memory_or_time: Deprecated, has been renamed to 'method'
+%   cfg.precondition (boolean): 1, scales each row of Xdc to SD=1. This
+%               increase the solving speed by factor ~2. For very large
+%               matrices you might run into memory problems. Deactivate
+%               then.
+%
 %   EEG:  the EEG set, need to have EEG.unfold.Xdc compatible with
 %         the size of EEG.data
 %
@@ -96,26 +100,6 @@ emptyRows = sum(abs(X),2) == 0;
 X(emptyRows,:)  = [];
 data(:,emptyRows) = [];
 
-% % normalize data
-% READ THIS
-% this is uncommented because it doesn't actually solve the problem I
-% wanted to solve. nevertheless it might be helpful to normalize data
-% before the fits. We hav eto check the methods, some do this automatically
-% (glmnet). Others might (matlab?). Pinv should benefit from this, lsmr - I
-% don't really know.
-%
-% if any(strcmp(cfg.method,{'lsmr','par-lsmr'}))
-%     % I don't do mean/median subtraction yet, because I'm not actually sure
-%     % how to undo it again? I don't have a total-EEG signal Intercept.
-%     % Maybe I could just do it and not undo it again?
-%
-%     normalize = struct();
-%     %     normalize.median = nanmedian(data,2);
-%     normalize.mad = mad(data')';
-%     %     data = bsxfun(@minus,data,normalize.median);
-%     data = bsxfun(@rdivide,data,normalize.mad);
-% end
-
 if cfg.precondition
     normfactor = sqrt(sum(X.^2)); % cant use norm because of sparsematrix
     % X = X./normfactor; %matlab 2016b and later
@@ -145,7 +129,7 @@ elseif strcmp(cfg.method,'lsqr')
     
 elseif strcmp(cfg.method,'lsmr')
     
- 
+    
     for e = cfg.channel
         t = tic;
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
@@ -183,7 +167,7 @@ elseif strcmp(cfg.method,'par-lsmr')
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         % use iterative solver for least-squares problems (lsmr)
         [beta(:,e),ISTOP,ITN] = lsmr(parXdc.Value,parData.Value(:,e),[],10^-10,10^-10,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
-        if ISTOP == 7 
+        if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations. You can either try to increase the number of iterations using the option ''lsmriterations'' or it might be, that your model is highly collinear and difficult to estimate. Check the designmatrix EEG.unfold.X for collinearity.'])
         elseif ITN == cfg.lsmriterations
             warning(['The iterative least squares (likely) did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations. You can either try to increase the number of iterations using the option ''lsmriterations'' or it might be, that your model is highly collinear and difficult to estimate. Check the designmatrix EEG.unfold.X for collinearity.'])
@@ -227,7 +211,7 @@ elseif strcmp(cfg.method,'glmnet')
     end
     beta = beta([2:end 1],:); %put the dc-intercept last
     if cfg.precondition
-    normfactor = [normfactor 1];
+        normfactor = [normfactor 1];
     end
     EEG = uf_designmat_addcol(EEG,ones(1,size(EEG.unfold.Xdc,1)),'glmnet-DC-Correction');
     
@@ -242,11 +226,6 @@ if cfg.precondition
 end
 beta = beta'; % I prefer channels X betas (easier to multiply things to)
 
-% Unnormalize data
-% if any(strcmp(cfg.method,{'lsmr','par-lsmr'}))
-%    beta = bsxfun(@times,beta,normalize.mad);
-%
-% end
 
 % We need to remove customrows, as they were not timeexpanded.
 eventcell = cellfun(@(x)iscell(x(1)),EEG.unfold.eventtypes)*1;

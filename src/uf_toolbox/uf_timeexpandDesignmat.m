@@ -1,18 +1,19 @@
 function [EEG] = uf_timeexpandDesignmat(EEG,varargin)
-%Timeexpand / Deconvolve Designmatrix This function takes the designmatrix
-% (saved in EEG.unfold.X, a EEG.points times nPredictor matrix) and makes
-% copies over time (in the range of the windowlength).
+%Timeexpand Designmatrix. 
+% This function takes the designmatrix% (saved in EEG.unfold.X, a
+% EEG.points times nPredictor matrix) and expands it 
+% over time (in the range of the windowlength).
 %
 %Arguments:
 %  cfg.method(string): default 'stick'; Three methods are available:
 %
 %        * 'stick'      We shift the signal over each point in time, uses the stickfunction basis
-%        * 'splines'    We use cubic splines (number = TimeexpandPARAM) to approximate the signal. This makes sense as neighbouring timepoints are very likely correlated.
-%        * 'fourier'    We use a fourier set (up to the first TimeexpandPARAM frequencies) to model the signal.
+%        * 'splines'    We use cubic splines (number = Timeexpandparam) to approximate the signal. This makes use of neighbouring timepoints that are very likely correlated.
+%        * 'fourier'    We use a fourier set (up to the first Timeexpandparam frequencies) to model the signal.
 %
 %  cfg.timelimits (2 integer):     defines over what time the timeexpand should go, this is
 %       analog to the epoch-size. This should be as long, as you think
-%       overlap can happen in your data (in seconds.
+%       overlap can happen in your data (in seconds)
 %
 %  cfg.timeexpandparam (integer):    depending on whether cfg.method is splines or fourier defines how
 %       many splines or fourier frequencies (in case of fourier, the

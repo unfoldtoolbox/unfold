@@ -10,9 +10,11 @@ function varargout = uf_unfold2csv(ufresult,varargin)
 %   cfg.filename: filename for the csv file. if empty, only returns table
 %
 %Return:
-%   Data-Table in the "tidy"-format:
+%    Data-Table in the "tidy"-format:
 %    Each observation (voltage/beta) has one row, channels, predictors etc.
 %    gets one column
+%Example:
+% uftable = uf_unfold2csv(ufresult,'filename','output.csv')
 
 
 cfg = finputcheck(varargin,...

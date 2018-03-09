@@ -1,5 +1,6 @@
 function [] = uf_plotParam2d(ufresult,varargin)
-%Function not yet ready (sorry)
+% Plots a 2D plot of parameter vs. time with the predicted value as the
+% third dimension
 % This function plots an imagesc plot of time vs. parameter of choice
 %
 %Arguments:
@@ -9,7 +10,9 @@ function [] = uf_plotParam2d(ufresult,varargin)
 % 'channel'       : Specify which channel-idx to plot
 % 'betaSetName'   : Default 'beta'. Can be any field of the ufresult-struct
 % 'caxis'         : Default [], specify coloraxis
-
+%
+%Example:
+%uf_plotParam2d('plotParam','continuosPredictorA')
 
 cfg= finputcheck(varargin,...
     {'plotParam','',[],{};

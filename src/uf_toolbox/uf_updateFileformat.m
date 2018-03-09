@@ -1,5 +1,7 @@
 function ufresult = uf_updateFileformat(ufresult)
 % updates the ufresult file struct to some changes in variable names
+
+
 ufresult = rename_stru(ufresult,'deconv','unfold'); 
 ufresult.unfold = rename_stru(ufresult.unfold,'dcX','Xdc');
 ufresult.unfold = rename_stru(ufresult.unfold,'dcX_termidx','Xdc_terms2cols');

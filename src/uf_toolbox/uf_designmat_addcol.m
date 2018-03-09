@@ -1,6 +1,7 @@
 function EEG = uf_designmat_addcol(EEG,newrow,label)
 %uf_designmat_addcol
-% Adds a single custom column to the unfold-Designmat "Xdc"
+% Adds a single custom column to the unfold-Designmat "Xdc". This is
+% sometimes useful to add e.g. continuous predictors manually.
 %
 %Arguments:
 %   newrow (array): The column to add to the Xdc designmat
