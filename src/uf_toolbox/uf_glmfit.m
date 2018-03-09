@@ -15,7 +15,7 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 %
 %    * "par-lsmr"  same as lsmr, but uses parfor with ncpu-1. This does not
 %    seem to be any faster. Not recommended
-%
+
 %    * "matlab"    , uses matlabs native A/b solver. For moderate to big
 %    design-matrices it will need *a lot* of memory (40-60GB is easily
 %    reached)
@@ -32,6 +32,7 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 %    compared to the fit of the model). We use the glmnet recommended
 %    'lambda_1se', i.e. minimum lambda + 1SE buffer towards more strict
 %    regularisation.
+%
 %
 %   cfg.lsmriterations: (default 400), defines how many steps the iterative
 %                   solver should search for a solution. While the solver is
@@ -57,7 +58,7 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 % EEG.unfold.beta: array (nchan x ntime x npred) (ntime could be
 % n-timesplines, n-fourierbasis or samples)
 %
-%*Examples:*
+%*Example:*
 % EEG = dc_glmfit(EEG);
 % EEG = dc_glmfit(EEG,'method','matlab','channel',[3 5]);
 %

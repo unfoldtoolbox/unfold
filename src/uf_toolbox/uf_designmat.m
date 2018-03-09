@@ -1,10 +1,8 @@
 function [EEG] = uf_designmat(EEG,varargin)
 % Generate Designmatrix out of EEG.event structure and a cfg.formula
 % Input an EEG event structure and you will get an EEG.unfold.X field with
-% the designmatrix.
-% If you add multiple eventtypess+formulas as cell-arrays , this function will iteratively
-% call itself and combine it to one big designmatrix.
-% The designmatrix is not yet ready to do deconvolution, use
+% the designmatrix.If you add multiple eventtypess+formulas as cell-arrays, this function will iteratively
+% call itself and combine it to one big designmatrix.The designmatrix is not yet ready to do deconvolution, use
 % uf_timeexpandDesignmat for this.
 %
 %Arguments:
@@ -61,7 +59,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   Reference coding is also known as treatment coding
 %
 %Returns:
-%     EEG: Returns the EEG structure with the additional fields in EEG.unfold
+%     EEG-struct: Returns the EEG structure with the additional fields in EEG.unfold
 %
 %     * X:          The design matrix
 %     * colnames:     For each column of 'X', which predictor it represents
@@ -77,9 +75,9 @@ function [EEG] = uf_designmat(EEG,varargin)
 %|   cfgDesign.categorical = {'level_predictability','target_fixation'};
 %|
 %|   Second Example
-%|   This extends the above example by two cases: A) We add non-parametric
-%    splines (n = 10) for the X and Y position of the current fixation. B)
-%    We add a second formula for a second event (StimOnset1/2) that only
+%|   This extends the above example by two cases: 
+%|     **A)** We add non-parametric splines (n = 10) for the X and Y position of the current fixation.
+%|     **B)** We add a second formula for a second event (StimOnset1/2) that only
 %    contains a constant (y~1).
 %|   cfgDesign.eventtypes = {{'fixation'},{'StimOnset1','StimOnset2'}};
 %|   cfgDesign.formula = {'y ~ 1 + level_predictability*target_fixation','y~1'};
@@ -87,7 +85,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %|   cfgDesign.categorical = {'level_predictability','target_fixation'};
 %|
 %|   EEG = uf_addDesignmat(EEG,cfgDesign);
-%
+
 
 cfg = finputcheck(varargin,...
     {'categorical',   'cell', [], {};...
