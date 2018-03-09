@@ -34,12 +34,8 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   "stimulus_type:color, color:size"
 %                   
 %                   To define the reference category, have a look at
-%                   cfg.categorical {cell} down below. By default matlab
-%                   decides on the reference category. Warning: If you use
-%                   strings in your EEG.event field, matlab will make the
-%                   first occurance of a level the reference. This can lead
-%                   to problems when averaging over subjects. Please
-%                   specify the reference level down below.
+%                   cfg.categorical {cell} down below. By default we sort
+%                   the levels and choose the first level as the reference
 %
 %   cfg.eventtypes(cell of strings or cell of cells of strings): the formula is fit on these
 %                  events. make sure that all fields are filled for all events
@@ -215,6 +211,7 @@ for s = 1:length(spl)
 end%% First check for unique variablenames
 cfg.spline = [cfg.spline spl];
 
+numericix = [];
 % check categorical input and combine
 if ~isempty(cfg.categorical)&& size(cfg.categorical,2)>1 && iscell(cfg.categorical{1,2})
     % if one categorical reference exists (a cell array), then all other
@@ -225,7 +222,7 @@ if ~isempty(cfg.categorical)&& size(cfg.categorical,2)>1 && iscell(cfg.categoric
     
     % the matlab designmatrix function cannot handle {[0],[1]}, we need to
     % transform to {'0' '1'}
-    numericix = cellfun(@(x)isnumeric(x{1}),categoricalLevels);
+    numericix = find(cellfun(@(x)isnumeric(x{1}),categoricalLevels));
     categoricalLevels(numericix) = cellfun(@(x)cellfun(@(y)num2str(y),x,'UniformOutput',0),categoricalLevels(numericix),'UniformOutput',0);
     
     
@@ -235,6 +232,7 @@ if ~isempty(cfg.categorical)&& size(cfg.categorical,2)>1 && iscell(cfg.categoric
     % and proceed as planned
     cfg.categorical = [cfg.categorical(:,1)]';
 else
+    categoricalLevelsOrder = [];
     categoricalLevels = []; % matlab should do the ordering
 end 
 
@@ -334,11 +332,10 @@ for p = 1:size(t_clean,2)
         %variables to string categorical variables. Else the reordering of
         %the levels does not work.
         
-        if strcmp(t_clean.Properties.VariableNames{p},categoricalLevelsOrder(numericix)) %numericix from line ~210
+        if ~isempty(numericix) && strcmp(t_clean.Properties.VariableNames{p},categoricalLevelsOrder(numericix)) %numericix from line ~210
             is_nan = isnan(t_clean{:,p});
             t_clean.(t_clean.Properties.VariableNames{p}) = arrayfun(@(x)num2str(x),t_clean{:,p},'UniformOutput',0);
             t_clean{is_nan,p} = repmat({''},sum(is_nan),1);
-            fprintf('You gave a numeric variable (%s) and specified it as categorical. Due to a matlab-bug we have to convert the variable internally to strings. This should not give further problems \n',t_clean.Properties.VariableNames{p})
         end
 
         continue
@@ -387,22 +384,38 @@ else
     end
     
    catlev = cell(size(is_categorical));
-    if sum(is_categorical)>0 && ~isempty(categoricalLevels)
-        % we need to sort the categoricalLevels to their respective model
-        % terms. The user could input the formula in a different order than
-        % the cfg..categorical cell-array
-        for pIDX = 1:length(categoricalLevelsOrder)
-            currCat = categoricalLevelsOrder{pIDX};
-            ix = find(strcmp(F.PredictorNames,currCat));
+    if sum(is_categorical)>0
+        % We need to make use of the user-specified categoryLevels (if
+        % specified). Else we sort the predictors (because matlab sorts
+        % only the numerical levels not the string ones). If we would not
+        % sort, then over subjects the reference category (the first
+        % specified level) could be different.
+        for pIDX = 1:(length(F.PredictorNames)) % -1 because of "zzz_response": the y-term
+            if ~is_categorical(pIDX)
+                % for continuous/spline do nothing
+                continue
+            end
+            currCat = F.PredictorNames{pIDX};
+            ix = find(strcmp(categoricalLevelsOrder,currCat));
+            
+            dataFrameLevels = unique(t_clean.(currCat))';
+
             if isempty(ix)
-                error('could not match all cfg.categorical variablenames (%s)to the names in EEG.event',currCat)
+                currCatLevels = sort(dataFrameLevels);
+            else
+                currCatLevels = categoricalLevels{ix};
+                assert(all(cellfun(@(x)any(strcmp(x,dataFrameLevels)),currCatLevels)),'Could not find the levels you specified in cfg.categorical for factor EEG.event.%s ',currCat)
+                categoricalLevelsOrder(ix) = [];
+                categoricalLevels(ix) = [];
             end
             
             %make sure all levels specified occur in the parameter
-            dataFrameLevels = unique(t_clean.(currCat))';
-            assert(all(cellfun(@(x)any(strcmp(x,dataFrameLevels)),categoricalLevels{pIDX})),'Could not find the levels you specified in cfg.categorical for factor EEG.event.%s ',currCat)
             
-            catlev(ix) = categoricalLevels(pIDX);
+            
+            catlev{pIDX} = currCatLevels;
+        end
+        if ~isempty(categoricalLevelsOrder)
+           error('could not match all cfg.categorical variablenames (%s)to the names in EEG.event',categoricalLevelsOrder{:}) 
         end
     end
     categoricalLevels = catlev;
@@ -625,6 +638,11 @@ end
 
 
 function check_rank(X)
+    isnancol = any(isnan(X));
+    X = X(:,~isnancol);
+    if any(isnancol)
+        warning('Rank check: removed %i columns with nans in it, rank estimation might be faulty',sum(isnancol));
+    end
     if rank(X)<size(X,2)
         warning('Rank is smaller than matrix size. Do you have two columns that are identical? Other linear dependencies can occur. Check for collinearity')
     end
