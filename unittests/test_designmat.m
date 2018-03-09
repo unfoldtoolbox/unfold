@@ -64,11 +64,8 @@ for e= 1:length(EEGsim.event)
 end
 EEGtmp = uf_designmat(EEGsim,cfgDesign);
 
-shouldBe = {'(Intercept)','conditionA','splineA','2_(Intercept)','2_conditionA','continuousA','2_splineA','2_conditionA:continuousA','3_(Intercept)','3_continuousA','3_splineA','splineB'};
-for k = 1:length(EEGtmp.unfold.variablenames)
-    is = EEGtmp.unfold.variablenames{k};
-    assert(strcmp(is,shouldBe{k}),sprintf('error in %s, should be %s',is,shouldBe{k}))
-end
+shouldBeFunction(EEGtmp,{'(Intercept)','conditionA','splineA','2_(Intercept)','2_conditionA','continuousA','2_splineA','2_conditionA:continuousA','3_(Intercept)','3_continuousA','3_splineA','splineB'},'variablenames');
+
 
 %% Renaming check interactions
 cfgDesign = [];
@@ -86,11 +83,8 @@ end
 EEGtmp = uf_designmat(EEGsim,cfgDesign);
 
 
-shouldBe = {'(Intercept)','conditionA','conditionB','2_(Intercept)','conditionC','2_conditionA:2_conditionB:conditionC','3_(Intercept)','3_conditionB','3_conditionC','3_conditionB:3_conditionC'};
-for k = 1:length(EEGtmp.unfold.variablenames)
-    is = EEGtmp.unfold.variablenames{k};
-    assert(strcmp(is,shouldBe{k}),sprintf('error in %s, should be %s',is,shouldBe{k}))
-end
+
+shouldBeFunction(EEGtmp,{'(Intercept)','conditionA','conditionB','2_(Intercept)','conditionC','2_conditionA:2_conditionB:conditionC','3_(Intercept)','3_conditionB','3_conditionC','3_conditionB:3_conditionC'},'variablenames')
 
 %% Test the categorical rereferencing
 EEGtest = EEGsim;
@@ -112,10 +106,37 @@ cfgDesign.categorical = {'catA',{'B','C','A'};
                          'catB',{2,3,1}};
 EEGtmp = uf_designmat(EEGtest,cfgDesign);
 
-shouldBe = {'(Intercept)'  'catA_C'  'catA_A'  'catB_3'  'catB_1'};
-for k = 1:length(EEGtmp.unfold.colnames)
-    is = EEGtmp.unfold.colnames{k};
+
+shouldBeFunction(EEGtmp,{'(Intercept)'  'catA_C'  'catA_A'  'catB_3'  'catB_1'},'colnames')
+assert(all(strcmp('categorical',EEGtmp.unfold.variabletypes) == [0 1 1]))
+%% Specifying only one reference category
+cfgDesign.categorical = {'catB',{2,3,1}};
+EEGtmp = uf_designmat(EEGtest,cfgDesign);
+shouldBeFunction(EEGtmp,{'(Intercept)'  'catA_B'  'catA_C'  'catB_3'  'catB_1'},'colnames')
+%% add a non-categorical variable
+cfgDesign = [];
+cfgDesign.eventtypes = {'stimulus1'};
+cfgDesign.formula   = {'y~1+ catB + cat(catA)'};
+EEGtmp = uf_designmat(EEGtest,cfgDesign);
+
+shouldBeFunction(EEGtmp,{'(Intercept)','catA_B'  'catA_C','catB'},'colnames')
+
+%% check that they are automatically sorted if not specified differently
+cfgDesign = [];
+cfgDesign.formula   = {'y~1+ cat(catA)+ cat(catB)'};
+cfgDesign.eventtypes = {'stimulus1'};
+
+EEGtest.event(1).catA = 'C';
+EEGtest.event(1).catB = 3;
+EEGtmp = uf_designmat(EEGtest,cfgDesign);
+
+shouldBeFunction(EEGtmp,{'(Intercept)'  'catA_B'  'catA_C'  'catB_2'  'catB_3'},'colnames')
+
+end
+
+function shouldBeFunction(EEG,shouldBe,field)
+for k = 1:length(EEG.unfold.(field))
+    is = EEG.unfold.(field){k};
     assert(strcmp(is,shouldBe{k}),sprintf('error in %s, should be %s',is,shouldBe{k}))
 end
-assert(all(strcmp('categorical',EEGtmp.unfold.variabletypes) == [0 1 1]))
 end
