@@ -216,7 +216,7 @@
 <dt id="src.uf_toolbox.uf_designmat">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_designmat" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
-<dt>Generate Designmatrix out of EEG.event structure and a cfg.formula</dt>
+<dt>Generate Designmatrix out of EEG.event structure and a formula</dt>
 <dd>Input an EEG event structure and you will get an EEG.unfold.X field with
 the designmatrix.If you add multiple eventtypess+formulas as cell-arrays, this function will iteratively
 call itself and combine it to one big designmatrix.The designmatrix is not yet ready to do deconvolution, use
@@ -227,25 +227,32 @@ uf_timeexpandDesignmat for this.</dd>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cfg.formula</strong> (<em>string</em>) – <p>Formula in the wilkinson format. In addition
-one can specify ‘cat(X)’ so that X is interpreted as a
+<li><strong>cfg.formula</strong> (<em>string</em>) – <p>Formula in the wilkinson format. In addition to
+the matlab default, one can specify ‘cat(X)’ so that X is interpreted as a
 categorical variable and therefore dummy/effect-coded.
 Also using spl(Y,5) defines a “non-linear” predictor
 using 5 b-cubic spline basis functions. The more
 splines one uses, the higher the risk of overfitting
 but also of course more flexible relations can be
-fitted.</p>
+fitted. Custom spline functions are possible by using
+uf_designmat_spline() after the initial call of
+uf_designmat.</p>
 <p>Example with multiple formulas: {‘y~A+spl(B,5)’, ‘y~x+cat(y)’,’y~1’}</p>
+<p>Be sure to define multiple eventtypes if you use
+multiple formulas.</p>
 <p>Example with more complex formula:
-{‘y ~ stimulus_type + color * size + stimulus_type:color}’
-This formula would add the following main effects:
-“Stimulus Type, color, size”
+{‘y ~ stimulus_type + color * size + stimulus_type:color}’</p>
+<p>This formula would add the following main effects:
+“stimulus_type, color, size”
 and the following interactions:
-“stimType:color, color:size”</p>
+“stimulus_type:color, color:size”</p>
+<p>To define the reference category, have a look at
+cfg.categorical {cell} down below. By default we sort
+the levels and choose the first level as the reference</p>
 </li>
-<li><strong>cfg.eventtypes</strong> (<em>cell of strings</em>) – cell array of strings, the formula is fit on these
+<li><strong>cfg.eventtypes</strong> (<em>cell of strings or cell of cells of strings</em>) – the formula is fit on these
 events. make sure that all fields are filled for all events
-special-case: Multiple eventtypess (currently in TESTING mode)
+special-case: Multiple eventtypess
 You can fit multiple different formulas on different events
 concurrently. The specification could be as follows:
 {{‘A1’,’A2’,’A3’},{‘B’},{‘C’}}.
@@ -258,10 +265,21 @@ knots and size with 10 knots, thus in total 14+9=23
 parameters (we remove one spline due to the Linear
 Modeling aspect). Can be specified more conveniently
 directly inside the formula</li>
-<li><strong>cfg.categorical</strong> (<em>array</em>) – default [], which of the EEG.event fields
+<li><strong>cfg.categorical</strong> (<em>cell-array</em>) – <p>default {}, list of which of the EEG.event fields
 should be treated as an categorical effect (thus
 dummy/effect coded). You can also directly specify what
-variables are categorical in the formula.</li>
+variables are categorical in the formula.
+You can specify the order of the predictors. For
+example:
+{‘predictorA’,{‘level3’,’level1’,’level2’};</p>
+<blockquote>
+<div>’predictorB’,{‘level2’,’level1’}}</div></blockquote>
+<p>For predictorA, the level3 is now used as a reference
+group. For predictorB the level2 is now used.
+The second column of the cell array is optional. E.g.
+{‘predictorA’,’predictorB’} will make both predictors
+as categorical</p>
+</li>
 <li><strong>cfg.splinespacing</strong> (<em>string</em>) – defines how the knots of the splines should be
 placed. Possible values:
 ‘linear’ : linear spacing with boundary splines at the respective min/max
@@ -297,20 +315,35 @@ Reference coding is also known as treatment coding</li>
 <div class="line-block">
 <div class="line">cfgDesign = [];</div>
 <div class="line">cfgDesign.eventtypes = {‘fixation’};</div>
-<div class="line">cfgDesign.formula = ‘y ~ level_predictability*target_fixation + 1’;</div>
-<div class="line">cfgDesign.categorical = {‘level_predictability’,’target_fixation’};</div>
+<div class="line">cfgDesign.formula = ‘y ~ 1 + cat(level_predictability)*cat(target_fixation)’;</div>
 <div class="line"><br /></div>
+<div class="line">Specifying the reference category</div>
+<div class="line">cfgDesign = [];</div>
+<div class="line">cfgDesign.eventtypes = {‘fixation’};</div>
+<div class="line">cfgDesign.formula = ‘y ~ cat(level_predictability)*cat(target_fixation)+ 1’;</div>
+<div class="line">cfgDesign.categorical = {‘level_predictability’,{‘low’,’high’};      % level low   is reference</div>
+<div class="line-block">
+<div class="line">‘target_fixation’,     {‘early’,’late’}};   % level early is reference</div>
+<div class="line"><br /></div>
+</div>
+<div class="line">Adding spline and multiple events</div>
+<div class="line">This extends the above example by two cases: A) We add a non-parametric</div>
+<div class="line-block">
+<div class="line">spline (n = 10) for the saccade amplitude B) We add a second formula</div>
+<div class="line">for a second event (StimOnset1/2) that only contains a constant (y~1).</div>
+<div class="line"><br /></div>
+</div>
 <div class="line">Second Example</div>
 <div class="line">This extends the above example by two cases:</div>
 <div class="line-block">
 <div class="line"><strong>A)</strong> We add non-parametric splines (n = 10) for the X and Y position of the current fixation.</div>
-<div class="line"><strong>B)</strong> We add a second formula for a second event (StimOnset1/2) that only
-contains a constant (y~1).</div>
+<div class="line"><strong>B)</strong> We add a second formula for a second event (StimOnset1/2) that only</div>
 </div>
+<div class="line">contains a constant (y~1).</div>
+<div class="line"><br /></div>
+<div class="line">cfgDesign = [];</div>
 <div class="line">cfgDesign.eventtypes = {{‘fixation’},{‘StimOnset1’,’StimOnset2’}};</div>
-<div class="line">cfgDesign.formula = {‘y ~ 1 + level_predictability*target_fixation’,’y~1’};</div>
-<div class="line">cfgDesign.spline = { {{‘fixpos_x’,10},{‘fixpos_y’,10}} , {} };</div>
-<div class="line">cfgDesign.categorical = {‘level_predictability’,’target_fixation’};</div>
+<div class="line">cfgDesign.formula = {‘y ~ 1 + cat(level_predictability)*cat(target_fixation) + spl(sac_amplitude,10)’,’y~1’};</div>
 <div class="line"><br /></div>
 <div class="line">EEG = uf_addDesignmat(EEG,cfgDesign);</div>
 </div>
@@ -320,9 +353,10 @@ contains a constant (y~1).</div>
 <dt id="src.uf_toolbox.uf_timeexpandDesignmat">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_timeexpandDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_timeexpandDesignmat" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
-<dt>Timeexpand / Deconvolve Designmatrix This function takes the designmatrix</dt>
-<dd>(saved in EEG.unfold.X, a EEG.points times nPredictor matrix) and makes
-copies over time (in the range of the windowlength).</dd>
+<dt>Timeexpand Designmatrix.</dt>
+<dd>This function takes the designmatrix% (saved in EEG.unfold.X, a
+EEG.points times nPredictor matrix) and expands it
+over time (in the range of the windowlength).</dd>
 </dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -332,13 +366,13 @@ copies over time (in the range of the windowlength).</dd>
 <li><strong>cfg.method</strong> (<em>string</em>) – <p>default ‘stick’; Three methods are available:</p>
 <ul>
 <li>’stick’      We shift the signal over each point in time, uses the stickfunction basis</li>
-<li>’splines’    We use cubic splines (number = TimeexpandPARAM) to approximate the signal. This makes sense as neighbouring timepoints are very likely correlated.</li>
-<li>’fourier’    We use a fourier set (up to the first TimeexpandPARAM frequencies) to model the signal.</li>
+<li>’splines’    We use cubic splines (number = Timeexpandparam) to approximate the signal. This makes use of neighbouring timepoints that are very likely correlated.</li>
+<li>’fourier’    We use a fourier set (up to the first Timeexpandparam frequencies) to model the signal.</li>
 </ul>
 </li>
 <li><strong>cfg.timelimits</strong> (<em>2 integer</em>) – defines over what time the timeexpand should go, this is
 analog to the epoch-size. This should be as long, as you think
-overlap can happen in your data (in seconds.</li>
+overlap can happen in your data (in seconds)</li>
 <li><strong>cfg.timeexpandparam</strong> (<em>integer</em>) – depending on whether cfg.method is splines or fourier defines how
 many splines or fourier frequencies (in case of fourier, the
 effective parametersize is twice as large due to the sin/cos ‘duplication’) should be used
@@ -378,28 +412,86 @@ take quite a lot of memory.</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg.method</strong> (<em>string</em>) – <ul class="simple">
-<li>“lsmr”      default; SAVES MEMORY an iterative solver is used, this is</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cfg.method</strong> (<em>string</em>) – <ul>
+<li>“lsmr”      default; an iterative solver is used, this is</li>
 </ul>
 <p>very memory efficient, but is a lot slower than the ‘time’ option
 because each electrode has to be solved independently. The LSMR
 algorithm is used for sparse iterative solving.</p>
-<ul class="simple">
+<ul>
 <li>”par-lsmr”  same as lsmr, but uses parfor with ncpu-1. This does not</li>
 </ul>
-<p>seem to be any faster. Not recommended</p>
+<p>seem to be any faster at the moment (unsure why). Not recommended</p>
+<ul>
+<li>”matlab”    , uses matlabs native A/b solver. For moderate to big</li>
+</ul>
+<p>design-matrices it will need <em>a lot</em> of memory (40-60GB is easily
+reached)</p>
+<ul>
+<li>”pinv”      A naive pseudo-inverse, generally not recommended due to</li>
+</ul>
+<p>floating point instability</p>
+<ul>
+<li>”glmnet”    uses glmnet to fit the linear system. This by default uses</li>
+</ul>
+<p>L1-Norm aka lasso (specified as cfg.glmnetalpha = 1). For
+ridge-regression (L2-Norm) use (cfg.glmnetalpha = 0). Something
+inbetween results in elastic-net. We use the cvglmnet functionality
+that automatically does crossvalidation to estimate the lambda
+parameter (i.e. how strongly parameter values should be regularised
+compared to the fit of the model). We use the glmnet recommended
+‘lambda_1se’, i.e. minimum lambda + 1SE buffer towards more strict
+regularisation.</p>
+</li>
+<li><strong>cfg.lsmriterations</strong> – <p>(default 400), defines how many steps the iterative
+solver should search for a solution. While the solver is</p>
+<blockquote>
+<div>mostly monotonic (see paper), it is recommended to increase
+the iterations. A limit is only defined because in our
+experience, high number of iterations are a result of
+strong collinearities, and hint to a faulty model</div></blockquote>
+</li>
+<li><strong>cfg.glmnetalpha</strong> – (default 1, as in glmnet), can be 0 for L2 norm, 1 for L1-norm or
+something inbetween for elastic net</li>
+<li><strong>cfg.channel</strong> (<em>array</em>) – Restrict the beta-calculation to a subset of
+channels. Default is all channels</li>
+<li><strong>cfg.debug</strong> (<em>boolean</em>) – 0, only with method:matlab, outputs additional
+details from the solver used</li>
+<li><strong>cfg.precondition</strong> (<em>boolean</em>) – 1, scales each row of Xdc to SD=1. This
+increase the solving speed by factor ~2. For very large
+matrices you might run into memory problems. Deactivate
+then.</li>
+<li><strong>EEG</strong> – the EEG set, need to have EEG.unfold.Xdc compatible with
+the size of EEG.data</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array (nchan x ntime x npred) (ntime could be
+n-timesplines, n-fourierbasis or samples)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">EEG.unfold.beta</p>
 </td>
 </tr>
 </tbody>
 </table>
+<dl class="docutils">
+<dt><em>Example:</em></dt>
+<dd>EEG = dc_glmfit(EEG);
+EEG = dc_glmfit(EEG,’method’,’matlab’,’channel’,[3 5]);</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_condense">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_condense</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_condense" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an “ufresult”-struct that contains the predictor betas over time
+<dd><p>Condense results in new structure. Apply timebasis (if necessary)
+Returns an “ufresult”-struct that contains the predictor betas over time
 and accompanying information. This structure is further used in all
-plotting functions</p>
+plotting functions. This function also applys the timebasis (if you
+specified something else than the default ‘stick’ in
+uf_timeexpandDesignmat()</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -413,11 +505,6 @@ deconvolution
 and returns both</li>
 <li><strong>cfg.channel</strong> (<em>array</em>) – Restrict the beta-output to a subset of
 channels. Default is all channels</li>
-<li><strong>cfg.predictAt</strong> (<em>cell</em>) – Only necessary if splines are used. One entry per parameter:
-{{‘par1’,[10 20 30]},{‘par2’,[0,1,2]}}.
-This evaluates parameter 1 at the values 10,20 and 30. Parameter 2
-at 0, 1 and 2. Default behaviour: evaluates 7 linearly spaced values between the min + max. of the
-parameterdomain</li>
 </ul>
 </td>
 </tr>
@@ -494,6 +581,8 @@ artifactual segments will be rejected and replaced by a ‘boundary’ event cod
 </tr>
 </tbody>
 </table>
+<p class="rubric">Example</p>
+<p>winrej = uf_continuousArtifactDetect(EEG)</p>
 <dl class="docutils">
 <dt>Reference:</dt>
 <dd><p class="first">ERP Boot Camp: Data Analysis Tutorials. Emily S. Kappenman, Marissa L. Gamble, and Steven J. Luck. UC Davis</p>
@@ -520,11 +609,18 @@ values at the given times to 0.</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg.winrej</strong> (<em>integer</em>) – A (2xn) array with n from-to pairs of samples to be excluded from further processing</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cfg.winrej</strong> (<em>integer</em>) – A (2xn) array with n from-to pairs of samples to</li>
+<li><strong>excluded from further processing This is the same output as from</strong> (<em>be</em>) – </li>
+<li><strong>eegplot rej</strong> (<em>EEGlabs'</em>) – </li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">EEG-Structure<ul class="simple">
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>EEG-Structure</p>
+<ul class="simple">
 <li>unfold.X: All elements between the from-to pairs got set to 0</li>
 </ul>
+</p>
 </td>
 </tr>
 </tbody>
@@ -549,7 +645,8 @@ values at the given times to 0.</dd>
 <dd>Deconvolution works on continuous data, thus to compare it to the
 “normal” use-case, we have to epoch it. Because the data has not been
 cleaned yet, we do this in this function. We additionally remove trials
-from unfold.X that were removed during epoching.</dd>
+from unfold.X that were removed during epoching.
+Afterwards you can use uf_glmfit_nodc to fit the model</dd>
 </dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -578,14 +675,23 @@ from unfold.X that were removed during epoching.</dd>
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_glmfit_nodc</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_glmfit_nodc" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>A function to solve the inverse problem without deconvolution</dt>
-<dd>Currently it solves the pseudo-inverse of EEG.unfold.X and multiplies it
-to all channels.</dd>
+<dd><p class="first">Simple function to do massive univariate linear model. The function
+expects EEG.data to be (CHAN,TIME,EPOCH) with EPOCH the same number as
+EEG.unfold.X.</p>
+<p class="last">It is recommended to use uf_epoch for epoching, because you need to remove rows
+from EEG.unfold.X if the epoching function removed trials. Also cleaning
+of data is taken care of in uf_epoch</p>
+</dd>
 </dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>arguments right now</strong> (<em>No</em>) – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg.method</strong> – (default pinv) ‘glmnet’,’pinv’,’matlab’,’lsmr’ are available. See
+the uf_glmfit function for further information. By making use of
+pinv, the linear model needs to be solved only once and can be
+applied to all electrodes. The other solves iteratively solve for
+each electtrode.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Returns a matrix (channel x pnts x predictors) of betas saved into
 EEG.devon.beta</td>
@@ -632,12 +738,17 @@ correlations between predictors (c.f. Horton &amp; Kleinmann 2007)</dd>
 EEG.unfold.X in which missing NAN-values were imputed (‘marginal’, ‘mean’,
 ‘median’) or in which the events with missing predictor information were
 removed (‘drop’), which means put to 0</p>
+<p class="rubric">Example</p>
+<p>EEG = uf_imputeMissing(EEG)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_designmat_addcol">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat_addcol</code><span class="sig-paren">(</span><em>EEG</em>, <em>newrow</em>, <em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_designmat_addcol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a single custom column to the unfold-Designmat “Xdc”</p>
+<dd><dl class="docutils">
+<dt>Adds a single custom column to the unfold-Designmat “Xdc”. This is</dt>
+<dd>sometimes useful to add e.g. continuous predictors manually.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -661,6 +772,57 @@ removed (‘drop’), which means put to 0</p>
 <dt id="src.uf_toolbox.uf_designmat_spline">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat_spline</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_designmat_spline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to generate spline-part of designmatrix</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Argument:</dt>
+<dd><dl class="first last docutils">
+<dt>cfg.name(string): (optional, default: “spline_default”) A name for the</dt>
+<dd>spline predictor</dd>
+<dt>cfg.paramValues(double): The values of the predictor on which the</dt>
+<dd>splines should be calculated and evaluated.
+E.g. [-3 4,1,2,3, … 4]</dd>
+<dt>cfg.nsplines(integer): number of splines to use. too many lead to</dt>
+<dd>overfitting, to few to underfitting</dd>
+<dt>cfg.knotsequence(real): optional (if nsplines is specified). Give the</dt>
+<dd>sequence of knots explicitly (else they are put on the
+quantiles or linearly (see splinespacing). An example would
+be [0,1,2,3,5,10,11,12,13]. This example could make sense
+if there is lots of data at predictor 0-5 and again at
+10-13.  To define the knotsequence explicitly is also
+useful when you directly want to estimate the same betas
+for all subjects. But beware of subject-specific ranges, not all
+subjects have the same range in their covariates.</dd>
+<dt>cfg.splinespacing(string): (quantile) linear or quantile. The spacing</dt>
+<dd>of the knots along the</dd>
+<dt>cfg.splinefunction (functionhandle): You can specify your own spline</dt>
+<dd>function. This in principle also allows to make use of polynomial
+regression</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>EEG structure</dt>
+<dd><ul class="first last simple">
+<li>unfold.X: new entries for the spline</li>
+<li>unfold.splines: new entrie for the spline</li>
+<li>in addition update to unfold: colnames, variablenames,cols2variablenames,cols2eventtypes,variabletypes</li>
+</ul>
+</dd>
+</dl>
+<p>spl: Same as EEG.unfold.spline{end}
+nanlist: the paramValues that were nan (same as ‘isnan(spl.paramValues)’ )</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>EEG = dc_designmat_spline(EEG,’name’,’splineA’,’paramValues’,[EEG.event.splineB],’nsplines’,10,’splinespacing’,’linear’);
+EEG = dc_designmat_spline(EEG,’name’,’splineB’,’paramValues’,[EEG.event.splineB],’knotsequence’,linspace(0,2*pi,15),’splinefunction’,’cyclical’);</p>
 </dd></dl>
 
 </div>
@@ -669,56 +831,38 @@ removed (‘drop’), which means put to 0</p>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_predictContinuous">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_predictContinuous</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_predictContinuous" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Evaluates a continuous/spline parameter at specific values</dt>
-<dd>For example you get an beta for par1 at 3 for a continuous
-variable. The output then would be the respective values 30,60 and
-90. Because model-estimates / parameters are defined for each time-point&amp;electrode and can
+<dd><p>Evaluates a continuous/spline parameter at specific values
+This is similar to a predict function, but does not add the marginal of
+the other parameters. For this please make use of uf_addmarignals().</p>
+<p>Because model-estimates / parameters are defined for each time-point&amp;electrode and can
 also encompass multiple betas (in the case of splines), this
-becomes non trivial and thus this function.</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cfg.predictAt</strong> (<em>cell</em>) – One entry per parameter:
-{{‘par1’,[10 20 30]},{‘par2’,[0,1,2]}}.
-This evaluates parameter 1 at the values 10,20 and 30. Parameter 2
-at 0, 1 and 2.
-Default behaviour: evaluates 7 linearly spaced values between the min + max. of the
-parameterdomain</li>
-<li><strong>cfg.auto_method</strong> (<em>string</em>) – ‘quantile’ (default) or ‘linear’.
-‘quantile’ - the auto_n values are placed on the quantile of the predictor
-‘linear’   - the auto_n values are placed linearly over the range of the predictor
-‘average’  - only evaluates at the average of the predictor</li>
-<li><strong>cfg.auto_n</strong> (<em>integer</em>) – default 7; the number of automatically evaluated values</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Result-Betas with evaluated betas at specified continuous values.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt><em>Example:</em></dt>
-<dd>TODO</dd>
-</dl>
+becomes non trivial and thus this function.
+Note that this will overvwrite the ufresult.beta field</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_addmarginal">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_addmarginal</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_addmarginal" title="Permalink to this definition">¶</a></dt>
-<dd><p>add the marginal of the other predictors (i.e. continuous &amp; spline
-predictors) to the beta estimates.</p>
-<blockquote>
-<div><p>Important: If dummy-coded (i.e. non-effect coded) predictors and
+<dd><p>add the marginal of the other predictors (i.e. continuous &amp; spline predictors) to the beta estimates.
+Important: If dummy-coded (i.e. non-effect coded) predictors and
 interactions exist, they are NOT added to the marginal effect. I.e. the
 output of the method returns the average ERP evaluated at the average of
 all spline/continuous predictors, keeping the categorical/interaction
 structure untouched.</p>
-<p>For instance the model 1 + cat(facA) + continuousB
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cfg.channel</strong> – (all) Calculate only for a subset of channels (numeric)</li>
+<li><strong>cfg.betaSetname</strong> – (“beta”) string that indicates which unfold.(field) to use</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example
+For instance the model 1 + cat(facA) + continuousB
 has the betas: intercept, facA==1, continuousB-Slope</p>
 <p>The beta output of uf_condense(uf_glmfit) mean the following:
 intercept: response with facA = 0 and continuousB = 0
@@ -739,7 +883,6 @@ continuousB&#64;0  : the response of facA==0 if continuous B is 0
 <a class="reference external" href="mailto:continuousB&#37;&#52;&#48;100">continuousB<span>&#64;</span>100</a>: the response of facA==0 if continuous B is 100</p>
 <p>Note that mean(continuousB) does not need to be a number we evaluated in
 the uf_predictContinuous step.</p>
-</div></blockquote>
 </dd></dl>
 
 <dl class="function">
@@ -770,6 +913,8 @@ gets one column</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Example</p>
+<p>uftable = uf_unfold2csv(ufresult,’filename’,’output.csv’)</p>
 </dd></dl>
 
 </div>
@@ -780,7 +925,11 @@ gets one column</p>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotEventCorrmat">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotEventCorrmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotEventCorrmat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots a correlation matrix of the event structure</p>
+<dd><dl class="docutils">
+<dt>Plots a correlation matrix of the event structure</dt>
+<dd>Its possible to subselect the eventtype
+Planned feature: allow to plot only the EEG.unfold.X field</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -797,12 +946,17 @@ returned</li>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Example</p>
+<p>uf_plotEventCorrmat(EEG)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotEventHistogram">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotEventHistogram</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotEventHistogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that plots histogram of all events in the EEG.event structure</p>
+<dd><dl class="docutils">
+<dt>Function that plots histogram of all events in the EEG.event structure</dt>
+<dd>This function also adds a density estimate</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -823,8 +977,8 @@ returned</li>
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotDesignmat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the designmatrix
 If the matrix is very large (the timeexpanded/Xdc matrix) we do not plot
-everything, but only the middle 1000s. We also try to zoom in
-automatically, but this fails sometimes</p>
+everything, but only the middle 60s. In addition (for timeexpand) we plot
+the events as horizontal lines.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -833,7 +987,7 @@ automatically, but this fails sometimes</p>
 <li><strong>cfg.timeexpand'</strong> (<em>boolean</em>) – 0: Plots EEG.unfold.X (default)
 1: Plots EEG.unfold.Xdc</li>
 <li><strong>cfg.logColor</strong> (<em>boolean</em>) – plot the color on logscale (default 0)</li>
-<li><strong>cfg.sort</strong> (<em>boolean</em>) – Sort the designmatrix</li>
+<li><strong>cfg.sort</strong> (<em>boolean</em>) – Sort the designmatrix (only possible for X, not Xdc)</li>
 <li><strong>cfg.figure</strong> (<em>1/0</em>) – Open a new figure (default 1)</li>
 </ul>
 </td>
@@ -842,9 +996,9 @@ automatically, but this fails sometimes</p>
 </table>
 <dl class="docutils">
 <dt><em>Example:</em></dt>
-<dd><p class="first">uf_plot_designmat(EEG)</p>
-<p class="last">uf_plot_designmat(EEG,’timeexpand’,1) %plot the timeexpanded X</p>
-</dd>
+<dd>uf_plot_designmat(EEG)
+uf_plot_designmat(EEG,’sort’,1)
+uf_plot_designmat(EEG,’timeexpand’,1) %plot the timeexpanded X</dd>
 </dl>
 </dd></dl>
 
@@ -869,9 +1023,8 @@ automatically, but this fails sometimes</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>'channel'</strong> (<em>integer</em>) – Which channel to plot</li>
 <li><strong>'predictAt'</strong> (<em>cell</em>) – a cell of cell arrays, e.g. {{‘parName’,linspace(0,10,5)},{‘parname2’,1:5}}
-This splits up the parName-predictor into 5 bins from
-0 to 10, so 5 lines would be plotted. Default are 7 lines
-from min to max</li>
+This is a shortcut to uf_continuousPredict. We generally
+recommend to explicitly use the uf_continuousPredict function.</li>
 <li><strong>'deconv'</strong> (<em>[-1 0 1]</em>) – default: -1; whether to plot ufresult.beta (1) or
 ufresult.beta_nodc(0) or everything/autodetect (-1). Autodetect would
 also detect same-shaped other predictors. If e.g. you want to compare
@@ -910,8 +1063,9 @@ useful to plot multiple subjects in a single figure.</li>
 <dt id="src.uf_toolbox.uf_plotParam2d">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotParam2d</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotParam2d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
-<dt>Function not yet ready (sorry)</dt>
-<dd>This function plots an imagesc plot of time vs. parameter of choice</dd>
+<dt>Plots a 2D plot of parameter vs. time with the predicted value as the</dt>
+<dd>third dimension
+This function plots an imagesc plot of time vs. parameter of choice</dd>
 </dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -929,26 +1083,26 @@ all splines/continuous parameters</li>
 </tr>
 </tbody>
 </table>
+<p>Example:
+uf_plotParam2d(‘plotParam’,’continuosPredictorA’)</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotParamTopo">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotParamTopo</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotParamTopo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates topoplots over time. each row is a predictor or predictor-value-combination</p>
+<dd><dl class="docutils">
+<dt>Generates rows of topoplots over time. each row is a predictor</dt>
+<dd>If you are not interested in differences, but the predicted cells, it
+might be helpful to run dc_addmarginal() before. Then you do not only
+plot the simple/main effect, but the intercept is added to the difference
+resulting in both condition.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>'plotParam'</strong> – cell array of parameters to be plotted, if empty plots all</li>
-<li><strong>'predictAt'</strong> – only used for continuous / spline predictors.
-a cell of cell arrays, e.g. {{‘parName’,linspace(0,10,5)},{‘parname2’,1:5}}
-This would split up the parName-predictor into 5 bins from
-0 to 10, so 5 rows of topoplots would be plotted. Default are 7 lines
-from min to max (see code for more info)</li>
-<li><strong>'add_intercept'</strong> – (not yet supported) whether to add the intercept to each curve (thus not
-the ‘pure’ effect of a independent variable is plotted but
-more of an ERP-like plot is generated</li>
 <li><strong>'n_topos'</strong> – <ol class="arabic" start="15">
 <li>number of topographies to plot</li>
 </ol>
@@ -977,7 +1131,34 @@ customized to whichever caxis e.g. [-3 5]</li>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plot2nd">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plot2nd</code><span class="sig-paren">(</span><em>d2nd</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plot2nd" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Preliminary function
+This function allows to plot multiple subjects at the same time
+the function requires the data to be in the following format:</p>
+<blockquote>
+<div>ufresult.beta(CHAN,TIME,PARAM,SUBJECT)</div></blockquote>
+<p>Each line is one subject, its possible to calculate confidence intervals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cfg.channel</strong> – </li>
+<li><strong>cfg.plotParam</strong> – (default 1, as in glmnet), can be 0 for L2 norm, 1 for L1-norm or
+something inbetween for elastic net</li>
+<li><strong>cfg.bootci</strong> – (default 1) calculate and plot boostraped confidence intervals</li>
+<li><strong>cfg.singlesubjects</strong> – (default 1) plot the singlesubject lines</li>
+<li><strong>...</strong> – Other parameters are linked to uf_plotParam</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">nothing</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<p>uf_plot2nd(ufresult2nd,’channel’,2)</p>
+</dd></dl>
 
 </div>
 </div>

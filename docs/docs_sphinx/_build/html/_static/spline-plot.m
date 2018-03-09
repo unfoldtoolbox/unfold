@@ -1,3 +1,5 @@
+cfg = [];
+cfg.export = 0;
 rng(1); %speficy seed
 b = [0.1 0.5 1 2 0.2 4 2]/2;
 N = 200;
@@ -22,9 +24,11 @@ ylabel('signal to be explained')
 set(get(gcf,'Children'),'Box','off','YTick',[],'XTick',[])
 
 set(gcf,'Position',[   716   687   763   309])
+if cfg.export
 export_fig nonlinear1.png -transparent
+end
 %% Boxcar function fit
-tmp = floor(x);
+tmp = floor(x/2);
 basisBox = [];
 %build the dummy coding matrix
 for u = unique(tmp)';
@@ -51,7 +55,10 @@ set(get(gcf,'Children'),'Box','off','YTick',[],'XTick',[])
 xlabel('predictor value (e.g. saccadic amplitude)')
 ylabel('signal to be explained')
 set(gcf,'Position',[   716   687   763   309])
+if cfg.export
+
 export_fig nonlinear_boxcar.png -transparent
+end
 %% Spline Fit
 tmp = ceil(x*19/7)-2;
 
@@ -72,7 +79,6 @@ hold all,
 plot(0,0),plot(0,0),plot(0,0),plot(0,0),plot(0,0),plot(0,0); %stupid colors were not the same in both plots
 plot(linspace(min(x),max(x),200),splinePlot'.*betaSpline(1:end),'-')
 
-
 plot(linspace(min(x),max(x),200),splinePlot*betaSpline(1:end),'k','LineWidth',3)
 
 xlabel('predictor value (e.g. saccadic amplitude)')
@@ -80,4 +86,20 @@ ylabel('signal to be explained')
 
 set(get(gcf,'Children'),'Box','off','YTick',[],'XTick',[])
 set(gcf,'Position',[   716   687   763   309])
+if cfg.export
 export_fig nonlinear_spline.png -transparent
+end
+
+%%
+s = @()axis('off')
+figure
+subplot(1,3,1)
+imagesc([ones(size(x)) x])
+colormap(cbrewer('seq','Reds',100))
+s()
+subplot(1,3,2)
+imagesc(basisBox)
+s()
+subplot(1,3,3)
+imagesc(splineFit)
+s()

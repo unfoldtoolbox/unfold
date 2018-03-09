@@ -211,7 +211,11 @@ clear g
 
 
 % Combine name + event incase we plot everything in one plot
-plotLabel = cellfun(@(x,y)[x '@' y],plotName,plotEvent,'UniformOutput',0);
+if length(unique(plotEvent)) == 1
+    plotLabel = plotName;
+else
+    plotLabel = cellfun(@(x,y)[x '@' y],plotName,plotEvent,'UniformOutput',0);
+end
 rowName = plotLabel;
 
 % Should all axis be the same?
@@ -247,6 +251,10 @@ end
 
 % the actuall plotting things
 facet_grid(g,plotColLabel,rowName,'scale',facet_scale);
+set_order_options(g,'column',0);
+set_text_options(g,'facet_scaling',0.8);
+
+
 geom_line(g);
 
 %give us continuous colors!
@@ -258,6 +266,8 @@ if isempty(cfg.gramm)
     geom_hline(g,'yintercep',0);
 end
 set_names(g,'color','','x','Time [s]','y','ERP [yV]','linestyle','','row','','column','');
+
+
 
 draw(g);
 
