@@ -1,4 +1,4 @@
-function EEG = uf_continuousArtifactExclude(EEG,varargin)
+function [EEG eventwise] = uf_continuousArtifactExclude(EEG,varargin)
 %% Function to exclude (artifactual) continuous data from being modeled
 % This function inputs a rejection vector and excludes the content from
 % being modeled in the design matrix. That means it sets all predictor
@@ -26,10 +26,58 @@ cfg = finputcheck(varargin,...
 if(ischar(cfg)); error(cfg);end
 
 rej = [];
+
+
+
 cfg.winrej = round(cfg.winrej);
+
+times = EEG.unfold.times;
+
+eventlat = [EEG.event.latency];
 for k = 1:size(cfg.winrej,1)
     rej = [rej cfg.winrej(k,1):cfg.winrej(k,2)];
 end
+
+
+
+
+% structure that saves how many trials were excluded
+eventwise = struct('type',unique({EEG.event.type}));
+
+
+fprintf('Portions of data removed split up by each event in EEG.event\n')
+% add how much total time the events occupy (in s)
+for ev = 1:length(eventwise)
+    evIDX = strcmp({EEG.event.type},eventwise(ev).type);
+    
+    eventwise(ev).unit = 'seconds';
+    eventwise(ev).total_signallength = size(EEG.data,2) * 1/EEG.srate;
+    % do as if no overlap
+    eventwise(ev).total_evttime= sum(evIDX) * range(EEG.unfold.times);
+    
+    % include the overlap
+    activesamp = zeros(size(EEG.data,2),1);
+    for evlat = [EEG.event(evIDX).latency]
+        ix = round((evlat+min(EEG.unfold.times)*EEG.srate ) : (evlat+max(EEG.unfold.times)*EEG.srate));
+        ix(ix<=0) = []; %negative time does not exist
+        ix(ix>size(EEG.data,2)) = []; %larger than EEG does not exist
+        activesamp( ix ) = 1;
+    end
+    eventwise(ev).abs_evttime= sum(activesamp) * 1/EEG.srate;
+    
+    
+      
+    rejsamp = zeros(size(EEG.data,2),1);
+    for k = 1:size(cfg.winrej,1)
+        rejwindow =  cfg.winrej(k,1):cfg.winrej(k,2);
+        rejsamp(rejwindow) = 1;
+    end
+    eventwise(ev).abs_removed = sum(rejsamp&activesamp) * 1/EEG.srate;
+    
+    fprintf('Type: %-14s Modelled Eventtime: %9.2fs \t rejected eventtime: %9.2fs \t percent removed: %4.1f%%\n',eventwise(ev).type,eventwise(ev).abs_evttime,eventwise(ev).abs_removed, eventwise(ev).abs_removed / eventwise(ev).abs_evttime * 100)
+end
+
+
 EEG.unfold.Xdc(round(rej),:) = 0;
 fprintf('\nremoving %.2f%% of rows from design matrix (fill it with zeros) \n',length(unique(rej))/size(EEG.unfold.Xdc,1)*100)
 
