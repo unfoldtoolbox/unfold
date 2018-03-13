@@ -72,7 +72,14 @@ cfg = finputcheck(varargin,...
     },'mode','error');
 
 
+
+
 if(ischar(cfg)); error(cfg);end
+
+% check for EYE-EEG channels
+if any(strcmp('EYE',{EEG.chanlocs.type}))
+    warning('EYE-Channels (from EYE-EEG toolobx) detected. Its not recommended to include these channels in the continuousArtefactDetect algorithm as the scale is usually very differet. Please remove before using this function')
+end
 
 ampth     = cfg.amplitudeThreshold;%microV
 winms     = cfg.windowsize;%ms
