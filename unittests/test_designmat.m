@@ -12,6 +12,9 @@ cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulu
 
 
 
+%% List of formulas
+% y~1+cat(ABC)+ABC+spl(ABC,10)+circspl(ABC,5,pi,50.3)+spl(ABC,10)+ABC:BCD+cat(ABC):BABC+cat(ABC):BAC:CAD+spl(ABC,5):cat(ABC)+circspl(ABC,1,1,2):circspl(ABC,1,1,2)+spl(ABC,1):spl(ABC,1)+circspl(ABC,1,1,1):B
+%
 
 uf_designmat(EEGsim,cfgDesign);
 

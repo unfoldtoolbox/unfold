@@ -23,7 +23,7 @@ function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
 %               subjects have the same range in their covariates.
 %
 %   cfg.splinespacing(string): (quantile) linear or quantile. The spacing
-%         of the knots along the 
+%         of the knots along the
 %
 %   cfg.splinefunction (functionhandle): You can specify your own spline
 %        function. This in principle also allows to make use of polynomial
@@ -49,7 +49,8 @@ cfg = finputcheck(varargin,...
     'knotsequence','real',[],[];...
     'splinespacing','string',{'linear','quantile'},'quantile';
     'splinefunction','','','default';
-    },'mode','ignore');
+    'cyclical_bounds','real','',[];
+    },'mode','error');
 
 
 assert(~isempty(cfg.nsplines) | ~isempty(cfg.knotsequence),'you need to specify either number of splines or knotsequence')
@@ -76,16 +77,50 @@ spl.name = cfg.name;
 
 
 
+
+% In case of cyclical spline we need to wrap around the spl.paramValues by
+% user specified limits before calculating the knot sequence.
+if  strcmp(cfg.splinefunction,'cyclical')
+    
+    if ~isempty(cfg.cyclical_bounds)
+        fprintf('Wrapping the parametervalues around the specified lower/upper bound\n')
+        
+        lbound = cfg.cyclical_bounds(1);
+        ubound = cfg.cyclical_bounds(2);
+        
+        x = spl.paramValues;
+        x(x > ubound) = lbound + (x(x > ubound) - ubound); % (ubound - lbound)
+        x(x < lbound) = ubound - (lbound - x(x < lbound)); % (ubound - lbound)
+        spl.paramValues = x;
+        
+    elseif isempty(cfg.knotsequence)
+        warning('You specified a cyclical predictor, but neither specified a knotsequence nor a lower/upper-bound. We will assume that the lower/upper bound is min/max of your predictor')
+        
+    end
+    if isempty(cfg.knotsequence)
+        warning('You specified a cyclical predictor, but did not specify an explicit knotsequence. We will apply the splinespacing function (linear/quantile) on the parameter values to find the knotsequence')
+    end
+end
+
+
+
+
+
+
+if strcmp(cfg.splinefunction,'default')
+    % the function adds two splines to the knotsequence, we temporaly
+    % remove them 
+    spl.nSplines = spl.nSplines-2;
+end
+
 knots = [];
-
-
 if isempty(cfg.knotsequence)
     switch cfg.splinespacing
         case 'linear'
-            spl.knots =  linspace(splmin,splmax,spl.nSplines-2);
+            spl.knots =  linspace(splmin,splmax,spl.nSplines);
             
         case 'quantile'
-            spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines-2));
+            spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines));
             
         otherwise
             error('wrong cfg.splinespacing. expected linear or quantile')
@@ -94,10 +129,15 @@ else
     spl.knots =  cfg.knotsequence;
 end
 
+if strcmp(cfg.splinefunction,'default')
+    % and we add them again
+    spl.nSplines = spl.nSplines+2;
+end
 
 if ~ischar(cfg.splinefunction)
     assert(isa(cfg.splinefunction, 'function_handle'),'for custom type one need to define a splinefunction')
     spl.splinefunction = cfg.splinefunction;
+    
 elseif strcmp(cfg.splinefunction,'default')
     spl.splinefunction = @default_spline;
     
@@ -109,6 +149,7 @@ else
 end
 
 Xspline =  spl.splinefunction(spl.paramValues,spl.knots);
+
 
 %%
 % if strcmp(cfg.codingschema,'effects')

@@ -4,7 +4,7 @@ function test_splines()
 %%
 cfgSim = [];
 cfgSim.plot = 1;
-for type = {'default','cyclical','custom'}
+for type = {'default','cyclical','custom','cyclical_formula'}
     
     cfgSim.type = type{1};
     
@@ -12,7 +12,7 @@ for type = {'default','cyclical','custom'}
     
     %% Generate data
     switch cfgSim.type
-        case 'cyclical'
+        case {'cyclical','cyclical_formula'}
             spl.function = @cyclical_spline;
             spl.values = linspace(0,4*pi,100);
             datafunction = @(x)(sin(x+pi/2)+0.5*sin(3*x)); % something where we need phase diff :)
@@ -64,6 +64,8 @@ for type = {'default','cyclical','custom'}
         case 'custom'
             EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1');
             EEG = uf_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(-10,10,5),'splinefunction',spl.function);
+        case 'cyclical_formula'
+            EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1+circspl(splineA,15,0,2*pi)');
     end
     
     EEGepoch = uf_epoch(EEG,'timelimits',[0 1]);

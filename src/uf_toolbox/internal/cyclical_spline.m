@@ -1,4 +1,4 @@
-function dmt = cyclical_spline(x, knots)
+function dmt = cyclical_spline(x, knots,bounds)
 %     """Builds an unconstrained cubic regression spline design matrix.
 %     Returns design matrix with dimensions ``len(x) x n``
 %     for a cubic regression spline smoother
@@ -16,8 +16,11 @@ function dmt = cyclical_spline(x, knots)
 
 cyclic = 1;
 n = length(knots);
+if nargin == 2 || isempty(bounds)
+    bounds = [min(knots),max(knots)];
+end
 if cyclic
-    x = map_cyclic(x, min(knots), max(knots));
+    x = map_cyclic(x, bounds(1), bounds(2));
     n = n- 1;
 end
 

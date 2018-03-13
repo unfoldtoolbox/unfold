@@ -193,27 +193,58 @@ fprintf('\nModeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
 EEG.unfold.formula = {cfg.formula};
 %% Regexp the formula
 catRegexp = 'cat\((.+?)\)';
-splRegexp = 'spl\((.+?)(,.+?)+?\)';
+% splRegexp = 'spl\((.+?)(,.+?)+?\)'; % old version without cirspl
+splRegexp     = '(?<=\+)spl\(([^,]+?)(,[^)]+?)\)';
+circsplRegexp = '(?<=\+)circspl\(([^,]+?)(,[^)]+?)(,[^)]+?)(,[^)]+?)\)';
 
 % remove all whitespace
 cfg.formula = regexprep(cfg.formula,'[\s]','');
 
-splInteraction= [ regexp(cfg.formula,['2(\*|\:)[\s]*?' splRegexp]) regexp(cfg.formula,[splRegexp '[\s]*?(\*|\:)'])];
+splInteraction= [               regexp(cfg.formula,['(\*|\:)[\s]*?' splRegexp])     regexp(cfg.formula,[splRegexp     '(\*|\:)'])];
+splInteraction= [splInteraction regexp(cfg.formula,['(\*|\:)[\s]*?' circsplRegexp]) regexp(cfg.formula,[circsplRegexp '(\*|\:)'])];
 if ~isempty(splInteraction)
     error('Spline-Interactions are not supported')
 end
 
 cat  = regexp(cfg.formula,catRegexp,'tokens');
 spl = regexp(cfg.formula,splRegexp,'tokens');
+circspl = regexp(cfg.formula,circsplRegexp,'tokens');
 
+
+%% Check the normal spliones
 for s = 1:length(spl)
     if length(spl{s})~=2
         error('error while parsing formula. wrongly defined spline in: %s. Needs to be: spl(your_eventname,10)',cfg.formula)
     end
     spl{s}{2} = str2num(strrep(spl{s}{2},',',''));
+    spl{s}{3} = 'default';
+    assert(floor(spl{s}{2}) == spl{s}{2},'spline number has to be an integer!')
     
 end%% First check for unique variablenames
-cfg.spline = [cfg.spline spl];
+
+%% check the circular splines
+for s = 1:length(circspl)
+    if length(circspl{s})~=4
+        error('error while parsing formula. wrongly defined circspline in: %s. Needs to be: circspl(your_eventname,10,low,high)',cfg.formula)
+    end
+    circspl{s}{2} = [str2num(strrep(circspl{s}{2},',',''))
+                     str2num(strrep(circspl{s}{3},',',''))
+                     str2num(strrep(circspl{s}{4},',',''))];
+    circspl{s}{3} = 'cyclical';
+    
+    assert(floor(circspl{s}{2}(1)) == circspl{s}{2}(1),'circspline number has to be an integer!')
+    assert(   isreal(circspl{s}{2}(2)),'circspline lower bound has to be a real number!')
+    assert(   isreal(circspl{s}{2}(3)),'circspline upper bound has to be a real number!')
+    
+end%% First check for unique variablenames
+
+%% auto fill in default_spline for the cfg.spline defined splines
+for s = 1:length(cfg.spline )
+    if size(cfg.spline{s},2) == 2
+        cfg.spline{s} = @default_spline;
+    end
+end
+cfg.spline = [cfg.spline spl circspl];
 
 numericix = [];
 % check categorical input and combine
@@ -246,8 +277,9 @@ cfg.categorical = unique([cfg.categorical cellfun(@(x)x{1},cat,'UniformOutput',0
 % remove the 'cat()' from cat(eventA) so that only 'eventA' remains
 f2= regexprep(cfg.formula, catRegexp,'$1');
 
-% remove the spl(splineA) completly
+% remove the spl(splineA) and circspl(xxx) completly
 f2= regexprep(f2,['(\+|\*)[\s]*?' splRegexp],'');
+f2= regexprep(f2,['(\+|\*)[\s]*?' circsplRegexp],'');
 
 % We need to replace the term before the ~ by something that matlab sorts
 % after the variables e.g. 'zzz_response'
@@ -514,11 +546,17 @@ EEG.unfold.cols2variablenames= cols2variablenames;
 EEG.unfold.cols2eventtypes = ones(1,size(X,2)); % This looks odd, but the function is recursively called if multiple events are detected. This number is the fixed in the recursive call to represent the actual cols2eventtypes
 EEG.unfold.eventtypes = {cfg.eventtypes};
 
-%% Add the extra defined splines
+%% Add the splines
 EEG.unfold.splines = [];
 if ~isempty(cfg.spline)
     for s = 1:length(cfg.spline)
-        [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2},'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing);
+        if strcmp(cfg.spline{s}{3},'cyclical')
+            bounds = [cfg.spline{s}{2}(2:3)];
+        else
+            bounds = [];
+        end
+        [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2}(1),'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing,'splinefunction',cfg.spline{s}{3},'cyclical_bounds',bounds);
+        
         EEG.unfold.X(nanlist,:) = 0;
     end
 end
