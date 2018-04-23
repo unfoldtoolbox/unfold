@@ -93,7 +93,7 @@ signal = nan(length(cfg.channel),length(EEG.unfold.times),length(paramList));
 times = EEG.unfold.times;
 
 % initialize vectors
-value = nan(1,size(signal,3));
+value = cell(1,size(signal,3));
 name = cell(1,size(signal,3));
 event = name;
 type = name;
@@ -112,13 +112,15 @@ for pred = paramList
         colname = EEG.unfold.colnames(pred);
         
         
-        splt = regexp(colname,'([-]?[\d]*\.?[\d]*)$','tokens');
+%         splt = regexp(colname,'([-]?[\d]*\.?[\d]*)$','tokens');
+%         splt = regexp(colname,'_(.*)$','tokens');
+        splt = regexp(colname,'_?.*_(.*)$','tokens');
         number = splt{1}{1}{1};
         name(loopRunner) = {colname{1}(1:(end-length(number)-1))}; % -1 to get rigd of the "_"
-        value(loopRunner) = str2num(number);
+        value{loopRunner} = str2num(number);
         %             name(loopRunner)= splt(1);
     else
-        value(loopRunner) = nan;
+        value{loopRunner} = nan;
         name(loopRunner)= EEG.unfold.colnames(pred);
     end
     event(loopRunner)= EEG.unfold.eventtypes(EEG.unfold.cols2eventtypes(pred));
@@ -141,7 +143,7 @@ if isfield(EEG,'chanlocs')
 else
     warning('no chanlocs found')
 end
-output.param = struct('value',num2cell(value),'name',name,'event',event,'type',type);
+output.param = struct('value',value,'name',name,'event',event,'type',type);
 if isfield(EEG,'chanlocs')&&~isempty(EEG.chanlocs)
     output.chanlocs= EEG.chanlocs(cfg.channel);
 end
