@@ -51,6 +51,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   parameters (we remove one spline due to the Linear
 %                   Modeling aspect). Can be specified more conveniently
 %                   directly inside the formula
+%                   2D splines have to be specified in the form {'xpos','ypos',10}
 %
 %   cfg.categorical(cell-array): default {}, list of which of the EEG.event fields
 %                   should be treated as an categorical effect (thus
