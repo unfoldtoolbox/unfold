@@ -137,8 +137,11 @@ for currPred= 1:length(paramList)
         % that one
         customSplineValue = strcmp(predNameList,spl.name);
         if any(customSplineValue)
-            splValueSelect = predValueSelectList{customSplineValue}{2};
-            
+            if size(spl.paramValues,1) == 2
+                splValueSelect = predValueSelectList{customSplineValue}(2:3);
+            else
+                splValueSelect = predValueSelectList{customSplineValue}{2};
+            end
         else
             splValueSelect = auto_spacing(cfg,spl.paramValues);
         end
@@ -146,8 +149,20 @@ for currPred= 1:length(paramList)
         
         % default case, a spline function has been defined
         if isfield(spl,'splinefunction')
-            Xspline = spl.splinefunction(splValueSelect,spl.knots);       
-            
+            if size(spl.paramValues,1) == 2
+                auxsiz = size(splValueSelect{2},2);
+                splValueSelect{2}  = reshape(repmat(splValueSelect{2},length(splValueSelect{1}),1),1,length(splValueSelect{1})* size(splValueSelect{2},2));
+                splValueSelect{1}  = repmat(splValueSelect{1},1,auxsiz);
+                Xspline1 =  spl.splinefunction(splValueSelect{1},spl.knots(1,:));
+                Xspline2 =  spl.splinefunction(splValueSelect{2},spl.knots(2,:));
+                Xspline  = [];
+                for iD = 1:size(Xspline1,1)
+                    aux = Xspline1(iD,:)'*Xspline2(iD,:);
+                    Xspline(iD,:) = aux(:)';
+                end    
+            else
+                Xspline = spl.splinefunction(splValueSelect,spl.knots); 
+            end
         elseif spl.knots(1) == spl.knots(2) 
             warning('deprecated spline-function detection,detected default bspline')
             Xspline = default_spline(splValueSelect,spl.knots(3:end-2));
@@ -158,8 +173,7 @@ for currPred= 1:length(paramList)
         
         Xspline(:,spl.removedSplineIdx) = [];
         
-        
-        for c = 1:length(splValueSelect)
+         for c = 1:size(Xspline,1)
             % we have a [channel x time x beta] * [beta x 1] vector product
             % to calculate => loop over channel
             for chan = 1:size(b,1)
@@ -173,7 +187,11 @@ for currPred= 1:length(paramList)
             % the event is already saved in 'e' (ufresult.param(predIDX))
             
             eNew = e;
-            eNew.value = splValueSelect(c);
+            if iscell(splValueSelect)
+                eNew.value = [splValueSelect{1}(c),splValueSelect{2}(c)];
+            else
+                eNew.value = splValueSelect(c);
+            end
             eNew.name = spl.name;
             eNew.type = 'spline_converted';
             

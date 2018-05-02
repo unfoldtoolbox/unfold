@@ -50,7 +50,7 @@ end
 
 
 assert(cfg.timelimits(1)<cfg.timelimits(2),'Timelimits are not ordered correctly or are equal')
-assert(~any(isnan(EEG.unfold.X(:))),'Warning NAN values found in designmatrix. will not continue')
+% assert(~any(isnan(EEG.unfold.X(:))),'Warning NAN values found in designmatrix. will not continue')
 
 
 % Taken and modified from the epoch-eeglab function
