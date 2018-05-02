@@ -137,7 +137,7 @@ shouldBeFunction(EEGtmp,{'(Intercept)'  'catA_B'  'catA_C'  'catB_2'  'catB_3'},
 %% Test multiple splines
 EEGtest = EEGsim;
 cfgDesign = [];
-cfgDesign.formula   = {'y~1+spl(splineA,4)+ spl(splineB,4)','y~1+spl(splineA,4)+ spl(splineB,4)'};
+cfgDesign.formula   = {'y~0+spl(splineA,4)+ spl(splineB,4)','y~1+spl(splineA,4)+ spl(splineB,4)'};
 cfgDesign.eventtypes = {'stimulus2','stimulus3'};
 
 for e = 1:length(EEGtest.event)
@@ -148,6 +148,10 @@ end
 
 EEGtmp = uf_designmat(EEGtest,cfgDesign);
 shouldBeFunction(EEGtmp,{'(Intercept)','splineA','splineB','2_(Intercept)','2_splineA','2_splineB'},'variablenames')
+strcmp(EEGtmp.unfold.splines{1}.name,'splineA')
+strcmp(EEGtmp.unfold.splines{2}.name,'splineB')
+strcmp(EEGtmp.unfold.splines{3}.name,'2_splineA')
+strcmp(EEGtmp.unfold.splines{4}.name,'2_splineB')
 
 end
 
