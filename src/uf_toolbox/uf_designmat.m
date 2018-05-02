@@ -296,6 +296,8 @@ f2= regexprep(f2,['(\+|\*)[\s]*?' circsplRegexp],'');
 f2= regexprep(f2,['(\+|\*)[\s]*?' spl2DRegexp],'');
 % We need to replace the term before the ~ by something that matlab sorts
 % after the variables e.g. 'zzz_response'
+
+cfg.formula_nozzz = f2;
 f2 = regexprep(f2,'.+~','zzz_response~');
 % This hack will not be necessary anymore as soon as we have our own parser
 
@@ -353,7 +355,7 @@ end
 %% display infos on the number of events used
 % because other output is printed, mark these sections (due to recursive
 % call, its not easy to print all this information in one nice table)
-fprintf('Modeling %i event(s) of [%s] using formula: %s \n',size(t,1),eventStr,cfg.formula)
+fprintf('Modeling %i event(s) of [%s] using formula: %s \n',size(t,1),eventStr,cfg.formula_nozzz)
 
 %%
 
