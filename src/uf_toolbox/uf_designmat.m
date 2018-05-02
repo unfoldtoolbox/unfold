@@ -188,7 +188,6 @@ else
     eventStr = cfg.eventtypes;
 end
 
-fprintf('\nModeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
 %%
 % First of all save the formula
 EEG.unfold.formula = {cfg.formula};
@@ -350,7 +349,13 @@ for p = 1:size(t,2)
     end
 end
 
-%
+
+%% display infos on the number of events used
+% because other output is printed, mark these sections (due to recursive
+% call, its not easy to print all this information in one nice table)
+fprintf('Modeling %i event(s) of [%s] using formula: %s \n',size(t,1),eventStr,cfg.formula)
+
+%%
 
 % Check everything necessary is there
 tf = ismember(F.PredictorNames,t.Properties.VariableNames);
@@ -449,7 +454,7 @@ else
             ix = find(strcmp(categoricalLevelsOrder,currCat));
             
             dataFrameLevels = unique(t_clean.(currCat))';
-            dataFrameLevels(isnan(dataFrameLevels)) = [];
+%             dataFrameLevels(isnan(dataFrameLevels)) = [];
             if isempty(ix)
                 currCatLevels = sort(dataFrameLevels);
             else
@@ -587,6 +592,10 @@ if any(any(isnan(EEG.unfold.X)))
     fprintf('\n')
     
 end
+
+
+
+
 end
 
 function deconvAll = combine_deconvsets(deconvAll,EEG2,k)

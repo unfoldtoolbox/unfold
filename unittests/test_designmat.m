@@ -1,7 +1,7 @@
 function test_designmat()
 % Multi-Test
 
-testCase = [15]
+testCase = [15];
 
 EEGsim = simulate_test_case(testCase,'noise',0,'basis','box');
 cfgDesign = [];
