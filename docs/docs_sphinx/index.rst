@@ -21,3 +21,4 @@ A toolbox for *deconvolution* of overlapping EEG signals and *(non)-linear model
    contenttutorials
    toolboxtutorials
    documentation
+   Impressum
