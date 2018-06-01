@@ -1,7 +1,7 @@
 .. unfold documentation master file
 .. highlight:: matlab
 
-.. image:: ../../media/unfold_logo_large_ERP.png
+.. image:: ../../media/unfold_800x377.png
 
 A toolbox for *deconvolution* of overlapping EEG signals and *(non)-linear modeling*
 
