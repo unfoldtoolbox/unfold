@@ -215,13 +215,15 @@
   <div class="section" id="unfold-s-toolbox-workflow">
 <h1>Unfold’s toolbox workflow<a class="headerlink" href="#unfold-s-toolbox-workflow" title="Permalink to this headline">¶</a></h1>
 <p>We start with continuous data with events that mark times in the data that are of interest. Usually these are stimulus onsets, buttonpresses etc.</p>
+<p>A minimal example is the following</p>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">EEG</span> <span class="p">=</span> <span class="n">uf_designmat</span><span class="p">(</span><span class="s">&#39;eventtypes&#39;</span><span class="p">,{</span><span class="s">&#39;fixation&#39;</span><span class="p">},</span><span class="s">&#39;formula&#39;</span><span class="p">,</span><span class="s">&#39;1+cat(category)&#39;</span><span class="p">)</span>
+<span class="n">EEG</span> <span class="p">=</span> <span class="n">uf_timeexpandDesignmat</span><span class="p">(</span><span class="s">&#39;timelimits&#39;</span><span class="p">,[</span><span class="o">-</span><span class="mf">0.5</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">EEG</span> <span class="p">=</span> <span class="n">uf_glmfit</span><span class="p">(</span><span class="n">EEG</span><span class="p">)</span>
+<span class="c">% (strictly speaking optional, but recommended)</span>
+<span class="n">ufresult</span> <span class="p">=</span> <span class="n">uf_condense</span><span class="p">(</span><span class="n">EEG</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="docutils">
-<dt>A minimal example is the following::</dt>
-<dd>EEG = uf_designmat(‘eventtypes’,{‘fixation’},’formula’,‘1+cat(category)’)
-EEG = uf_timeexpandDesignmat(‘timelimits’,[-0.5 1])
-EEG = uf_glmfit(EEG)
-% (strictly speaking optional, but recommended)
-ufresult = uf_condense(EEG)</dd>
 <dt>Definition of the design (<code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_designmat()</span></code>)</dt>
 <dd>We first need to define which event should be included in the deconvolution. Let’s assume we have an event type ‘stimulus’ and one ‘keypress’. We first define a formula for each event. These formulas are commonly used in <code class="xref mat mat-func docutils literal notranslate"><span class="pre">R()</span></code> and also matlab and are called Wilkinson-Formulas. They allow to easily specify model-designs, e.g. 2x2 categorical linear model with interaction; continuous variables, spline-based (additive models, GAM) and mixtures between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as <code class="xref mat mat-func docutils literal notranslate"><span class="pre">X()</span></code>) for your design-specifications.</dd>
 <dt>Timeexpansion of the designmatrix (<code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_timeexpandDesignmat()</span></code>)</dt>

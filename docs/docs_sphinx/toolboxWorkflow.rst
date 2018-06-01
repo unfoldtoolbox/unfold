@@ -3,7 +3,10 @@ Unfold's toolbox workflow
 
 We start with continuous data with events that mark times in the data that are of interest. Usually these are stimulus onsets, buttonpresses etc.
 
-A minimal example is the following::
+A minimal example is the following
+
+.. code-block:: matlab
+
   EEG = uf_designmat('eventtypes',{'fixation'},'formula','1+cat(category)')
   EEG = uf_timeexpandDesignmat('timelimits',[-0.5 1])
   EEG = uf_glmfit(EEG)
