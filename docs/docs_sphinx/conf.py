@@ -211,10 +211,10 @@ todo_include_todos = True
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+html_title = "Unfold EEG Toolbox"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
+html_short_title = "Unfold EEG Toolbox"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -359,7 +359,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'unfold', u'Unfold Documentation',
-     author, 'unfold', 'One line description of project.',
+     author, 'unfold', 'An EEG toolbox for overlap correction and non-linear regression analyses',
      'Miscellaneous'),
 ]
 
