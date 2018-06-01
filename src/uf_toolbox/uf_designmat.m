@@ -1,5 +1,5 @@
 function [EEG] = uf_designmat(EEG,varargin)
-%% Generate Designmatrix out of EEG.event structure and a formula
+ %% Generate Designmatrix out of EEG.event structure and a formula
 % Input an EEG event structure and you will get an EEG.unfold.X field with
 % the designmatrix.If you add multiple eventtypess+formulas as cell-arrays, this function will iteratively
 % call itself and combine it to one big designmatrix.The designmatrix is not yet ready to do deconvolution, use
@@ -51,6 +51,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   parameters (we remove one spline due to the Linear
 %                   Modeling aspect). Can be specified more conveniently
 %                   directly inside the formula
+%                   2D splines have to be specified in the form {'xpos','ypos',10}
 %
 %   cfg.categorical(cell-array): default {}, list of which of the EEG.event fields
 %                   should be treated as an categorical effect (thus
@@ -187,7 +188,6 @@ else
     eventStr = cfg.eventtypes;
 end
 
-fprintf('\nModeling event(s) [%s] using formula: %s \n',eventStr,cfg.formula)
 %%
 % First of all save the formula
 EEG.unfold.formula = {cfg.formula};
@@ -196,6 +196,7 @@ catRegexp = 'cat\((.+?)\)';
 % splRegexp = 'spl\((.+?)(,.+?)+?\)'; % old version without cirspl
 splRegexp     = '(?<=\+)spl\(([^,]+?)(,[^)]+?)\)';
 circsplRegexp = '(?<=\+)circspl\(([^,]+?)(,[^)]+?)(,[^)]+?)(,[^)]+?)\)';
+spl2DRegexp     = '(?<=\+)2dspl\(([^,]+?)(,[^)]+?)(,[^)]+?)\)';
 
 % remove all whitespace
 cfg.formula = regexprep(cfg.formula,'[\s]','');
@@ -209,7 +210,7 @@ end
 cat  = regexp(cfg.formula,catRegexp,'tokens');
 spl = regexp(cfg.formula,splRegexp,'tokens');
 circspl = regexp(cfg.formula,circsplRegexp,'tokens');
-
+spl2D = regexp(cfg.formula,spl2DRegexp,'tokens');
 
 %% Check the normal spliones
 for s = 1:length(spl)
@@ -238,13 +239,25 @@ for s = 1:length(circspl)
     
 end%% First check for unique variablenames
 
+%% check the 2D splines
+for s = 1:length(spl2D)
+    if length(spl2D{s})~=3
+        error('error while parsing formula. wrongly defined spline in: %s. Needs to be: spl(your_eventname1,your_eventname2,10)',cfg.formula)
+    end
+    spl2D{s}{1} = {spl2D{s}{1} strrep(spl2D{s}{2},',','')};
+    spl2D{s}{2} = str2num(strrep(spl2D{s}{3},',',''));
+    spl2D{s}{3} = '2D';
+    assert(floor(spl2D{s}{2}) == spl2D{s}{2},'spline number has to be an integer!')
+    
+end%% First check for unique variablenames
+
 %% auto fill in default_spline for the cfg.spline defined splines
 for s = 1:length(cfg.spline )
     if size(cfg.spline{s},2) == 2
         cfg.spline{s} = @default_spline;
     end
 end
-cfg.spline = [cfg.spline spl circspl];
+cfg.spline = [cfg.spline spl circspl spl2D];
 
 numericix = [];
 % check categorical input and combine
@@ -280,9 +293,11 @@ f2= regexprep(cfg.formula, catRegexp,'$1');
 % remove the spl(splineA) and circspl(xxx) completly
 f2= regexprep(f2,['(\+|\*)[\s]*?' splRegexp],'');
 f2= regexprep(f2,['(\+|\*)[\s]*?' circsplRegexp],'');
-
+f2= regexprep(f2,['(\+|\*)[\s]*?' spl2DRegexp],'');
 % We need to replace the term before the ~ by something that matlab sorts
 % after the variables e.g. 'zzz_response'
+
+cfg.formula_nozzz = f2;
 f2 = regexprep(f2,'.+~','zzz_response~');
 % This hack will not be necessary anymore as soon as we have our own parser
 
@@ -336,7 +351,13 @@ for p = 1:size(t,2)
     end
 end
 
-%
+
+%% display infos on the number of events used
+% because other output is printed, mark these sections (due to recursive
+% call, its not easy to print all this information in one nice table)
+fprintf('Modeling %i event(s) of [%s] using formula: %s \n',size(t,1),eventStr,cfg.formula_nozzz)
+
+%%
 
 % Check everything necessary is there
 tf = ismember(F.PredictorNames,t.Properties.VariableNames);
@@ -435,7 +456,7 @@ else
             ix = find(strcmp(categoricalLevelsOrder,currCat));
             
             dataFrameLevels = unique(t_clean.(currCat))';
-
+%             dataFrameLevels(isnan(dataFrameLevels)) = [];
             if isempty(ix)
                 currCatLevels = sort(dataFrameLevels);
             else
@@ -555,8 +576,11 @@ if ~isempty(cfg.spline)
         else
             bounds = [];
         end
-        [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2}(1),'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing,'splinefunction',cfg.spline{s}{3},'cyclical_bounds',bounds);
-        
+        if strcmp(cfg.spline{s}{3},'2D')
+            [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cell2mat(cfg.spline{s}{1}),'nsplines',cfg.spline{s}{2}(1),'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing,'splinefunction',cfg.spline{s}{3},'cyclical_bounds',bounds);
+        else
+            [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2}(1),'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing,'splinefunction',cfg.spline{s}{3},'cyclical_bounds',bounds);
+        end
         EEG.unfold.X(nanlist,:) = 0;
     end
 end
@@ -570,6 +594,10 @@ if any(any(isnan(EEG.unfold.X)))
     fprintf('\n')
     
 end
+
+
+
+
 end
 
 function deconvAll = combine_deconvsets(deconvAll,EEG2,k)
@@ -590,7 +618,7 @@ setA = cellfun(@(x)strsplit(x,':'),setA,'UniformOutput',0);
 
 currnames= EEG2.unfold.variablenames;
 colnames = EEG2.unfold.colnames;
-
+currtypes = EEG2.unfold.variabletypes;
 for curridx = 1:length(currnames)
     
     currnameext= strsplit(currnames{curridx},':');
@@ -610,13 +638,15 @@ for curridx = 1:length(currnames)
         
         % find all columns, could be more than variablenames because of
         % dummy coding
-        ix = c2var(ismember(c2var,curridx));
+%         ix = c2var(ismember(c2var,curridx));
+        ix = find(ismember(c2var,curridx));
         for j = 1:length(ix)
             % find the substring and replace it. Colnames could be longer
             % than variablenames, i.e. 
             % variablename: condA
             % colname:      condA_0, condA_1, condA_2
-            colnames{ix(j) + j -1} = strrep(colnames{ix(j) + j - 1},currnameext{1},newname);
+%             colnames{ix(j) + j -1} = strrep(colnames{ix(j) + j - 1},currnameext{1},newname);
+            colnames{ix(j)} = strrep(colnames{ix(j)},currnameext{1},newname);
         end
         
     elseif any(samenameext)
@@ -652,13 +682,18 @@ for curridx = 1:length(currnames)
     % does not add a ':' for single names
 
     currnames{curridx} = newname;
-    
+
 end
 EEG2.unfold.variablenames = currnames;
 EEG2.unfold.colnames = colnames;
 
-
-
+anyspline = strmatch('spline',EEG2.unfold.variabletypes);
+if any(anyspline)
+    for spltoch = 1:length(anyspline)
+        EEG2.unfold.splines{spltoch}.name = EEG2.unfold.variablenames{anyspline(spltoch)};
+        EEG2.unfold.splines{spltoch}.colnames = EEG2.unfold.colnames(find(EEG2.unfold.cols2variablenames==anyspline(spltoch)))';
+    end
+end
 
 deconvAll.X(:,(end+1):(end+size(EEG2.unfold.X,2))) = EEG2.unfold.X;
 deconvAll.colnames = [deconvAll.colnames,EEG2.unfold.colnames];

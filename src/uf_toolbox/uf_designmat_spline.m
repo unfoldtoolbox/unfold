@@ -55,27 +55,32 @@ cfg = finputcheck(varargin,...
 
 assert(~isempty(cfg.nsplines) | ~isempty(cfg.knotsequence),'you need to specify either number of splines or knotsequence')
 assert(~isempty(cfg.paramValues),'paramValues were empty')
-assert(~all(isnan(cfg.paramValues)),'all paramValues are nans')
 
-if size(cfg.paramValues,2) == 1
-    cfg.paramValues = cfg.paramValues';
+spl = [];
+spl.nSplines = cfg.nsplines;
+spl.name = cfg.name;
+
+if strcmp(cfg.splinefunction,'2D')
+    assert(any(~all(isnan(cfg.paramValues))),'all paramValues are nans')
+    if size(cfg.paramValues,2) == 2
+        cfg.paramValues = cfg.paramValues';
+    end
+    spl.paramValues = cfg.paramValues;
+    splmin = min(spl.paramValues,[],2);
+    splmax= max(spl.paramValues,[],2);
+else
+    assert(~all(isnan(cfg.paramValues)),'all paramValues are nans')
+    if size(cfg.paramValues,2) == 1
+        cfg.paramValues = cfg.paramValues';
+    end
+    spl.paramValues = cfg.paramValues;
+    splmin = min(spl.paramValues);
+    splmax= max(spl.paramValues);
 end
 
 
 
-spl = [];
-spl.paramValues = cfg.paramValues;
-spl.nSplines = cfg.nsplines;
-
 %spl.range = range(spl.paramValues);
-splmin = min(spl.paramValues);
-splmax= max(spl.paramValues);
-spl.name = cfg.name;
-
-
-
-
-
 
 
 % In case of cyclical spline we need to wrap around the spl.paramValues by
@@ -107,7 +112,7 @@ end
 
 
 
-if strcmp(cfg.splinefunction,'default')
+if strcmp(cfg.splinefunction,'default') || strcmp(cfg.splinefunction,'2D')  % jpo 15.04.2018: not sure about this
     % the function adds two splines to the knotsequence, we temporaly
     % remove them 
     spl.nSplines = spl.nSplines-2;
@@ -117,11 +122,19 @@ knots = [];
 if isempty(cfg.knotsequence)
     switch cfg.splinespacing
         case 'linear'
-            spl.knots =  linspace(splmin,splmax,spl.nSplines);
-            
+            if strcmp(cfg.splinefunction,'2D')
+                spl.knots       = linspace(splmin(1),splmax(1),spl.nSplines);
+                spl.knots(2,:)  = linspace(splmin(2),splmax(2),spl.nSplines);
+            else
+                spl.knots =  linspace(splmin,splmax,spl.nSplines);
+            end
         case 'quantile'
-            spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines));
-            
+            if strcmp(cfg.splinefunction,'2D')
+                spl.knots      =  quantile(spl.paramValues(1,:),linspace(0,1,spl.nSplines));
+                spl.knots(2,:) =  quantile(spl.paramValues(2,:),linspace(0,1,spl.nSplines));
+            else
+                spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines));
+            end
         otherwise
             error('wrong cfg.splinespacing. expected linear or quantile')
     end
@@ -138,7 +151,7 @@ if ~ischar(cfg.splinefunction)
     assert(isa(cfg.splinefunction, 'function_handle'),'for custom type one need to define a splinefunction')
     spl.splinefunction = cfg.splinefunction;
     
-elseif strcmp(cfg.splinefunction,'default')
+elseif strcmp(cfg.splinefunction,'default') || strcmp(cfg.splinefunction,'2D')
     spl.splinefunction = @default_spline;
     
 elseif strcmp(cfg.splinefunction,'cyclical')
@@ -148,18 +161,34 @@ else
     error('unknown spline type')
 end
 
-Xspline =  spl.splinefunction(spl.paramValues,spl.knots);
-
+if strcmp(cfg.splinefunction,'2D')
+    Xspline1 =  spl.splinefunction(spl.paramValues(1,:),spl.knots(1,:));
+    Xspline2 =  spl.splinefunction(spl.paramValues(2,:),spl.knots(2,:));
+    for iD = 1:size(Xspline1,1)
+        aux = Xspline1(iD,:)'*Xspline2(iD,:);
+        Xspline(iD,:) = aux(:)';
+    end
+else
+    Xspline =  spl.splinefunction(spl.paramValues,spl.knots);
+end
 
 %%
 % if strcmp(cfg.codingschema,'effects')
-
-minix = get_min(nanmean(spl.paramValues),spl.paramValues);
+if strcmp(cfg.splinefunction,'2D')
+    [~,minix] = min(sqrt((nanmean(spl.paramValues(1,:))-spl.paramValues(1,:)).^2+(nanmean(spl.paramValues(2,:))-spl.paramValues(2,:)).^2)); % 
+else
+    minix = get_min(nanmean(spl.paramValues),spl.paramValues);
+end
 [~,killThisSpline] = max(Xspline(minix,:));
-
 [~,tmp] = max(Xspline(:,killThisSpline));
-peakAt = spl.paramValues(tmp);
-fprintf('The spline that got removed due to collinearity in the basis set (as intended) for the effect %s has its peak at %f\n',spl.name,peakAt)
+
+if strcmp(cfg.splinefunction,'2D')
+    peakAt = spl.paramValues(:,tmp);
+    fprintf('The spline that got removed due to collinearity in the basis set (as intended) for the effect %s has its peak at %f,%f\n',spl.name,peakAt(1),peakAt(2))
+else
+    peakAt = spl.paramValues(tmp);
+    fprintf('The spline that got removed due to collinearity in the basis set (as intended) for the effect %s has its peak at %f\n',spl.name,peakAt)
+end
 fprintf('This does not mean that the event-intercept represents this value! \n')
 % else
 %     killThisSpline = 1;
@@ -182,16 +211,22 @@ spl.nSplines = size(spl.X,2);
 % we find the parameter value that maximizes a spline and take this as an
 % identifier for the spline. Not perfect, but a good approximation
 [~,I] = max(Xspline,[],1);
-maxSplVal = spl.paramValues(I);
-
+if strcmp(cfg.splinefunction,'2D')
+    maxSplVal = spl.paramValues(:,I);  
+else
+    maxSplVal = spl.paramValues(I);
+end
 % round to two significant digits:
 tmpSplVal = 2-floor(log10(abs(maxSplVal)));
 tmpSplVal(isinf(tmpSplVal)) = 0;
 tmpSplVal(tmpSplVal<0) = 0;
 rawColnames = repmat({spl.name},spl.nSplines,1);
 
-spl.colnames = cellfun(@(x,signPoint,y)sprintf('%s_%.*f',x,signPoint,y),rawColnames,num2cell(tmpSplVal)',num2cell(maxSplVal)','UniformOutput', 0);
-
+if strcmp(cfg.splinefunction,'2D')
+    spl.colnames = cellfun(@(x,signPoint1,y,signPoint2,z)sprintf('%s_%.*f,%.*f',x,signPoint1,y,signPoint2,z),rawColnames,num2cell(tmpSplVal(1,:))',num2cell(maxSplVal(1,:))',num2cell(tmpSplVal(2,:))',num2cell(maxSplVal(2,:))','UniformOutput', 0);
+else
+    spl.colnames = cellfun(@(x,signPoint,y)sprintf('%s_%.*f',x,signPoint,y),rawColnames,num2cell(tmpSplVal)',num2cell(maxSplVal)','UniformOutput', 0);
+end
 
 %% Add the spline to the EEG-data
 
