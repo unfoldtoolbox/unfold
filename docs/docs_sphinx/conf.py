@@ -22,10 +22,10 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 html_theme_options = {
     # Navigation bar title. (Default: ``project`` value)
-    'navbar_title': "Unfold Toolbox",
+    'navbar_title': " ",
 
     # Tab name for entire site. (Default: "Site")
-    'navbar_site_name': "Navigation",
+    'navbar_site_name': "",
 
     # A list of tuples containing pages or urls to link to.
     # Valid tuples should be in the following forms:
@@ -43,10 +43,10 @@ html_theme_options = {
     'navbar_sidebarrel': False,
 
     # Render the current pages TOC in the navbar. (Default: true)
-    'navbar_pagenav': True,
+    'navbar_pagenav': False,
 
     # Tab name for the current pages TOC. (Default: "Page")
-    'navbar_pagenav_name': "this page",
+    'navbar_pagenav_name': "Current Page",
 
     # Global TOC depth for "site" navbar tab. (Default: 1)
     # Switching to -1 shows all levels.
@@ -218,7 +218,7 @@ html_short_title = "Unfold EEG Toolbox"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = '../../media/unfold_logo_erp_small.png'
+html_logo = '../../media/unfold_white_200x94.png'
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

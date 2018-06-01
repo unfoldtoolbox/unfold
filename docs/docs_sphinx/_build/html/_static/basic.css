@@ -34,3 +34,7 @@ iframe{
 	display: block;
 
 }
+
+.navbar-brand span img {
+  height:35px;
+}
