@@ -3,24 +3,32 @@ Unfold's toolbox workflow
 
 We start with continuous data with events that mark times in the data that are of interest. Usually these are stimulus onsets, buttonpresses etc.
 
+A minimal example is the following::
+  EEG = uf_designmat('eventtypes',{'fixation'},'formula','1+cat(category)')
+  EEG = uf_timeexpandDesignmat('timelimits',[-0.5 1])
+  EEG = uf_glmfit(EEG)
+  % (strictly speaking optional, but recommended)
+  ufresult = uf_condense(EEG)
 
-Definition of the design (`uf_designmat`)
+
+
+Definition of the design (:func:`uf_designmat`)
   We first need to define which event should be included in the deconvolution. Let's assume we have an event type 'stimulus' and one 'keypress'. We first define a formula for each event. These formulas are commonly used in `R` and also matlab and are called Wilkinson-Formulas. They allow to easily specify model-designs, e.g. 2x2 categorical linear model with interaction; continuous variables, spline-based (additive models, GAM) and mixtures between these models. The unfold-toolbox takes care of generating the appropriate designmatrix (denoted as `X`) for your design-specifications.
 
 
-Timeexpansion of the designmatrix (`uf_timeexpandDesignmat`)
-  In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated. The resulting timeexpanded/expanded designmatrix is denoted as `dcX`.
+Timeexpansion of the designmatrix (:func:`uf_timeexpandDesignmat`)
+  In order to perform the deconvolution, we need to expand the designmatrix over time. Because these designmatrices can become quite large, we offer the option to use a basis set (either cubic-splines or fourier-components). This will greatly reduce the number of parameters that need to be estimated but is an advanced feature - the benefits/costs are not well explored. The resulting timeexpanded/expanded designmatrix is denoted as `dcX`.
 
 
-Fitting the model (`uf_glmfit`)
+Fitting the model (:func:`uf_glmfit`)
   There are multiple ways to fit the expanded designmatrix `dcX`. The unfold-toolbox offers a memory-friendly iterative least squares algorithm (lsmr), default matlab pseudo-inverse and regularized glmnet (LASSO,ridge-regression and elastic-net).
 
 
-Extracting parameters (uf_beta2unfold)
+Condensing Results (:func:`uf_condense`)
   This step extracts the betas, transforms them if necessary, and returns a cleaned-up output structure. When using time-basis functions (splines/fourier) we need to transform the estimated betas back to their native time-space. For example if we use 10 time-splines instead of 100 sample points, we receive 10 parameter-estimate (betas). In this case we want to transform the 10 betas back to the domain of 100 samples.
 
 
-Plotting (e.g. `uf_plotParam`)
+Plotting (e.g. :func:`uf_plotParam`)
   The toolbox offers multiple functions to explore also quite complex designs. These functions work on 1D (ERP-like), 2D (erpimage-like) or as timeseries of topoplots.
 
 Group-Level Statistics
@@ -46,7 +54,7 @@ The minimal required fields (the usual EEGlab-structure) are:
 
 Imputation of missing data
 ==================================
-In linear models, missing data need to be imputed ('interpolated') or the event needs to be excluded. We currently offer four methods to deal with this in the function `uf_imputeMissing` (to be called after the design specification):
+In linear models, missing data need to be imputed ('interpolated') or the event needs to be excluded. We currently offer four methods to deal with this in the function :func:`uf_imputeMissing` (to be called after the design specification):
 
 drop
   this removes events that have a missing field in a single explanatory variable
@@ -63,42 +71,40 @@ median
 
 Removing artefactual data
 ============================
-Because we start with continuous data, usual removal of data stretches does not work the same. The function `uf_continuousArtifactExclude` allows one to reject continuous portions of data that are either marked automatically or manually. We expect a 'winrej'-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment)
+Because we start with continuous data, usual removal of data stretches does not work the same. The function :func:`uf_continuousArtifactExclude` allows one to reject continuous portions of data that are either marked automatically or manually. We expect a 'winrej'-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment)
 
 Comparison between deconvolved and non-deconvolved (classical)
 ================================================================
 we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial :doc:`toolbox-tut04`
 
-Explanation of all variable fields
+Toolbox variables
 ==================================
 Fields of `EEG.unfold`
-----------------------
-
 
 
 splines
-  all information on the splines are saved in here (see below). Splines are a bit more involved to describe, additional information needs to be saved
+  all information on the splines are saved in here (see below). Each spline is added at splines{end+1}
 
 formula
-  contains all formulas specified in `uf_designmat`
+  contains all formulas specified in :func:`uf_designmat`
 
 X
-  The designmatrix. This can be used for 'classical' mass-univariate linear modeling
+  The designmatrix. This can be used for 'classical' mass-univariate linear modeling (:func:`uf_epoch` and :func:`uf_glmfit_nodc`)
 
 variabletypes
-  Type of each variable/predictor, can be 'categorical','continuous' and 'spline'
+  Type of each variable/predictor, can be 'categorical', 'interaction', 'continuous' and 'spline'
 
 variablenames
-  Name of each variable/predictor
+  Name of each variable/predictor without modifiers for level / spline modifier (e.g. factorA, sac_amplitude)
 
-colnames: {1×10 cell}
-  The name of each column of `X`. As soon as categorical variables are used, we will have more columns than variables.
+colnames:
+  The name of each column of `X`. This field contains the modifier for level and spline (e.g. factorA_face or sac_amplitude_3.5)
 
 cols2variablenames
-  A list connecting the columns of `X` with the variables. A 0 means that the intercept is meant.
+  A list connecting the columns of `X` with the variables.
 
 cols2eventtypes
-  A list connecting the colums of `X` with the event. Multiple events can be modeled but they are not separable based on `X` alone.
+  A list connecting the columns of `X` with possibly multiple events.
 
 eventtypes
   The names of the events that are modeled. Only interesting if multiple different events were modeled.
@@ -107,19 +113,19 @@ Xdc
   Timeexpanded designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of `uf_timeexpandDesignmat`. If you need to modify this, have a look at `uf_designmat_addcol` to see which fields should be modified.
 
 timebasis
-  The basis-function of the timeexpand for the deconvolution. This matrix could be the identity matrix in case of "stick"/dirac-functions. Useful only for splines/fourier time-basis functions
+  The basis-function of the timeexpand for the deconvolution. This matrix could be the identity matrix in case of "stick"/dirac-functions. Used only for splines/fourier time-basis functions
 
 times: [1×20 double]
-  A vector containing the time in seconds over what range the timeexpand occured. This encodes the time of the resulting ERP
+  A vector containing the time in seconds over what range the timeexpand occurred. This encodes the time of the resulting ERP
 
-Xuf_terms2cols
+Xdc_terms2cols
   A list connecting the columns of `Xdc` with columns of `X`
 
 beta_dc
   deconvolved betas. Output of `uf_glmfit`. This is the main outcome of this toolbox
 
 beta_nodc
-    non-deconvolved betas. This is a mass univariate fit where each timepoint and each electrode were fitted independently. Output of `uf_glmfit_nodc`
+    non-deconvolved betas. This is a mass univariate fit where each timepoint and each electrode were fitted independently. Output of :func:`uf_glmfit_nodc`
 
 channel
   for which channel the deconvolved betas have been calculated
@@ -128,15 +134,15 @@ effects_mean
     In case of effects coding contains the mean of the designmatrix columns
 
 
-Fields of `unfold`
+Fields of `ufresult`
 ----------------------
-the unfold structure is the output of `uf_beta2unfold`. This function removes the time-splines if used and possibly evaluates splines at (automatically) specific quantiles.
+the ufresult structure is the output of :func:`uf_condense`. This function removes the time-splines if used and possibly evaluates splines at (automatically) specific quantiles.
 
 unfold
   same as EEG.unfold
 
 times
-  same as EEG.times, thus the epoch-time in ms
+  same as ufresult.unfold.basistime, thus the epoch-time in s
 
 chanlocs
   same as EEG.chanlocs
@@ -154,11 +160,15 @@ Fields of `unfold.splines`
 ------------------------------------
 paramValues
   the parameter values of each event, e.g. for saccade amplitude: [1.3, 2.3, 6, 1.2 ...]
+
 nSplines
   the number of splines used for modelling
 
 knots
   the knot sequence. This is necessary to evaluate splines at a later point in time
+
+splineFunction
+  the function used to define the spline, could be a custom function.
 
 removedSplineIdx
   The index of the spline which was removed during spline-generation. It is necessary to remove one spline in order to not have any collinearities. Depending on configuration either a middle or the first spline is removed.

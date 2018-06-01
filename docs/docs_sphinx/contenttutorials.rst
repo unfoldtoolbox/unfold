@@ -14,7 +14,6 @@ because  :math:`\beta` is unknown one has to estimate it, usually using:
 .. math::
   \beta = X^{-1}y
 
-
 The choice of predictors (:math:`x_1,x_n...`) is up to the analyst of the signal. In order to understand how to use the toolbox it is helpful to understand the designmatrix :math:`X`. This designmatrix has multiple columns, each representing a predictor. Each row is one repetition, usually in EEG, one trial. If the predictor is a categorical one, some kind of encoding has to be used (reference/effects are currently supported). This encoding translates for example a two condition predictor 'face' vs 'house' in one predictor called the intercept, which in reference coding represents the reference-category (we use 'face') and the other predictor represents the difference of 'face' and 'house', because everything 'face' can explain, has already been soaked up by the first predictor.
 
 
