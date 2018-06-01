@@ -3,9 +3,11 @@
 
 .. container:: landing
 
-  .. image:: ../../media/unfold_800x377.png
-    :align: center
-    :width: 50 %
+  .. container:: center-div
+
+    .. image:: ../../media/unfold_800x377.png
+      :align: center
+      :width: 35 %
 
   A toolbox for *deconvolution* of overlapping EEG signals and *(non)-linear modeling*
 
@@ -16,6 +18,10 @@
   * Programmed in a modular fashion
   * Temporal basis functions (Fourier & Splines)
   * Optional regularization using **glmnet**
+
+.. image:: ../tutorials/unfold_plotting_tools.png
+  :align: center
+  :width: 65 %
 
 
 .. toctree::

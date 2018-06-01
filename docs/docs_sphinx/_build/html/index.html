@@ -47,7 +47,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="#">Home</a></li>
-                <li><a href="http://github.com/behinger/unfold">Download from Github</a></li>
+                <li><a href="http://github.com/unfoldtoolbox/unfold">Download from Github</a></li>
             
             
               <li class="dropdown globaltoc-container">
@@ -65,9 +65,8 @@
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#removing-artefactual-data">Removing artefactual data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-eeg-unfold">Fields of <code class="docutils literal notranslate"><span class="pre">EEG.unfold()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-unfold">Fields of <code class="docutils literal notranslate"><span class="pre">unfold()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-variables">Toolbox variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
 </ul>
 </li>
@@ -102,6 +101,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="impressum.html">Impressum</a></li>
 </ul>
 </ul>
 </li>
@@ -119,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="impressum.html">Impressum</a></li>
 </ul>
 </ul>
 </li>
@@ -155,9 +156,8 @@
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#removing-artefactual-data">Removing artefactual data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#explanation-of-all-variable-fields">Explanation of all variable fields</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-eeg-unfold">Fields of <code class="docutils literal notranslate"><span class="pre">EEG.unfold()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-unfold">Fields of <code class="docutils literal notranslate"><span class="pre">unfold()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-variables">Toolbox variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
 </ul>
 </li>
@@ -192,22 +192,29 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="impressum.html">Impressum</a></li>
 </ul>
 
         </div>
       </div>
     <div class="col-md-9 content">
       
-  <img alt="_images/unfold_logo_large_ERP.png" src="_images/unfold_logo_large_ERP.png" />
+  <div class="landing docutils container">
+<div class="center-div docutils container">
+<a class="reference internal image-reference" href="_images/unfold_800x377.png"><img alt="_images/unfold_800x377.png" class="align-center" src="_images/unfold_800x377.png" style="width: 35%;" /></a>
+</div>
 <p>A toolbox for <em>deconvolution</em> of overlapping EEG signals and <em>(non)-linear modeling</em></p>
 <ul class="simple">
-<li>Linear deconvolution</li>
-<li>Model specification using R-style formulas (“EEG~1+face+age”)</li>
+<li>Overlap between subsequent potentials using linear deconvolution</li>
+<li>Model specification using R-style formulas, e.g. <code class="docutils literal notranslate"><span class="pre">EEG~1+face+age</span></code></li>
+<li>Non-linear effects using regression splines, e.g. <code class="docutils literal notranslate"><span class="pre">EEG~1+face+spl(age,10)</span></code></li>
+<li>Multiple events, e.g. <em>Stimulus</em>, <em>Response</em> and <em>Fixation</em></li>
 <li>Programmed in a modular fashion</li>
-<li>Regularization using <strong>glmnet</strong></li>
 <li>Temporal basis functions (Fourier &amp; Splines)</li>
+<li>Optional regularization using <strong>glmnet</strong></li>
 </ul>
-<img alt="_images/unfold_plotting_tools.png" src="_images/unfold_plotting_tools.png" />
+</div>
+<a class="reference internal image-reference" href="_images/unfold_plotting_tools.png"><img alt="_images/unfold_plotting_tools.png" class="align-center" src="_images/unfold_plotting_tools.png" style="width: 65%;" /></a>
 <div class="toctree-wrapper compound">
 </div>
 
@@ -224,7 +231,7 @@
     </p>
     <p>
         &copy; Copyright 2018, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Mar 28, 2018.<br/>
+      Last updated on Jun 01, 2018.<br/>
     </p>
   </div>
 </footer>

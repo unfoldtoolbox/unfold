@@ -36,7 +36,7 @@ html_theme_options = {
     # an arbitrary url.
     'navbar_links': [
         ("Home",'index'),
-        ("Download from Github", "http://github.com/behinger/unfold",True)
+        ("Download from Github", "http://github.com/unfoldtoolbox/unfold",True)
     ],
 
     # Render the next and previous page links in navbar. (Default: true)

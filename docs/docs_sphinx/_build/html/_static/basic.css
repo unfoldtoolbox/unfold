@@ -27,3 +27,10 @@ iframe{
 .toctree-l2{
   font-weight:400;
 }
+
+.center-div {
+  	margin-left: auto;
+	margin-right: auto;
+	display: block;
+
+}
