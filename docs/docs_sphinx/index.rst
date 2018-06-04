@@ -51,7 +51,7 @@ What can you do with *unfold*?
 Requirements
 ^^^^^^^^^^^^^^^^^
 * MATLAB 2015a+
-* Data in EEGLAB 12+ format
+* Continuous data in EEGLAB 12+ format
 * Unfold toolbox `Download it on GitHub <https://github.com/unfoldtoolbox/unfold/>`_
 
 Getting Started
@@ -74,4 +74,5 @@ To get started, best is to start with the 2x2 ANOVA-Design tutorial :doc:`toolbo
    contenttutorials
    toolboxtutorials
    documentation
+   datastructures
    impressum
