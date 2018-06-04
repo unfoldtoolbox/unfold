@@ -32,6 +32,7 @@
   var _paq = _paq || [];
   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
   _paq.push(['requireConsent']);
+  disableCookies()
   _paq.push(['trackPageView']);
   _paq.push(['rememberConsentGiven']);
   _paq.push(['forgetConsentGiven']);
@@ -245,8 +246,8 @@
       Last updated on Jun 04, 2018.<br/>
     </p>
   </div>
-<iframe
-        style="border: 0; height: 200px; width: 600px;"
+<iframe class='container',
+ id = 'matomo_tracking_frame',        style="border: 0; height: 200px; width: 600px;"
         src="https://www.unfoldtoolbox.org/piwik/index.php?module=CoreAdminHome&action=optOut&language=en&backgroundColor=&fontColor=&fontSize=&fontFamily="
         ></iframe>
 
