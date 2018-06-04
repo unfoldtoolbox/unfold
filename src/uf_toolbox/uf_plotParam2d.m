@@ -36,9 +36,10 @@ paramIdx = find(strcmp(ufresult.unfold.variabletypes,'spline') | strcmp(ufresult
 for p = 1:length(paramIdx)
     
     if any(strcmp(ufresult.unfold.variabletypes,'continuous'))
-        cfg.auto_n = 100;
-        cfg.auto_method = 'linear';
-        ufresult = uf_predictContinuous(ufresult,cfg);
+        cfgtmp= struct();
+        cfgtmp.auto_n = 100;
+        cfgtmp.auto_method = 'linear';
+        ufresult = uf_predictContinuous(ufresult,cfgtmp);
     end
     figure
     varName = ufresult.unfold.variablenames(paramIdx(p));

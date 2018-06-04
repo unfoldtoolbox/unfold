@@ -37,7 +37,7 @@ Plotting (e.g. :func:`uf_plotParam`)
 Group-Level Statistics
   Most commonly users estimate the parameters for all subjects and then test the parameters against an H0 of no effect. If no prior knowledege on the time/location of the effect is known, we recommend to use cluster-permutation based statistics. We recommend the EPT-TFCE toolbox. We focus on single subject beta-estimates and leave the statistics up to the user.
 
-Specification for Input-Data
+Minimal Data Specifications
 =============================
 Data need to be in continuous form. We use the default format of EEG.
 
@@ -55,8 +55,21 @@ The minimal required fields (the usual EEGlab-structure) are:
   * event.latency (in samples)
   * event.customField (`customField` = name of your variable, e.g. `color`. The content should be in this case a string 'red' or, for continuous variables, a number)
 
+
+Bad & Missing data
+=========================================
+There are some important differences in the workflow to a classical EEG experiment. This mostly regards to the handling of bad data (artefacts) and the removal/estimation of missing predictor values of some events (imputation)
+
+Removing artifactual data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The toolbox requires continuous, uncleaned data. Removing data before the deconvolution would possibly also remove events that overlap partially in 'clean' events. Therefore the classical removal of continuous data, or removal of epochs does not work directly.
+
+The function :func:`uf_continuousArtifactExclude` allows one to reject continuous portions of data that are were marked on the continuous signal. We expect a 'winrej'-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment). The function then removes (puts to 0) the entries of EEG.unfold.Xdc corresponding to these time points. They are thereby effectively removed from being modeled.
+
+
 Imputation of missing data
-==================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 In linear models, missing data need to be imputed ('interpolated') or the event needs to be excluded. We currently offer four methods to deal with this in the function :func:`uf_imputeMissing` (to be called after the design specification):
 
 drop
@@ -72,18 +85,27 @@ median
   fill in missing predictor-values with the median of the remaining events.
 
 
-Removing artefactual data
-============================
-Because we start with continuous data, usual removal of data stretches does not work the same. The function :func:`uf_continuousArtifactExclude` allows one to reject continuous portions of data that are either marked automatically or manually. We expect a 'winrej'-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment)
+Massive univariate modeling (rERP)
+=================================================================
+It is possible to use the toolbox for massive univariate linear modeling (also known as regression ERP, rERP) without any deconvolution applied. A minimal script looks like this:
 
-Comparison between deconvolved and non-deconvolved (classical)
-================================================================
-we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial :doc:`toolbox-tut04`
+.. code-block:: matlab
 
-Toolbox variables
-==================================
+  EEG = uf_designmat('eventtypes',{'fixation'},'formula','1+cat(category)')
+  EEG = uf_epoch(EEG,'timelimits',[-0.5 1])
+  EEG = uf_glmfit_nodc(EEG)
+  % (strictly speaking optional, but recommended)
+  ufresult = uf_condense(EEG)
+
+
+In addition, we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial :doc:`toolbox-tut04`.
+|
+
+Toolbox structure fields explained
+====================================
+
 Fields of `EEG.unfold`
-
+----------------------
 
 splines
   all information on the splines are saved in here (see below). Each spline is added at splines{end+1}

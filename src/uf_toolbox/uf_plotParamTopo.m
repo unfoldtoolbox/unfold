@@ -39,10 +39,6 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
-if cfg.add_intercept
-    error('not supported yet')
-    
-end
 
 
 data = ufresult.(cfg.betaSetName);

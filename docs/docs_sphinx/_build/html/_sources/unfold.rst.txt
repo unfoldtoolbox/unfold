@@ -1,7 +1,7 @@
 .. automodule:: src.uf_toolbox
 
 Essential functions
-===============
+======================
 
 .. autofunction:: uf_designmat
 
@@ -29,7 +29,7 @@ Massive univariate linear modelling
 
 
 Designmatrix-Tools
-===========
+====================
 .. autofunction:: uf_imputeMissing
 
 .. autofunction:: uf_designmat_addcol
@@ -49,7 +49,7 @@ Plotting
 =================
 
 plot events & designmatrix
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. autofunction:: uf_plotEventCorrmat
 
 .. autofunction:: uf_plotEventHistogram
@@ -58,7 +58,7 @@ plot events & designmatrix
 
 
 plot results
-----------------
+^^^^^^^^^^^^^^^
 .. autofunction:: uf_plotParam
 
 .. autofunction:: uf_plotParam2d
