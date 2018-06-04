@@ -42,8 +42,6 @@
   var _paq = _paq || [];
   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
   _paq.push(['disableCookies']);
-  _paq.push(['rememberConsentGiven']);
-  _paq.push(['forgetConsentGiven']);
   _paq.push(['requireConsent']);
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
@@ -1161,7 +1159,7 @@ something inbetween for elastic net</li>
     </p>
 
     <div id="optout-form">
-      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage. You can find <a href='./_static/impressum.html'>the full privacy police here </a></p>
+      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage. You can find our <a href='./_static/impressum.html'> privacy police here.</a> We use the data only to track how many visitors come to this page.</p>
     </div>
 
 
@@ -1172,6 +1170,30 @@ something inbetween for elastic net</li>
     </span>
     <span class="nojs">It appears you have deactived JavaScript in your browser. This feature is only available with JavaScript turned on. If you don’t want your data to be collected, you can still turn on <em>Do Not Track</em> in your browser which is a general setting and is being respected by our Matomo installation.</span>
     </p>
+    <script>
+    if (dnt && doNotTrackRespected) {
+	/**
+	 * if browser DoNotTrack setting is activated show doNotTrackActive text
+	 */
+	for (var langDNT in langSnippets) {
+		$('.matomo-optout[lang="' + langDNT + '"]').html(langSnippets[langDNT].doNotTrackActive);
+	}
+} else {
+	if (typeof(Storage) !== 'undefined') {
+		/**
+		 * if localStorage exists show status text and set event listener to checkbox
+		 */
+		matomoDisplayStatus();
+		$('input[name="matomo-optout"]').on('change', function() {
+			matomoChangeStatus();
+		});
+	} else {
+		for (var langOldBrowser in langSnippets) {
+			$('.matomo-optout[lang="' + langOldBrowser + '"]').html(langSnippets[langOldBrowser].localStorageNotAvailable);
+		}
+	}
+}
+</script>
 
 </div>
 </footer>
