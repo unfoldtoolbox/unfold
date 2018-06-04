@@ -37,41 +37,6 @@ Plotting (e.g. :func:`uf_plotParam`)
 Group-Level Statistics
   Most commonly users estimate the parameters for all subjects and then test the parameters against an H0 of no effect. If no prior knowledege on the time/location of the effect is known, we recommend to use cluster-permutation based statistics. We recommend the EPT-TFCE toolbox. We focus on single subject beta-estimates and leave the statistics up to the user.
 
-Minimal Data Specifications
-=============================
-Data need to be in continuous form. We use the default format of EEG.
-
-The minimal required fields (the usual EEGlab-structure) are:
-
-* EEG.data (chan x time)
-
-* EEG.times (vector of time points in milliseconds)
-
-* EEG.srate (samplingrate in Hz)
-
-* EEG.event (structure of events, same structure as in EEGlab)
-
-  * event.type (e.g. 'stimulus' or 'keypress')
-  * event.latency (in samples)
-  * event.customField (`customField` = name of your variable, e.g. `color`. The content should be in this case a string 'red' or, for continuous variables, a number)
-
-
-Bad & Missing data
-=========================================
-There are some important differences in the workflow to a classical EEG experiment. This mostly regards to the handling of bad data (artefacts) and the removal/estimation of missing predictor values of some events (imputation)
-
-Removing artifactual data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The toolbox requires continuous, uncleaned data. Removing data before the deconvolution would possibly also remove events that overlap partially in 'clean' events. Therefore the classical removal of continuous data, or removal of epochs does not work directly.
-
-The function :func:`uf_continuousArtifactExclude` allows one to reject continuous portions of data that are were marked on the continuous signal. We expect a 'winrej'-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment). The function then removes (puts to 0) the entries of EEG.unfold.Xdc corresponding to these time points. They are thereby effectively removed from being modeled.
-
-
-Imputation of missing data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-In linear models, missing data need to be imputed ('interpolated') or the event needs to be excluded. We currently offer four methods to deal with this in the function :func:`uf_imputeMissing` (to be called after the design specification). See the documentation of impute missing for more details.
-
 Massive univariate modeling (rERP)
 =================================================================
 It is possible to use the toolbox for massive univariate linear modeling (also known as regression ERP, rERP) without any deconvolution applied. A minimal script looks like this:
@@ -86,3 +51,20 @@ It is possible to use the toolbox for massive univariate linear modeling (also k
 
 
 In addition, we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial :doc:`toolbox-tut04`.
+
+
+Artefacts & missing data/predictors
+=========================================
+There are some important differences in the workflow to a classical EEG experiment. This mostly regards to the handling of bad data (artefacts) and the removal/estimation of missing predictor values of some events (imputation)
+
+Removing artifactual data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The toolbox requires continuous, uncleaned data. Removing data before the deconvolution would possibly also remove events that overlap partially in 'clean' events. Therefore the classical removal of continuous data, or removal of epochs does not work directly.
+
+The function :func:`uf_continuousArtifactExclude` allows one to reject continuous portions of data that are were marked on the continuous signal. We expect a 'winrej'-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment). The function then removes (puts to 0) the entries of EEG.unfold.Xdc corresponding to these time points. They are thereby effectively removed from being modeled. One side effect is, that parts of an ERP can be estimated by different amounts of trials.
+
+
+Imputation of missing data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In linear models, missing data need to be imputed ('interpolated') or the event needs to be excluded. We currently offer four methods to deal with this in the function :func:`uf_imputeMissing` (to be called after the design specification). See the documentation of impute missing for more details.

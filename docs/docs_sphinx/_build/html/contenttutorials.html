@@ -80,16 +80,14 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html">Unfold’s toolbox workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#minimal-data-specifications">Minimal Data Specifications</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#bad-missing-data">Bad &amp; Missing data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#artefacts-missing-data-predictors">Artefacts &amp; missing data/predictors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#removing-artifactual-data">Removing artifactual data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-structure-fields-explained">Toolbox structure fields explained</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Theoretical Background</a><ul>
@@ -108,7 +106,7 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut06.html">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">API</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html">Essential functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html#data-cleaning">Data cleaning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html#massive-univariate-linear-modelling">Massive univariate linear modelling</a></li>
@@ -121,7 +119,13 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="impressum.html">Website Data Privacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">Data Structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#minimal-data-specifications">Minimal Data Specifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-eeg-unfold">Fields of <code class="docutils literal notranslate"><span class="pre">EEG.unfold()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -152,7 +156,7 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary">
   <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Theoretical Background</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#why-deconvolution">Why deconvolution?</a></li>
@@ -161,8 +165,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Tutorials / Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="impressum.html">Website Data Privacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">Data Structures</a></li>
 </ul>
 
         </div>
@@ -170,10 +174,10 @@
     <div class="col-md-9 content">
       
   <div class="section" id="theoretical-background">
-<h1>Theoretical Background<a class="headerlink" href="#theoretical-background" title="Permalink to this headline">¶</a></h1>
+<h1>Theoretical Background</h1>
 <p>We recommend the <em>unfold</em> toolbox paper (<code class="xref mat mat-func docutils literal notranslate"><span class="pre">Ehinger</span> <span class="pre">&amp;</span> <span class="pre">Dimigen</span> <span class="pre">2018</span></code>,b) for an introduction to linear modeling in ERP analyses. The second part explicitly discusses deconvolution. This overview will give you the gist on these topics.</p>
 <div class="section" id="introduction-to-linear-modeling">
-<h2>Introduction to linear modeling<a class="headerlink" href="#introduction-to-linear-modeling" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction to linear modeling</h2>
 <p>Linear modeling tries to explain the data (ERPs / EEG signals) as a sum of some predictors / independent variables. In M/EEG analysis usually one GLM is fitted separately for each electrode and time-point. It can be formally stated as</p>
 <div class="math notranslate">
 \[y = x_1*\beta_1 + x_2*\beta_2 + ... + x_n*\beta_n + e = X\beta +e\]</div>
@@ -183,14 +187,14 @@
 <p>The choice of predictors (<span class="math notranslate">\(x_1,x_n...\)</span>) is up to the analyst of the signal. In order to understand how to use the toolbox it is helpful to understand the designmatrix <span class="math notranslate">\(X\)</span>. This designmatrix has multiple columns, each representing a predictor. Each row is one repetition, usually in EEG, one trial. If the predictor is a categorical one, some kind of encoding has to be used (reference/effects are currently supported). This encoding translates for example a two condition predictor ‘face’ vs ‘house’ in one predictor called the intercept, which in reference coding represents the reference-category (we use ‘face’) and the other predictor represents the difference of ‘face’ and ‘house’, because everything ‘face’ can explain, has already been soaked up by the first predictor.</p>
 </div>
 <div class="section" id="why-deconvolution">
-<h2>Why deconvolution?<a class="headerlink" href="#why-deconvolution" title="Permalink to this headline">¶</a></h2>
+<h2>Why deconvolution?</h2>
 <p>It is standard practice in M/EEG research to separate events in time, so that no overlap occurs. But in some cases this is not possible. Especially in reading or free-viewing, that is experiments involving eye movements. Fixations occur on average every 250ms. Long lasting potentials like P300 or N400 occur around 400ms after stimulus onset. It is clear that in each fixation, the activity of the previous fixation is overlapping. Also even without long lasting potentials, baselines are influenced by the previous stimulus (e.g. Lütkenhof 2010).</p>
 <p>If the overlap for two conditions is exactly identical, the differences between the conditions are unaffected. But often this is not the case. For example fixation durations are correlated with many cognitive variables of interest. And if fixation durations differ between two conditions, bias can arise as the overlap of the potentials is different. This can hide as well as generate differences between conditions. One example is given in the following plot.</p>
 <img alt="_images/deconvolutionProblem.png" src="_images/deconvolutionProblem.png" />
 <p>In this example, a difference between conditions A &amp; B arises only due to their different distances to the subsequent event (shown as histograms in B). This difference completely vanishes if we use deconvolution.</p>
 </div>
 <div class="section" id="how-does-deconvolution-work">
-<h2>How does deconvolution work?<a class="headerlink" href="#how-does-deconvolution-work" title="Permalink to this headline">¶</a></h2>
+<h2>How does deconvolution work?</h2>
 <p>Deconvolution tries to disentangle the signal. This is possible as the overlap is a bit different in each trial. Thus an algorithm can try to disentangle the process. The simplest way to do this is linear deconvolution, assuming that the signals of two events are linearly added. This has support in physiology: voltages are added linearly, that is, if two sources are active at the same time their voltage potentials can be summed. Linear deconvolution assumes that the first event does not influence the processing of the second event, an assumption that is most certainly wrong in the general case. But, importantly, one has to deal with this in a more generic ERP analysis as well. At least with deconvolution, some part of the overlap can be corrected for.</p>
 <p>To understand deconvolution it is useful to first have a look at <strong>convolution</strong>.</p>
 <img alt="_images/convolutionExplanation.png" src="_images/convolutionExplanation.png" />
@@ -202,7 +206,7 @@
 <p>Time is on the x-axis. A beta-parameter needs to be estimated for each row with blocks of the designmatrix (the red/green blocks). The sample (blue) is assumed to be the linear sum of (in the dashed example) three events with different betas associated (they are different also for the same event <em>green</em>, because the distance to the event is different). After constructing this matrix and expanding the designmatrix in time, we can again invert it and solve for all unknown betas. It might be interesting to note that the influence of an event can also be modeled in the past. For example motor potentials are usually visible before the keypress. In practice one defines a window around each event, e.g. [-0.5 to 1s] and the toolbox takes care of the rest.</p>
 </div>
 <div class="section" id="introduction-to-additive-spline-linear-modeling">
-<h2>Introduction to additive/spline linear modeling<a class="headerlink" href="#introduction-to-additive-spline-linear-modeling" title="Permalink to this headline">¶</a></h2>
+<h2>Introduction to additive/spline linear modeling</h2>
 <p>Sometimes relations between predictors and lets say P100 are not linear. For example saccadic amplitude has a logarithmic relationship. If this relationship is known, one can simply transform the predictor (log transform in this case) and then perform a linear fit. But in many cases either the relationship is not known, or it is not a simple function.</p>
 <a class="reference internal image-reference" href="_images/spline_figure.png"><img alt="_images/spline_figure.png" src="_images/spline_figure.png" style="width: 60%;" /></a>
 <p>In panel A of this figure we see that a linear function does not fit well our logarithmical relation.</p>
@@ -229,10 +233,8 @@
     </p>
 
     <div id="optout-form">
-      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage.</p>
-      <p>You can opt in/out:</p>
-
-      <p>
+      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage. You can find <a href='./_static/impressum.html'>the full privacy police here </a></p>
+      <p>You can opt in/out:
         <input type="checkbox" id="optout" />
         <label for="optout"><strong></strong></label>
       </p>
@@ -240,12 +242,15 @@
     <script>
     document.addEventListener("DOMContentLoaded", function(event) {
       function setOptOutText(element) {
+        console.log('setOptOutTextFunction');
         _paq.push([function() {
           element.checked = !this.isUserOptedOut();
+          console.log(this.isUserOptedOut());
           document.querySelector('label[for=optout]').innerText = element.checked
             ? 'You are currently opted out. Click here to opt in.'
             : 'You are currently opted in. Click here to opt out.';
         }]);
+        console.log('setOptOutTextFunction end');
       }
 
       var optOut = document.getElementById("optout");
@@ -255,7 +260,9 @@
         } else {
           _paq.push(['optUserOut']);
         }
+        console.log('startClickFunction');
         setOptOutText(optOut);
+        console.log('endClickFunction');
       });
       setOptOutText(optOut);
     });

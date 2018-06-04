@@ -21,7 +21,7 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API" href="documentation.html" />
+    <link rel="next" title="Function Documentation" href="documentation.html" />
     <link rel="prev" title="Time-Basis functions" href="toolbox-tut05.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -80,16 +80,14 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html">Unfold’s toolbox workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#minimal-data-specifications">Minimal Data Specifications</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#bad-missing-data">Bad &amp; Missing data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#artefacts-missing-data-predictors">Artefacts &amp; missing data/predictors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#removing-artifactual-data">Removing artifactual data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-structure-fields-explained">Toolbox structure fields explained</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a><ul>
@@ -108,7 +106,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">API</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html">Essential functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html#data-cleaning">Data cleaning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html#massive-univariate-linear-modelling">Massive univariate linear modelling</a></li>
@@ -121,7 +119,13 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="impressum.html">Website Data Privacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">Data Structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#minimal-data-specifications">Minimal Data Specifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-eeg-unfold">Fields of <code class="docutils literal notranslate"><span class="pre">EEG.unfold()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -152,7 +156,7 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary">
   <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="toolboxtutorials.html">Tutorials / Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
@@ -163,8 +167,8 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="impressum.html">Website Data Privacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">Data Structures</a></li>
 </ul>
 
         </div>
@@ -172,7 +176,7 @@
     <div class="col-md-9 content">
       
   <div class="section" id="nd-level-group-subject-statistics">
-<h1>2nd level (group/subject) statistics<a class="headerlink" href="#nd-level-group-subject-statistics" title="Permalink to this headline">¶</a></h1>
+<h1>2nd level (group/subject) statistics</h1>
 <p>This is just one example how to do statistics. We employ the ept-TFCE toolbox for it. There are many other ways how to do statistics, this toolbox focuses on analysing the first level.</p>
 <iframe src='_static/tutorial6_2ndLevel.html',height="100%"> </iframe></div>
 
@@ -193,10 +197,8 @@
     </p>
 
     <div id="optout-form">
-      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage.</p>
-      <p>You can opt in/out:</p>
-
-      <p>
+      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage. You can find <a href='./_static/impressum.html'>the full privacy police here </a></p>
+      <p>You can opt in/out:
         <input type="checkbox" id="optout" />
         <label for="optout"><strong></strong></label>
       </p>
@@ -204,12 +206,15 @@
     <script>
     document.addEventListener("DOMContentLoaded", function(event) {
       function setOptOutText(element) {
+        console.log('setOptOutTextFunction');
         _paq.push([function() {
           element.checked = !this.isUserOptedOut();
+          console.log(this.isUserOptedOut());
           document.querySelector('label[for=optout]').innerText = element.checked
             ? 'You are currently opted out. Click here to opt in.'
             : 'You are currently opted in. Click here to opt out.';
         }]);
+        console.log('setOptOutTextFunction end');
       }
 
       var optOut = document.getElementById("optout");
@@ -219,7 +224,9 @@
         } else {
           _paq.push(['optUserOut']);
         }
+        console.log('startClickFunction');
         setOptOutText(optOut);
+        console.log('endClickFunction');
       });
       setOptOutText(optOut);
     });

@@ -21,8 +21,8 @@
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Website Data Privacy" href="impressum.html" />
-    <link rel="prev" title="API" href="documentation.html" />
+    <link rel="next" title="Data Structures" href="datastructures.html" />
+    <link rel="prev" title="Function Documentation" href="documentation.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -80,16 +80,14 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html">Unfold’s toolbox workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#minimal-data-specifications">Minimal Data Specifications</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#bad-missing-data">Bad &amp; Missing data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#artefacts-missing-data-predictors">Artefacts &amp; missing data/predictors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#removing-artifactual-data">Removing artifactual data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-structure-fields-explained">Toolbox structure fields explained</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a><ul>
@@ -108,7 +106,7 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut06.html">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="reference internal" href="documentation.html">API</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="documentation.html">Function Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Essential functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-cleaning">Data cleaning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#massive-univariate-linear-modelling">Massive univariate linear modelling</a></li>
@@ -121,7 +119,13 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="impressum.html">Website Data Privacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">Data Structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#minimal-data-specifications">Minimal Data Specifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-eeg-unfold">Fields of <code class="docutils literal notranslate"><span class="pre">EEG.unfold()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -152,10 +156,10 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary">
   <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a></li>
 <li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Tutorials / Examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="documentation.html">API</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="documentation.html">Function Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Essential functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-cleaning">Data cleaning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#massive-univariate-linear-modelling">Massive univariate linear modelling</a></li>
@@ -168,7 +172,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="impressum.html">Website Data Privacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">Data Structures</a></li>
 </ul>
 
         </div>
@@ -176,10 +180,10 @@
     <div class="col-md-9 content">
       
   <span class="target" id="module-src.uf_toolbox"></span><div class="section" id="essential-functions">
-<h1>Essential functions<a class="headerlink" href="#essential-functions" title="Permalink to this headline">¶</a></h1>
+<h1>Essential functions</h1>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_designmat">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_designmat" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Generate Designmatrix out of EEG.event structure and a formula</dt>
 <dd>Input an EEG event structure and you will get an EEG.unfold.X field with
@@ -314,7 +318,7 @@ Reference coding is also known as treatment coding</li>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_timeexpandDesignmat">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_timeexpandDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_timeexpandDesignmat" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_timeexpandDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Timeexpand Designmatrix.</dt>
 <dd>This function takes the designmatrix% (saved in EEG.unfold.X, a
@@ -362,7 +366,7 @@ to convolve. In case of ‘full’, the parameter is not used.</li>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_glmfit">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_glmfit</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_glmfit" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_glmfit</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Fit the fullX designmatrix on the data and returns beta and stats</dt>
 <dd>This function solves the Equation X*beta = EEG.data, with X = Designmat.
@@ -444,7 +448,7 @@ EEG = dc_glmfit(EEG,’method’,’matlab’,’channel’,[3 5]);</dd>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_condense">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_condense</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_condense" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_condense</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><p>Condense results in new structure. Apply timebasis (if necessary)
 Returns an “ufresult”-struct that contains the predictor betas over time
 and accompanying information. This structure is further used in all
@@ -489,10 +493,10 @@ ufresult.chanlocs = EEG.chanlocs</p>
 
 </div>
 <div class="section" id="data-cleaning">
-<h1>Data cleaning<a class="headerlink" href="#data-cleaning" title="Permalink to this headline">¶</a></h1>
+<h1>Data cleaning</h1>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_continuousArtifactDetect">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_continuousArtifactDetect</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_continuousArtifactDetect" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_continuousArtifactDetect</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Reject commonly recorded artifactual potentials (c.r.a.p.)</dt>
 <dd><p class="first">This function has been altered very much by Benedikt Ehinger
@@ -557,7 +561,7 @@ Davis, CA
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_continuousArtifactExclude">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_continuousArtifactExclude</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_continuousArtifactExclude" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_continuousArtifactExclude</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Function to exclude (artifactual) continuous data from being modeled</dt>
 <dd>This function inputs a rejection vector and excludes the content from
@@ -595,10 +599,10 @@ values at the given times to 0.</dd>
 
 </div>
 <div class="section" id="massive-univariate-linear-modelling">
-<h1>Massive univariate linear modelling<a class="headerlink" href="#massive-univariate-linear-modelling" title="Permalink to this headline">¶</a></h1>
+<h1>Massive univariate linear modelling</h1>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_epoch">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_epoch</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_epoch" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_epoch</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Epoch the data according to the unfold structure</dt>
 <dd>Deconvolution works on continuous data, thus to compare it to the
@@ -631,7 +635,7 @@ Afterwards you can use uf_glmfit_nodc to fit the model</dd>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_glmfit_nodc">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_glmfit_nodc</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_glmfit_nodc" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_glmfit_nodc</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>A function to solve the inverse problem without deconvolution</dt>
 <dd><p class="first">Simple function to do massive univariate linear model. The function
@@ -665,10 +669,10 @@ EEG.devon.beta</td>
 
 </div>
 <div class="section" id="designmatrix-tools">
-<h1>Designmatrix-Tools<a class="headerlink" href="#designmatrix-tools" title="Permalink to this headline">¶</a></h1>
+<h1>Designmatrix-Tools</h1>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_imputeMissing">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_imputeMissing</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_imputeMissing" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_imputeMissing</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Impute Missing Values</dt>
 <dd>Deal with predictors for which some values are missing in design matrix
@@ -710,7 +714,7 @@ removed (‘drop’), which means put to 0</td>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_designmat_addcol">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat_addcol</code><span class="sig-paren">(</span><em>EEG</em>, <em>newrow</em>, <em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_designmat_addcol" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat_addcol</code><span class="sig-paren">(</span><em>EEG</em>, <em>newrow</em>, <em>label</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Adds a single custom column to the unfold-Designmat “Xdc”. This is</dt>
 <dd>sometimes useful to add e.g. continuous predictors manually.</dd>
@@ -736,7 +740,7 @@ removed (‘drop’), which means put to 0</td>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_designmat_spline">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat_spline</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_designmat_spline" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat_spline</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><p>Helper function to generate spline-part of designmatrix</p>
 <dl class="docutils">
 <dt>Argument:</dt>
@@ -791,10 +795,10 @@ EEG = dc_designmat_spline(EEG,’name’,’splineB’,’paramValues’,[EEG.ev
 
 </div>
 <div class="section" id="post-fit-tools">
-<h1>Post-Fit tools<a class="headerlink" href="#post-fit-tools" title="Permalink to this headline">¶</a></h1>
+<h1>Post-Fit tools</h1>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_predictContinuous">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_predictContinuous</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_predictContinuous" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_predictContinuous</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><p>Evaluates a continuous/spline parameter at specific values
 This is similar to a predict function, but does not add the marginal of
 the other parameters. For this please make use of uf_addmarignals().</p>
@@ -806,7 +810,7 @@ Note that this will overvwrite the ufresult.beta field</p>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_addmarginal">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_addmarginal</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_addmarginal" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_addmarginal</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><p>add the marginal of the other predictors (i.e. continuous &amp; spline predictors) to the beta estimates.
 Important: If dummy-coded (i.e. non-effect coded) predictors and
 interactions exist, they are NOT added to the marginal effect. I.e. the
@@ -851,7 +855,7 @@ the uf_predictContinuous step.</p>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_unfold2csv">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_unfold2csv</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_unfold2csv" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_unfold2csv</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Exports betas in an organized csv file to be opened in another tool</dt>
 <dd>returns a data-table</dd>
@@ -883,12 +887,12 @@ gets one column</p>
 
 </div>
 <div class="section" id="plotting">
-<h1>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h1>
+<h1>Plotting</h1>
 <div class="section" id="plot-events-designmatrix">
-<h2>plot events &amp; designmatrix<a class="headerlink" href="#plot-events-designmatrix" title="Permalink to this headline">¶</a></h2>
+<h2>plot events &amp; designmatrix</h2>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotEventCorrmat">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotEventCorrmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotEventCorrmat" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotEventCorrmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Plots a correlation matrix of the event structure</dt>
 <dd>Its possible to subselect the eventtype
@@ -916,7 +920,7 @@ returned</li>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotEventHistogram">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotEventHistogram</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotEventHistogram" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotEventHistogram</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Function that plots histogram of all events in the EEG.event structure</dt>
 <dd>This function also adds a density estimate</dd>
@@ -938,7 +942,7 @@ returned</li>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotDesignmat">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotDesignmat" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotDesignmat</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><p>Plots the designmatrix
 If the matrix is very large (the timeexpanded/Xdc matrix) we do not plot
 everything, but only the middle 60s. In addition (for timeexpand) we plot
@@ -968,10 +972,10 @@ uf_plot_designmat(EEG,’timeexpand’,1) %plot the timeexpanded X</dd>
 
 </div>
 <div class="section" id="plot-results">
-<h2>plot results<a class="headerlink" href="#plot-results" title="Permalink to this headline">¶</a></h2>
+<h2>plot results</h2>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotParam">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotParam</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotParam" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotParam</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Plots time vs. Voltage in separate plots for each predictor, where there</dt>
 <dd><p class="first">are multiple lines for each predictor</p>
@@ -1025,7 +1029,7 @@ useful to plot multiple subjects in a single figure.</li>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotParam2d">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotParam2d</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotParam2d" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotParam2d</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Plots a 2D plot of parameter vs. time with the predicted value as the</dt>
 <dd>third dimension
@@ -1053,7 +1057,7 @@ uf_plotParam2d(‘plotParam’,’continuosPredictorA’)</p>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plotParamTopo">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotParamTopo</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plotParamTopo" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plotParamTopo</code><span class="sig-paren">(</span><em>ufresult</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Generates rows of topoplots over time. each row is a predictor</dt>
 <dd>If you are not interested in differences, but the predicted cells, it
@@ -1094,7 +1098,7 @@ customized to whichever caxis e.g. [-3 5]</li>
 
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plot2nd">
-<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plot2nd</code><span class="sig-paren">(</span><em>d2nd</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plot2nd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plot2nd</code><span class="sig-paren">(</span><em>d2nd</em>, <em>varargin</em><span class="sig-paren">)</span></dt>
 <dd><dl class="docutils">
 <dt>Preliminary function to plot multiple subjects (2nd-level analysis)</dt>
 <dd><p class="first">This function allows to plot multiple subjects at the same time
@@ -1146,10 +1150,8 @@ something inbetween for elastic net</li>
     </p>
 
     <div id="optout-form">
-      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage.</p>
-      <p>You can opt in/out:</p>
-
-      <p>
+      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage. You can find <a href='./_static/impressum.html'>the full privacy police here </a></p>
+      <p>You can opt in/out:
         <input type="checkbox" id="optout" />
         <label for="optout"><strong></strong></label>
       </p>
@@ -1157,12 +1159,15 @@ something inbetween for elastic net</li>
     <script>
     document.addEventListener("DOMContentLoaded", function(event) {
       function setOptOutText(element) {
+        console.log('setOptOutTextFunction');
         _paq.push([function() {
           element.checked = !this.isUserOptedOut();
+          console.log(this.isUserOptedOut());
           document.querySelector('label[for=optout]').innerText = element.checked
             ? 'You are currently opted out. Click here to opt in.'
             : 'You are currently opted in. Click here to opt out.';
         }]);
+        console.log('setOptOutTextFunction end');
       }
 
       var optOut = document.getElementById("optout");
@@ -1172,7 +1177,9 @@ something inbetween for elastic net</li>
         } else {
           _paq.push(['optUserOut']);
         }
+        console.log('startClickFunction');
         setOptOutText(optOut);
+        console.log('endClickFunction');
       });
       setOptOutText(optOut);
     });
