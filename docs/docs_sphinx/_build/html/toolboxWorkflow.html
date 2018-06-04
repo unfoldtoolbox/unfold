@@ -33,7 +33,6 @@
   var _paq = _paq || [];
   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
   _paq.push(['requireConsent']);
-  disableCookies()
   _paq.push(['trackPageView']);
   _paq.push(['rememberConsentGiven']);
   _paq.push(['forgetConsentGiven']);
@@ -341,10 +340,39 @@
         &copy; Copyright 2018, Benedikt Ehinger, Olaf Dimigen.<br/>
       Last updated on Jun 04, 2018.<br/>
     </p>
-<iframe class='container',
- id = 'matomo_tracking_frame',        style="border: 0; height: 200px;",
-        src="https://www.unfoldtoolbox.org/piwik/index.php?module=CoreAdminHome&action=optOut&language=en&backgroundColor=&fontColor=&fontSize=&fontFamily="
-        ></iframe>
+
+    <div id="optout-form">
+      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage.</p>
+      <p>You can opt in/out:</p>
+
+      <p>
+        <input type="checkbox" id="optout" />
+        <label for="optout"><strong></strong></label>
+      </p>
+    </div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+      function setOptOutText(element) {
+        _paq.push([function() {
+          element.checked = !this.isUserOptedOut();
+          document.querySelector('label[for=optout]').innerText = element.checked
+            ? 'You are currently opted out. Click here to opt in.'
+            : 'You are currently opted in. Click here to opt out.';
+        }]);
+      }
+
+      var optOut = document.getElementById("optout");
+      optOut.addEventListener("click", function() {
+        if (this.checked) {
+          _paq.push(['forgetUserOptOut']);
+        } else {
+          _paq.push(['optUserOut']);
+        }
+        setOptOutText(optOut);
+      });
+      setOptOutText(optOut);
+    });
+    </script>
 </div>
 </footer>
   </body>
