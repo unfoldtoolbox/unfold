@@ -19,6 +19,7 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <script type="text/javascript" src="_static/matomoTrackingOptOut.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Data Structures" href="datastructures.html" />
@@ -30,12 +31,21 @@
 
 <!-- Matomo -->
 <script type="text/javascript">
+
+  if (typeof(Storage) !== 'undefined') {
+  	if (localStorage.getItem('matomoTrackingEnabled') === null) {
+  		localStorage.setItem('matomoTrackingEnabled', 'true');
+  	}
+  }
+  if (localStorage.getItem('matomoTrackingEnabled') !== 'false') {
+
   var _paq = _paq || [];
   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['requireConsent']);
-  _paq.push(['trackPageView']);
+  _paq.push(['disableCookies']);
   _paq.push(['rememberConsentGiven']);
   _paq.push(['forgetConsentGiven']);
+  _paq.push(['requireConsent']);
+  _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
     var u="//www.unfoldtoolbox.org/piwik/";
@@ -44,6 +54,7 @@
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
   })();
+}
 </script>
 <!-- End Matomo Code -->
 
@@ -1151,39 +1162,17 @@ something inbetween for elastic net</li>
 
     <div id="optout-form">
       <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage. You can find <a href='./_static/impressum.html'>the full privacy police here </a></p>
-      <p>You can opt in/out:
-        <input type="checkbox" id="optout" />
-        <label for="optout"><strong></strong></label>
-      </p>
     </div>
-    <script>
-    document.addEventListener("DOMContentLoaded", function(event) {
-      function setOptOutText(element) {
-        console.log('setOptOutTextFunction');
-        _paq.push([function() {
-          element.checked = !this.isUserOptedOut();
-          console.log(this.isUserOptedOut());
-          document.querySelector('label[for=optout]').innerText = element.checked
-            ? 'You are currently opted out. Click here to opt in.'
-            : 'You are currently opted in. Click here to opt out.';
-        }]);
-        console.log('setOptOutTextFunction end');
-      }
 
-      var optOut = document.getElementById("optout");
-      optOut.addEventListener("click", function() {
-        if (this.checked) {
-          _paq.push(['forgetUserOptOut']);
-        } else {
-          _paq.push(['optUserOut']);
-        }
-        console.log('startClickFunction');
-        setOptOutText(optOut);
-        console.log('endClickFunction');
-      });
-      setOptOutText(optOut);
-    });
-    </script>
+
+    <p class="matomo-optout" lang="en">
+    <span class="js" style="display:none;">
+        <input type="checkbox" name="matomo-optout" id="matomo-optout-en" checked>
+        <label for="matomo-optout-en"></label>
+    </span>
+    <span class="nojs">It appears you have deactived JavaScript in your browser. This feature is only available with JavaScript turned on. If you don’t want your data to be collected, you can still turn on <em>Do Not Track</em> in your browser which is a general setting and is being respected by our Matomo installation.</span>
+    </p>
+
 </div>
 </footer>
   </body>
