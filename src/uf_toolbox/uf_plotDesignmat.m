@@ -24,8 +24,10 @@ cfg = finputcheck(varargin,...
     'figure','boolean',[],1;...
     'sort','boolean',[0,1],0;...
     'addContData','boolean',[0,1],0;... %undocumented, adds y-data as a subplot
-    },'mode','ignore');
-
+    },'mode','error');
+if ischar(cfg)
+    error(cfg)
+end
 assert(~(cfg.timeexpand & cfg.sort),'cannot plot Xdc sorted')
 
 if cfg.timeexpand
