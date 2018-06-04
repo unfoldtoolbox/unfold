@@ -70,20 +70,7 @@ The function :func:`uf_continuousArtifactExclude` allows one to reject continuou
 Imputation of missing data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In linear models, missing data need to be imputed ('interpolated') or the event needs to be excluded. We currently offer four methods to deal with this in the function :func:`uf_imputeMissing` (to be called after the design specification):
-
-drop
-  this removes events that have a missing field in a single explanatory variable
-
-marginal
-  fills in a random sample from the values in other events. This preserves the overall distribution of missing events
-
-mean
-  fill in missing predictor-values with the mean of the remaining events.
-
-median
-  fill in missing predictor-values with the median of the remaining events.
-
+In linear models, missing data need to be imputed ('interpolated') or the event needs to be excluded. We currently offer four methods to deal with this in the function :func:`uf_imputeMissing` (to be called after the design specification). See the documentation of impute missing for more details.
 
 Massive univariate modeling (rERP)
 =================================================================
