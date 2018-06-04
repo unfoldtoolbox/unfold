@@ -1,4 +1,4 @@
-Content Tutorials
+Theoretical Background
 ==================
 We recommend the *unfold* toolbox paper (`Ehinger & Dimigen 2018 <XXX>`,b) for an introduction to linear modeling in ERP analyses. The second part explicitly discusses deconvolution. This overview will give you the gist on these topics.
 
