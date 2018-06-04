@@ -38,7 +38,7 @@ for type = {'default','cyclical','custom','cyclical_formula','2D'}
     EEG.data = zeros(1,length(EEG.times));
     
     EEG.data = datafunction(spl.values);
-    EEG.data = EEG.data + randn(size(EEG.data)).*10;
+%     EEG.data = EEG.data + randn(size(EEG.data)).*1;
     
     EEG = eeg_checkset(EEG);
     
@@ -76,6 +76,7 @@ for type = {'default','cyclical','custom','cyclical_formula','2D'}
             EEG = uf_designmat_spline(EEG,'name','splineA','paramValues',[EEG.event.splineA],'knotsequence',linspace(-10,10,5),'splinefunction',spl.function);
         case 'cyclical_formula'
             EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1+circspl(splineA,15,0,2*pi)');
+        
         case '2D'
             EEG = uf_designmat(EEG,'eventtypes','stimulus','formula','y~1+2dspl(splineA,splineB,4)');
     end
@@ -134,7 +135,13 @@ for type = {'default','cyclical','custom','cyclical_formula','2D'}
         end
         
     end
-    assert(sum((EEG.data - result').^2) < 0.001,'could not recover function!')
+    if strcmp(cfgSim.type,'2D')
+        assert(sum((modelled(:)-data(:)).^2) < 0.001,'could not recover function!')
+    else
+        
+    assert(sum((EEG.data- result').^2) < 0.001,'could not recover function!')
+    end
+    
     
 %% Test 2D splines
 

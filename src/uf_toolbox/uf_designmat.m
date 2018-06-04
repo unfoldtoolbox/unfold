@@ -44,14 +44,6 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                  If more than one formula are specified, we expect you to specify
 %                  the eventtypess each formula should be applied to.
 %
-%   cfg.spline(cell): define a b-spline non-parametric continuous effect. For example:
-%                   cfg.spline = {{'speed',15},{'size',10}};
-%                   This adds two non-parametric splines, speed with 15
-%                   knots and size with 10 knots, thus in total 14+9=23
-%                   parameters (we remove one spline due to the Linear
-%                   Modeling aspect). Can be specified more conveniently
-%                   directly inside the formula
-%                   2D splines have to be specified in the form {'xpos','ypos',10}
 %
 %   cfg.categorical(cell-array): default {}, list of which of the EEG.event fields
 %                   should be treated as an categorical effect (thus
@@ -153,9 +145,7 @@ if iscell(cfg.formula)
         for k = 1:length(cfg.eventtypes)
             cfgSingle.eventtypes = cfg.eventtypes{k};
             cfgSingle.formula= cfg.formula{k};
-            if ~isempty(cfg.spline)
-                cfgSingle.spline = cfg.spline{k};
-            end
+            
             
             %do the summersault
             
@@ -251,14 +241,8 @@ for s = 1:length(spl2D)
     assert(floor(spl2D{s}{2}) == spl2D{s}{2},'spline number has to be an integer!')
     
 end%% First check for unique variablenames
-
-%% auto fill in default_spline for the cfg.spline defined splines
-for s = 1:length(cfg.spline )
-    if size(cfg.spline{s},2) == 2
-        cfg.spline{s} = @default_spline;
-    end
-end
-cfg.spline = [cfg.spline spl circspl spl2D];
+%%
+cfg.spline = [spl circspl spl2D];
 
 numericix = [];
 % check categorical input and combine
