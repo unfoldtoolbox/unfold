@@ -42,7 +42,6 @@
   var _paq = _paq || [];
   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
   /*_paq.push(['disableCookies']);*/
-  _paq.push(['requireConsent']);
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
@@ -236,14 +235,6 @@ concurrently. The specification could be as follows:
 {{‘A1’,’A2’,’A3’},{‘B’},{‘C’}}.
 If more than one formula are specified, we expect you to specify
 the eventtypess each formula should be applied to.</li>
-<li><strong>cfg.spline</strong> (<em>cell</em>) – define a b-spline non-parametric continuous effect. For example:
-cfg.spline = {{‘speed’,15},{‘size’,10}};
-This adds two non-parametric splines, speed with 15
-knots and size with 10 knots, thus in total 14+9=23
-parameters (we remove one spline due to the Linear
-Modeling aspect). Can be specified more conveniently
-directly inside the formula
-2D splines have to be specified in the form {‘xpos’,’ypos’,10}</li>
 <li><strong>cfg.categorical</strong> (<em>cell-array</em>) – default {}, list of which of the EEG.event fields
 should be treated as an categorical effect (thus
 dummy/effect coded). You can also directly specify what
