@@ -38,6 +38,8 @@ Getting Started
 To get started, best is to start with the 2x2 ANOVA-Design tutorial :doc:`toolbox-tut01`
 
 
+.. raw:: html
+    <iframe style="border: 0; height: 200px; width: 600px;"       src="https://www.unfoldtoolbox.org/piwik/index.php?module=CoreAdminHome&action=optOut&language=en&backgroundColor=&fontColor=&fontSize=&fontFamily"></iframe>
 
 
 

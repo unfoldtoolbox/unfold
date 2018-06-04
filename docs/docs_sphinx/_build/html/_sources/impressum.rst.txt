@@ -1,4 +1,4 @@
-Impressum
+Website Data Privacy
 =======================
 
 .. raw:: html

@@ -28,6 +28,27 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
+<!-- Matomo -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['requireConsent']);
+  _paq.push(['trackPageview']);
+  _paq.push(['trackPageView']);
+  _paq.push(['rememberConsentGiven']);
+  _paq.push(['forgetConsentGiven']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//www.unfoldtoolbox.org/piwik/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+
+
   </head><body>
 
   <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
@@ -60,27 +81,26 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Toolbox Overview</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html">Unfold’s toolbox workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#specification-for-input-data">Specification for Input-Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#removing-artefactual-data">Removing artefactual data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-variables">Toolbox variables</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#minimal-data-specifications">Minimal Data Specifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#bad-missing-data">Bad &amp; Missing data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#removing-artifactual-data">Removing artifactual data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-structure-fields-explained">Toolbox structure fields explained</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#why-deconvolution">Why deconvolution?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#how-does-deconvolution-work">How does deconvolution work?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="toolboxtutorials.html">Tutorials / Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Longstart: 2x2 ANOVA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut03.html">Non-Linear Predictors using splines</a></li>
@@ -89,7 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut06.html">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html">Essential functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html#data-cleaning">Data cleaning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html#massive-univariate-linear-modelling">Massive univariate linear modelling</a></li>
@@ -133,9 +153,9 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary">
   <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Toolbox Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="toolboxtutorials.html">Tutorials / Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Longstart: 2x2 ANOVA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut03.html">Non-Linear Predictors using splines</a></li>
@@ -144,7 +164,7 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut06.html">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="impressum.html">Impressum</a></li>
 </ul>
 
@@ -169,7 +189,7 @@
     </p>
     <p>
         &copy; Copyright 2018, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Jun 01, 2018.<br/>
+      Last updated on Jun 04, 2018.<br/>
     </p>
   </div>
 </footer>
