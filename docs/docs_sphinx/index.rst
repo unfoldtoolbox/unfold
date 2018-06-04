@@ -52,4 +52,5 @@ To get started, best is to start with the 2x2 ANOVA-Design tutorial :doc:`toolbo
    contenttutorials
    toolboxtutorials
    documentation
+   datastructures
    impressum
