@@ -35,11 +35,9 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 %
 %
 %   cfg.lsmriterations: (default 400), defines how many steps the iterative
-%                   solver should search for a solution. While the solver is
-%		    mostly monotonic (see paper), it is recommended to increase
-%		    the iterations. A limit is only defined because in our
-%		    experience, high number of iterations are a result of
-%		    strong collinearities, and hint to a faulty model
+%      solver should search for a solution. While the solver is mostly monotonic (see paper), it is recommended
+%      to increase the iterations. A limit is only defined because in our experience, high number of iterations
+%      are a result of strong collinearities, and hint to a faulty model
 %
 %   cfg.glmnetalpha: (default 1, as in glmnet), can be 0 for L2 norm, 1 for L1-norm or
 %                    something inbetween for elastic net

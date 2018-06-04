@@ -59,8 +59,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   variables are categorical in the formula.
 %                   You can specify the order of the predictors. For
 %                   example:
-%                   {'predictorA',{'level3','level1','level2'};
-%                    'predictorB',{'level2','level1'}}
+%                   {'predictorA',{'level3','level1','level2'}; 'predictorB',{'level2','level1'}}
 %                   For predictorA, the level3 is now used as a reference
 %                   group. For predictorB the level2 is now used.
 %                   The second column of the cell array is optional. E.g.
@@ -78,6 +77,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   relevant if you define categorical input variables.
 %                   Reference coding is also known as treatment coding
 %
+%
 %Returns:
 %     EEG-struct: Returns the EEG structure with the additional fields in EEG.unfold
 %
@@ -86,6 +86,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %     * formula:    The original cfg.formula
 %     * event:      the cfg.eventtypes
 %     * cols2eventtypes:   For each column of 'X' which event it represents
+%
 %
 %*Example:*
 %   A classical 2x2 factorial design with interaction
@@ -116,7 +117,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %|   cfgDesign.formula = {'y ~ 1 + cat(level_predictability)*cat(target_fixation) + spl(sac_amplitude,10)','y~1'};
 %|
 %|   EEG = uf_addDesignmat(EEG,cfgDesign);
-
+%
 
 cfg = finputcheck(varargin,...
     {'categorical',   'cell', [], {};...

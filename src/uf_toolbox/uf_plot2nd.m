@@ -1,25 +1,29 @@
 function ax = uf_plot2nd(d2nd,varargin)
-%% Preliminary function
+%Preliminary function to plot multiple subjects (2nd-level analysis)
 % This function allows to plot multiple subjects at the same time
 % the function requires the data to be in the following format:
-%    ufresult.beta(CHAN,TIME,PARAM,SUBJECT)
+% ufresult.beta(CHAN,TIME,PARAM,SUBJECT)
 % 
 % Each line is one subject, its possible to calculate confidence intervals
 %
-% Arguments:
-%   cfg.channel:
-%
+%Arguments:
+%   cfg.channel: Which channel to use
+%       
 %   cfg.plotParam: (default 1, as in glmnet), can be 0 for L2 norm, 1 for L1-norm or
-%                    something inbetween for elastic net
+%       something inbetween for elastic net
+%
 %   cfg.bootci:  (default 1) calculate and plot boostraped confidence intervals
+%
 %   cfg.singlesubjects: (default 1) plot the singlesubject lines
+%
 %   ... :      Other parameters are linked to uf_plotParam
 %   
-% Returns:
+%Returns:
 %   nothing
 %
-% Example:
+%Example:
 %   uf_plot2nd(ufresult2nd,'channel',2)
+%
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[];
     

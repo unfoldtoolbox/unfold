@@ -62,15 +62,14 @@
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html">Unfold’s toolbox workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#specification-for-input-data">Specification for Input-Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#removing-artefactual-data">Removing artefactual data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-variables">Toolbox variables</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#minimal-data-specifications">Minimal Data Specifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#bad-missing-data">Bad &amp; Missing data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#removing-artifactual-data">Removing artifactual data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="toolboxWorkflow.html#imputation-of-missing-data">Imputation of missing data</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="toolboxWorkflow.html#toolbox-structure-fields-explained">Toolbox structure fields explained</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a><ul>
@@ -212,21 +211,18 @@ parameters (we remove one spline due to the Linear
 Modeling aspect). Can be specified more conveniently
 directly inside the formula
 2D splines have to be specified in the form {‘xpos’,’ypos’,10}</li>
-<li><strong>cfg.categorical</strong> (<em>cell-array</em>) – <p>default {}, list of which of the EEG.event fields
+<li><strong>cfg.categorical</strong> (<em>cell-array</em>) – default {}, list of which of the EEG.event fields
 should be treated as an categorical effect (thus
 dummy/effect coded). You can also directly specify what
 variables are categorical in the formula.
 You can specify the order of the predictors. For
 example:
-{‘predictorA’,{‘level3’,’level1’,’level2’};</p>
-<blockquote>
-<div>’predictorB’,{‘level2’,’level1’}}</div></blockquote>
-<p>For predictorA, the level3 is now used as a reference
+{‘predictorA’,{‘level3’,’level1’,’level2’}; ‘predictorB’,{‘level2’,’level1’}}
+For predictorA, the level3 is now used as a reference
 group. For predictorB the level2 is now used.
 The second column of the cell array is optional. E.g.
 {‘predictorA’,’predictorB’} will make both predictors
-as categorical</p>
-</li>
+as categorical</li>
 <li><strong>cfg.splinespacing</strong> (<em>string</em>) – defines how the knots of the splines should be
 placed. Possible values:
 ‘linear’ : linear spacing with boundary splines at the respective min/max
@@ -391,14 +387,10 @@ compared to the fit of the model). We use the glmnet recommended
 ‘lambda_1se’, i.e. minimum lambda + 1SE buffer towards more strict
 regularisation.</p>
 </li>
-<li><strong>cfg.lsmriterations</strong> – <p>(default 400), defines how many steps the iterative
-solver should search for a solution. While the solver is</p>
-<blockquote>
-<div>mostly monotonic (see paper), it is recommended to increase
-the iterations. A limit is only defined because in our
-experience, high number of iterations are a result of
-strong collinearities, and hint to a faulty model</div></blockquote>
-</li>
+<li><strong>cfg.lsmriterations</strong> – (default 400), defines how many steps the iterative
+solver should search for a solution. While the solver is mostly monotonic (see paper), it is recommended
+to increase the iterations. A limit is only defined because in our experience, high number of iterations
+are a result of strong collinearities, and hint to a faulty model</li>
 <li><strong>cfg.glmnetalpha</strong> – (default 1, as in glmnet), can be 0 for L2 norm, 1 for L1-norm or
 something inbetween for elastic net</li>
 <li><strong>cfg.channel</strong> (<em>array</em>) – Restrict the beta-calculation to a subset of
@@ -657,13 +649,17 @@ EEG.devon.beta</td>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_imputeMissing">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_imputeMissing</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_imputeMissing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Deal with predictors for which some values are missing in design matrix
+<dd><dl class="docutils">
+<dt>Impute Missing Values</dt>
+<dd>Deal with predictors for which some values are missing in design matrix
 You can either impute missing values or remove the predictors events for
-which some values are missing</p>
-<p>Arguments:
-cfg.method:</p>
-<blockquote>
-<div><ul class="simple">
+which some values are missing</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg.method</strong> – <ul class="simple">
 <li><dl class="first docutils">
 <dt>‘drop’ <span class="classifier-delimiter">:</span> <span class="classifier">(similar to R) Drop the whole event from the designmat (fill</span></dt>
 <dd>it with 0). This will lead to the event not being used
@@ -671,20 +667,23 @@ for overlap correction!</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>‘marginal’ <span class="classifier-delimiter">:</span> <span class="classifier">fill in a random value from the marginal predictor-distribution</span></dt>
+<dt>’marginal’ <span class="classifier-delimiter">:</span> <span class="classifier">fill in a random value from the marginal predictor-distribution</span></dt>
 <dd>in the future it might be interesting to implement not the
 marginal, but multivariate methods to conservate
 correlations between predictors (c.f. Horton &amp; Kleinmann 2007)</dd>
 </dl>
 </li>
-<li>‘mean’     : fill in the mean value</li>
-<li>‘median’   : (Default) fill in the median value</li>
+<li>’mean’     : fill in the mean value</li>
+<li>’median’   : (Default) fill in the median value</li>
 </ul>
-</div></blockquote>
-<p>Returns:
-EEG.unfold.X in which missing NAN-values were imputed (‘marginal’, ‘mean’,
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">EEG.unfold.X in which missing NAN-values were imputed (‘marginal’, ‘mean’,
 ‘median’) or in which the events with missing predictor information were
-removed (‘drop’), which means put to 0</p>
+removed (‘drop’), which means put to 0</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Example</p>
 <p>EEG = uf_imputeMissing(EEG)</p>
 </dd></dl>
@@ -719,8 +718,7 @@ removed (‘drop’), which means put to 0</p>
 <dt id="src.uf_toolbox.uf_designmat_spline">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_designmat_spline</code><span class="sig-paren">(</span><em>EEG</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_designmat_spline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to generate spline-part of designmatrix</p>
-<blockquote>
-<div><dl class="docutils">
+<dl class="docutils">
 <dt>Argument:</dt>
 <dd><dl class="first last docutils">
 <dt>cfg.name(string): (optional, default: “spline_default”) A name for the</dt>
@@ -747,7 +745,6 @@ regression</dd>
 </dl>
 </dd>
 </dl>
-</div></blockquote>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1078,18 +1075,20 @@ customized to whichever caxis e.g. [-3 5]</li>
 <dl class="function">
 <dt id="src.uf_toolbox.uf_plot2nd">
 <code class="descclassname">src.uf_toolbox.</code><code class="descname">uf_plot2nd</code><span class="sig-paren">(</span><em>d2nd</em>, <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#src.uf_toolbox.uf_plot2nd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Preliminary function
-This function allows to plot multiple subjects at the same time
-the function requires the data to be in the following format:</p>
-<blockquote>
-<div>ufresult.beta(CHAN,TIME,PARAM,SUBJECT)</div></blockquote>
-<p>Each line is one subject, its possible to calculate confidence intervals</p>
+<dd><dl class="docutils">
+<dt>Preliminary function to plot multiple subjects (2nd-level analysis)</dt>
+<dd><p class="first">This function allows to plot multiple subjects at the same time
+the function requires the data to be in the following format:
+ufresult.beta(CHAN,TIME,PARAM,SUBJECT)</p>
+<p class="last">Each line is one subject, its possible to calculate confidence intervals</p>
+</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cfg.channel</strong> – </li>
+<li><strong>cfg.channel</strong> – Which channel to use</li>
 <li><strong>cfg.plotParam</strong> – (default 1, as in glmnet), can be 0 for L2 norm, 1 for L1-norm or
 something inbetween for elastic net</li>
 <li><strong>cfg.bootci</strong> – (default 1) calculate and plot boostraped confidence intervals</li>

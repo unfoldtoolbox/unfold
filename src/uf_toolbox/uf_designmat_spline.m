@@ -1,7 +1,7 @@
 function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
-% Helper function to generate spline-part of designmatrix
+%Helper function to generate spline-part of designmatrix
 %
-% Argument:
+%Argument:
 %   cfg.name(string): (optional, default: "spline_default") A name for the
 %           spline predictor
 %
