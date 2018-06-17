@@ -87,9 +87,9 @@ assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept 
 % Find out whether we want beta_dc, beta_nodc and if there are other fields
 % that have the same size that we should plot as columns.
 
-if ~isempty(cfg.predictAt{1}{1})
-    fprintf('Evaluating parameters at auto or specified values');
-    ufresult = uf_predictContinuous(ufresult,'deconv',cfg.deconv);
+if ~isempty(cfg.predictAt{1}{1}) % bugfix OD: this was ~isempty
+    fprintf('\nEvaluating parameters at auto or specified values');
+    ufresult = uf_predictContinuous(ufresult,'deconv',cfg.deconv,'predictAt',cfg.predictAt);
 end
 %% Prepare data
 % select parameters to plot, or else plot all available
