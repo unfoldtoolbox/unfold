@@ -120,12 +120,10 @@ cfg = finputcheck(varargin,...
     'codingschema','string',{'effects','reference'},'reference';
     },'mode','ignore');
 
-
-
 if(ischar(cfg)); error(cfg);end
 
 if isempty(cfg.eventtypes)
-    error('no eventtypes specified even though this is neccesary.')
+    error('%s(): No event types (eventtypes) specified. This is a required input to generate the design matrix.',mfilename)
 end
 
 if ~iscell(cfg.eventtypes)

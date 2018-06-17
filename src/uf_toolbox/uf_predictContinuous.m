@@ -42,6 +42,12 @@ cfg = finputcheck(varargin,...
 
 if(ischar(cfg)); error(cfg);end
 
+% check whether the user tried to enter EEG.unfold directly into this 
+% function without running uf_condense first
+if ~isfield(ufresult,'param') & isfield(ufresult,'unfold')
+    error('\n%s(): You cannot directly enter the unfold output into this function - you have to run uf_condense() first',mfilename)
+end
+
 % check if function has been run before
 % this will lead to mistakes and errors because some betas will not be the betas we expect anymore - don't allow that!
 if any(cellfun(@(x)~isempty(x),strfind({ufresult.param.type},'converted')))
