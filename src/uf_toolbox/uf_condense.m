@@ -29,7 +29,6 @@ function output = uf_condense(EEG,varargin)
 %ufresult = uf_condense(EEG)
 %
 %ufresult.param(X):
-%
 %* name: name of the variable, e.g.: 'continuousA'
 %* value: value of the predictor, e.g. '50'
 %* event: event of the variable, e.g.: 'eventA'

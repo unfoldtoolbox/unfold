@@ -7,7 +7,7 @@ function output = uf_predictContinuous(ufresult,varargin)
 % also encompass multiple betas (in the case of splines), this
 % becomes non trivial and thus this function.
 % Note that this will overvwrite the ufresult.beta field
-
+%
 %Arguments:
 %   cfg.predictAt(cell): One entry per parameter:
 %       {{'par1',[10 20 30]},{'par2',[0,1,2]}}.
