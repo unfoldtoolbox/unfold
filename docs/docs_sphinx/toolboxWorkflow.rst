@@ -61,7 +61,7 @@ Removing artifactual data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The toolbox requires continuous, uncleaned data. Removing data before the deconvolution would possibly also remove events that overlap partially in 'clean' events. Therefore the classical removal of continuous data, or removal of epochs does not work directly.
 
-The function :func:`uf_continuousArtifactExclude` allows one to reject continuous portions of data that are were marked on the continuous signal. We expect a 'winrej'-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment). The function then removes (puts to 0) the entries of EEG.unfold.Xdc corresponding to these time points. They are thereby effectively removed from being modeled. One side effect is, that parts of an ERP can be estimated by different amounts of trials.
+The function :func:`uf_continuousArtifactExclude` allows one to reject parts of data that are were previously marked in the continuous signal. We expect a 'winrej'-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment). The function then removes (puts to 0) the entries of EEG.unfold.Xdc corresponding to these time points. They are thereby effectively removed from being modeled. One side effect is, that parts of an ERP can be estimated by different amounts of trials.
 
 
 Imputation of missing data
