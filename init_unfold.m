@@ -1,5 +1,5 @@
 % Init unfold toolbox
-fprintf('\nAdding toolboxes and subfolders to path... \n')
+fprintf('\nStarting unfold toolbox.\nAdding subfolders and other toolboxes to path...\n')
 
 projectFolder  = fileparts(which('init_unfold.m'));
 scriptDir = fullfile(projectFolder,'src');
@@ -19,12 +19,13 @@ if ~exist('eeg_checkset','file')
     try
         eeglab
     catch
-    
-    warning('EEGlab could not be found in your path. You should be fine EXCEPT for using uf_epoch (for massive univariate modeling without overlap correction) which requires EEGLAB')
-    addpath(fullfile(projectFolder,'lib','eeglab'))
+        warning('%s():EEGLAB could not be found in your path. You should be fine EXCEPT for using uf_epoch (for massive univariate modeling without overlap correction) which requires EEGLAB.\n',mfilename)
+        addpath(fullfile(projectFolder,'lib','eeglab'))
     end
 end
 
 if ~exist('gramm','file')
-  warning('gramm could not be found. Did you run "git submodule update --init" to initialize submodules?')
+    warning('%s():\ngramm could not be found. Did you run "git submodule update --init" to initialize submodules?\n',mfilename)
 end
+
+fprintf('Done.\n')
