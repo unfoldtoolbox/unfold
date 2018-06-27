@@ -63,9 +63,9 @@ if ~isempty(cfg.baseline)
    data= bsxfun(@minus,data ,mean(data(:,(ufresult.times>=cfg.baseline(1))& (ufresult.times<cfg.baseline(2)),:),2));
 end
 
-% caculate common coloraxis
+% calculate common coloraxis
 if ischar(cfg.caxis) && strcmp(cfg.caxis,'same')
-    cfg.caxis = prctile(data(:),[1 99]);
+    cfg.caxis = prctile(data(:),[5 95]);
     cfg.caxis = [-max(abs(cfg.caxis)) max(abs(cfg.caxis))];
 end
 
