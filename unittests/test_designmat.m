@@ -112,10 +112,25 @@ EEGtmp = uf_designmat(EEGtest,cfgDesign);
 
 shouldBeFunction(EEGtmp,{'(Intercept)'  'catA_C'  'catA_A'  'catB_3'  'catB_1'},'colnames')
 assert(all(strcmp('categorical',EEGtmp.unfold.variabletypes) == [0 1 1]))
+
+
 %% Specifying only one reference category
 cfgDesign.categorical = {'catB',{2,3,1}};
 EEGtmp = uf_designmat(EEGtest,cfgDesign);
 shouldBeFunction(EEGtmp,{'(Intercept)'  'catA_B'  'catA_C'  'catB_3'  'catB_1'},'colnames')
+
+%% Checking Ticket #47
+cfgDesign = [];
+cfgDesign.coding = 'dummy';
+cfgDesign.formula   = {'y~1+ cat(catB)'};
+cfgDesign.eventtypes = {'stimulus1'};
+cfgDesign.categorical = {'catB',{3,2,1}};
+EEGtmp = uf_designmat(EEGtest,cfgDesign);
+
+
+shouldBeFunction(EEGtmp,{'(Intercept)'  'catB_2'  'catB_1'},'colnames')
+assert(all(strcmp('categorical',EEGtmp.unfold.variabletypes) == [0 1]))
+
 %% add a non-categorical variable
 cfgDesign = [];
 cfgDesign.eventtypes = {'stimulus1'};
