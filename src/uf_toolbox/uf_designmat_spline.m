@@ -60,24 +60,21 @@ spl = [];
 spl.nSplines = cfg.nsplines;
 spl.name = cfg.name;
 
+assert(~all(isnan(cfg.paramValues)),'all paramValues are nans')
 if strcmp(cfg.splinefunction,'2D')
-    assert(any(~all(isnan(cfg.paramValues))),'all paramValues are nans')
     if size(cfg.paramValues,2) == 2
         cfg.paramValues = cfg.paramValues';
     end
-    spl.paramValues = cfg.paramValues;
-    splmin = min(spl.paramValues,[],2);
-    splmax= max(spl.paramValues,[],2);
+    splmin = min(cfg.paramValues,[],2);
+    splmax= max(cfg.paramValues,[],2);
 else
-    assert(~all(isnan(cfg.paramValues)),'all paramValues are nans')
     if size(cfg.paramValues,2) == 1
         cfg.paramValues = cfg.paramValues';
     end
-    spl.paramValues = cfg.paramValues;
-    splmin = min(spl.paramValues);
-    splmax= max(spl.paramValues);
+    splmin = min(cfg.paramValues);
+    splmax= max(cfg.paramValues);
 end
-
+spl.paramValues = cfg.paramValues;
 
 
 %spl.range = range(spl.paramValues);
