@@ -564,7 +564,7 @@ if ~isempty(cfg.spline)
         else
             [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2}(1),'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing,'splinefunction',cfg.spline{s}{3},'cyclical_bounds',bounds);
         end
-        EEG.unfold.X(nanlist,:) = 0;
+        EEG.unfold.X(nanlist,:) = nan;
     end
 end
 
