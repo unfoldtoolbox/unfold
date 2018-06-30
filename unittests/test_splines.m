@@ -142,10 +142,13 @@ for type = {'default','cyclical','custom','cyclical_formula','2D'}
     assert(sum((EEG.data- result').^2) < 0.001,'could not recover function!')
     end
     
-    
-%% Test 2D splines
+end    
+%% Spline & Imputation
+% Ticket #46
+EEGtmp = simulate_test_case(7,'noise',0,'basis','box');
+EEGtmp.event(1).splineA = nan;
+EEGtmp = uf_designmat(EEGtmp,'eventtypes','stimulusA','formula','y~1+spl(splineA,4)');
+assert(all(isnan(EEGtmp.unfold.X(1,:))))
 
 
 
-
-end
