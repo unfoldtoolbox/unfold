@@ -15,6 +15,10 @@
 
 A toolbox for *deconvolution* of overlapping EEG signals and *(non)-linear modeling*
 
+First draft of reference paper
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+`Download our reference paper Ehinger & Dimigen 2018 from bioRxiv <https://www.biorxiv.org/content/early/2018/07/04/360156>`_
+This is a draft version, we are very happy to receive comments and criticism (info@unfoldtoolbox.org)
 
 What can you do with *unfold*?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
