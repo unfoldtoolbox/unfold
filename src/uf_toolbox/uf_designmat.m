@@ -564,16 +564,28 @@ if ~isempty(cfg.spline)
         else
             [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2}(1),'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing,'splinefunction',cfg.spline{s}{3},'cyclical_bounds',bounds);
         end
-        EEG.unfold.X(nanlist,:) = nan;
+        % There are two types of "nans". One if there are multiple events
+        % of different type, we could have a whole row being nan, these we
+        % want to put the nans to 0 to exclude them from the model fit.
+        % But if we model that event, the nan should stay so we can impute
+        % it later.
+        
+        %this was calculated way above already (removeIndex) but for sake
+        %of clarity we do it here again
+
+        EEG.unfold.X(isnan(t.latency),:) = 0;
+        
+        % This retains "real" nans
     end
 end
 
 
 
 % Designmat Checks
-if any(any(isnan(EEG.unfold.X)))
+subsetX = EEG.unfold.X(~all(isnan(EEG.unfold.X),2),:);
+if any(isnan(subsetX(:)))
     warning('NaNs detected in designmat, try to impute them before fitting the model')
-    fprintf(['nans found in: ',EEG.unfold.colnames{any(isnan(EEG.unfold.X))}])
+    fprintf(['nans found in: ',EEG.unfold.colnames{any(isnan(subsetX))}])
     fprintf('\n')
     
 end
