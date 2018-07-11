@@ -18,6 +18,8 @@ function [EEG] = uf_glmfit_nodc(EEG,varargin)
 %  cfg.channel: (all) subselect a set of channels (in numbers, not strings)
 %  cfg.glmnetalpha (1): used for glmnet --> see uf_glmfit
 %  cfg.debug: used for matlab solver 
+%  cfg.ica (boolean):0, use data or ICA components (have to be in
+%               EEG.icaact). cfg.channel chooses the components.
 %
 %Return:
 %  Returns a matrix (channel x pnts x predictors) of betas saved into
@@ -33,49 +35,55 @@ cfg = finputcheck(varargin,...
     'lsmriterations','integer',[],200;...
     'glmnetalpha','real',[],1;... # used for glmnet
     'debug','boolean',[],0;...
-    
+    'ica','boolean',[],0;...
+
     'channel','integer',[],1:size(EEG.data,1);
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
 X = EEG.unfold.X;
+if cfg.ica
+    data = EEG.icaact;
+else
+    data = EEG.data;
+end
 
 
 %reshape instead of squeeze to keep the mxn matrix even when m or n is 1
 if ~isfield(EEG.unfold,'timebasis')
-    warning('deconvolution time-basis not found, assuming stick-functions / full')
+    fprintf('deconvolution time-basis not found, assuming stick-functions / full \n')
     EEG.unfold.timebasis = eye(size(EEG.data,2));
 end
     
 if strcmp(cfg.method,'pinv')
     %% Pseudoinverse
     Xinv = pinv(X);
-    beta = calc_beta(EEG,Xinv);
+    beta = calc_beta(data,Xinv,EEG);
     
 elseif strcmp(cfg.method,'matlab') % save time
     warning('time-basis function currently not implemented')
     %% Matlab internal solver
-    beta = nan(size(X,2),size(EEG.data,2),size(EEG.data,1)); %plus one, because glmnet adds a intercept
+    beta = nan(size(X,2),size(data,2),size(data,1)); %plus one, because glmnet adds a intercept
     if cfg.debug
         spparms('spumoni',2)
     end
     for c = cfg.channel
-        beta(:,:,c) = X \ squeeze(EEG.data(c,:,:))';
+        beta(:,:,c) = X \ squeeze(data(c,:,:))';
     end
     beta =     permute(beta,[3 2 1]);
     
 elseif strcmp(cfg.method,'glmnet')
     warning('time-basis function currently not implemented')
     %% GLMNET
-    beta = nan(size(EEG.data,1),size(EEG.data,2),size(X,2)+1); %plus one, because glmnet adds a intercept
+    beta = nan(size(EEG.data,1),size(data,2),size(X,2)+1); %plus one, because glmnet adds a intercept
     
     
     for e = cfg.channel
         t = tic;
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
-        for time = 1:size(EEG.data,2)
+        for time = 1:size(data,2)
             %glmnet needs double precision
-            fit = cvglmnet(X,(double(squeeze(EEG.data(e,time,:))')),'gaussian',struct('alpha',cfg.glmnetalpha));
+            fit = cvglmnet(X,(double(squeeze(data(e,time,:))')),'gaussian',struct('alpha',cfg.glmnetalpha));
             
             %find best cv-lambda coefficients
             beta(e,time,:) = cvglmnetCoef(fit,'lambda_1se')';
@@ -91,16 +99,16 @@ elseif strcmp(cfg.method,'glmnet')
 elseif strcmp(cfg.method,'lsmr')
     warning('time-basis function currently not implemented')
     % go tru channels
-    beta = nan(size(EEG.data,1),size(EEG.data,2),size(X,2)); %plus one, because glmnet adds a intercept
+    beta = nan(size(data,1),size(data,2),size(X,2)); %plus one, because glmnet adds a intercept
     
-    for time = 1:size(EEG.data,2)
+    for time = 1:size(data,2)
         for e = cfg.channel
             t = tic;
             fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
             
             % use iterative solver for least-squares problems (lsmr)
-            data = squeeze(double(EEG.data(e,time,:)));
-            [beta(e,time,:),ISTOP,ITN] = lsmr(X,data,[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
+            data_tmp = squeeze(double(data(e,time,:)));
+            [beta(e,time,:),ISTOP,ITN] = lsmr(X,data_tmp,[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
             if ISTOP == 7
                 warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
             end
@@ -121,14 +129,14 @@ EEG.unfold.times = EEG.times/1000; %because seconds is better than ms!
 
 end
 
-function [beta] = calc_beta(EEG,Xinv)
+function [beta] = calc_beta(data,Xinv,EEG)
 
 for c = 1:EEG.nbchan
     
     % This is X^-1 * (time-basisFunction * Data) => We move the data first
     % in the same basis-domain i.e. splines, fourier or stick (which would
     % be the identity matrix) before running the regression
-    beta(c,:,:)= (Xinv*(EEG.unfold.timebasis*reshape(EEG.data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
+    beta(c,:,:)= (Xinv*(EEG.unfold.timebasis*reshape(data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
 
    
  

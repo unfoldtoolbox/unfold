@@ -53,6 +53,9 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 %               matrices you might run into memory problems. Deactivate
 %               then.
 %
+%   cfg.ica (boolean):0, use data or ICA components (have to be in
+%               EEG.icaact). cfg.channel chooses the components.
+%
 %   EEG:  the EEG set, need to have EEG.unfold.Xdc compatible with
 %         the size of EEG.data
 %
@@ -74,14 +77,18 @@ cfg = finputcheck(varargin,...
     'glmnetalpha','real',[],1;... # used for glmnet
     'precondition','boolean',[],1;... % inofficial
     'channel','integer',[],1:size(EEG.data,1);
+    'ica','boolean',[],0;
     'debug','boolean',[],0;
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
 
 
-
-assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
+if cfg.ica
+    assert(ndims(EEG.icaact) ==2,'EEG.icaact needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
+else
+    assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
+end
 assert(size(EEG.unfold.Xdc,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.unfold.Xdc),size(EEG.data))
 assert(~any(isnan(EEG.unfold.Xdc(:))),'Warning NAN values found in designmatrix. will not continue')
 
@@ -90,7 +97,11 @@ X = EEG.unfold.Xdc;
 disp('solving the equation system');
 t = tic;
 beta = nan(size(EEG.unfold.Xdc,2),EEG.nbchan);
-data = EEG.data;
+if cfg.ica
+    data = EEG.icaact;
+else
+    data = EEG.data;
+end
 
 %% Remove data that is unnecessary for the fit
 % this helps calculating better tolerances for lsmr
