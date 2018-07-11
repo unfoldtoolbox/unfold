@@ -55,15 +55,23 @@ if ~isfield(EEG.unfold,'timebasis')
     EEG.unfold.timebasis = eye(size(EEG.data,2));
 end
     
+beta = nan(size(X,2),size(data,2),size(data,1));
 if strcmp(cfg.method,'pinv')
     %% Pseudoinverse
     Xinv = pinv(X);
-    beta = calc_beta(data,Xinv,EEG);
+    for c = cfg.channel
+        % This is X^-1 * (time-basisFunction * Data) => We move the data first
+        % in the same basis-domain i.e. splines, fourier or stick (which would
+        % be the identity matrix) before running the regression
+        beta(c,:,:)= (Xinv*(EEG.unfold.timebasis*reshape(data(c,:,:),[EEG.pnts, EEG.trials 1]))')';        
+    end
+
+    
     
 elseif strcmp(cfg.method,'matlab') % save time
     warning('time-basis function currently not implemented')
     %% Matlab internal solver
-    beta = nan(size(X,2),size(data,2),size(data,1)); %plus one, because glmnet adds a intercept
+    
     if cfg.debug
         spparms('spumoni',2)
     end
@@ -127,19 +135,4 @@ EEG.unfold.times = EEG.times/1000; %because seconds is better than ms!
 
 
 
-end
-
-function [beta] = calc_beta(data,Xinv,EEG)
-
-for c = 1:EEG.nbchan
-    
-    % This is X^-1 * (time-basisFunction * Data) => We move the data first
-    % in the same basis-domain i.e. splines, fourier or stick (which would
-    % be the identity matrix) before running the regression
-    beta(c,:,:)= (Xinv*(EEG.unfold.timebasis*reshape(data(c,:,:),[EEG.pnts, EEG.trials 1]))')';
-
-   
- 
-
-end
 end
