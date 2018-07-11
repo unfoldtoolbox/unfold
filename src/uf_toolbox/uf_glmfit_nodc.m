@@ -55,7 +55,7 @@ if ~isfield(EEG.unfold,'timebasis')
     EEG.unfold.timebasis = eye(size(EEG.data,2));
 end
     
-beta = nan(size(X,2),size(data,2),size(data,1));
+beta = nan(size(data,1),size(data,2),size(X,2));
 if strcmp(cfg.method,'pinv')
     %% Pseudoinverse
     Xinv = pinv(X);
