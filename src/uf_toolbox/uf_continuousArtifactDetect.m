@@ -22,7 +22,7 @@ function [WinRej] = uf_continuousArtifactDetect(EEG,varargin)
 % 'amplitudeThreshold':     - Thresolds ( values). [-lim +lim] is marked
 % 'windowsize':     - moving window width in msec (default 2000 ms)
 % 'stepsize':    - moving window step (default 1000 ms)
-% 'combineSegements':  - marked segment(s) closer than this value will be joined together.
+% 'combineSegments':  - marked segment(s) closer than this value will be joined together.
 %
 %Example:
 % winrej = uf_continuousArtifactDetect(EEG)
@@ -68,7 +68,7 @@ cfg = finputcheck(varargin,...
     'windowsize','integer',[],2000;...
     'channels','integer',[1:size(EEG.data,1)],1:size(EEG.data,1);
     'stepsize','integer',[],100;...
-    'combineSegements','integer',[],[];...
+    'combineSegments','integer',[],[];...
     },'mode','error');
 
 
@@ -87,7 +87,7 @@ stepms    = cfg.stepsize;% ms steps
 chanArray = cfg.channels;
 
 
-shortisi  = cfg.combineSegements;
+shortisi  = cfg.combineSegments;
 
 [WinRej, chanrej] = basicrap(EEG, chanArray, ampth, winms, stepms);
 shortisisam  = floor(shortisi*EEG.srate/1000);  % to samples
