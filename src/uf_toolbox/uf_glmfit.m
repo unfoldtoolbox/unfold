@@ -90,7 +90,7 @@ else
     assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
 end
 assert(size(EEG.unfold.Xdc,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.unfold.Xdc),size(EEG.data))
-assert(~any(isnan(EEG.unfold.Xdc(:))),'Warning NAN values found in designmatrix. will not continue')
+%assert(~any(isnan(EEG.unfold.Xdc(:))),'Warning NAN values found in designmatrix. will not continue')
 
 X = EEG.unfold.Xdc;
 
