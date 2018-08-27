@@ -61,3 +61,16 @@ In the following we see the case additive linear modeling allows to use flexible
 In Panel B & C  we split the continuous predictor into six categorical predictors. In the modelfit (right plot) one can clearly see the step-function of this approach. In Panel D & E a more sensible approach is show: smooth borders. This can be achieved by using spline-basis functions instead of boxcars
 
 In order to get from the basisfunctions (left) to the function fit (right), each basis-function is multiplied by a fitted beta-coefficient value and then summed. These weighted basis-functions are in addition plotted in the right plot. It is important to note that the number of basis-functions is important to prevent over or underfitting. In the unfold toolbox one has to set the number of splines by hand. Nested crossvalidation to get a good estimate of the number of splines to use is certainly possible but computationally extremely expensive. In the field of additive modeling this issue is so far an unresolved problem.
+
+
+The connection of (formal) convolution and timeexpansion
+-----------------------------------------------------------
+In linear deconvolution, we make use of the knowledge that each observed sample of the continuous EEG sample can be described as the linear sum of (possibly) several overlapping event-related EEG responses. Depending on the latencies of the neighboring events, these overlapping responses occur at different times relative to the current event instance. In the following we will assume two events, A & B. The observed continuous EEG at time point t can be described as follows: 
+$$EEG(t)=∑_(i=1)^(n_A)ERP_A(t-eventOnsetA_i)+ ∑_(i=1)^(n_B)ERP_B(t-eventOnsetB_i)$$
+With $i$ an instance of an event.
+
+The (unknown) function $EEG_A (t-eventOnsetA_i )$  can be thought of as the “true” ERP activity at the continuous EEG time point t. Because instances of events occur at different time points, they are centered by the $t-eventOnsetA_i$ term, we refer to this centered time (the distance to the event) as local time $\tau$. 
+
+This is indead a classical convolution. If we replace the event onsets by a vector $g$ with zeros everywhere and ones  at the samples of event onset, we get:
+$$EEG(t)=g_A*ERP_A+g_B*ERP_B$$
+A sum of convolutions. This is the process we need to reverse, that is, we need to estimate $ERP_A$ and $ERP_B$ given $EEG(t)$ and $g$. 
