@@ -18,7 +18,7 @@ A toolbox for *deconvolution* of overlapping EEG signals and *(non)-linear model
 
 Second draft of reference paper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`Download our reference paper Ehinger & Dimigen 2018 from bioRxiv <https://www.biorxiv.org/content/early/2018/08/30/360156`_
+`Download our reference paper Ehinger & Dimigen 2018 from bioRxiv <https://www.biorxiv.org/content/early/2018/08/30/360156>`_
 
 This is a draft version, we are very happy to receive comments and criticism (info@unfoldtoolbox.org)
 
@@ -26,8 +26,8 @@ If you use the toolbox, please cite us as: Ehinger BV & Dimigen O, *Unfold: An i
 
 Why deconvolution and non-linear modeling?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Find a `twitter thread explaining the general idea here <https://twitter.com/BenediktEhinger/status/1036553493191032832`_
-or have a look at Figure 1 of `our paper<https://www.biorxiv.org/content/early/2018/08/30/360156`_
+Find a `twitter thread explaining the general idea here <https://twitter.com/BenediktEhinger/status/1036553493191032832>`_
+or have a look at Figure 1 of `our paper <https://www.biorxiv.org/content/early/2018/08/30/360156>`_
 
 What can you do with *unfold*?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
