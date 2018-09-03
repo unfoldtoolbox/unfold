@@ -35,4 +35,5 @@ ax = uf_plotParam(ufresult,'channel',1);
 
 ### Citation
 Please cite as:
+
 Ehinger BV, Dimigen O: "Unfold: An integrated toolbox for overlap correction, non-linear modeling, and regression-based EEG analysis", https://doi.org/10.1101/360156
