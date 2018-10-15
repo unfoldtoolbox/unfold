@@ -78,7 +78,7 @@ if ~isempty(EEG.chanlocs) && any(strcmp('EYE',{EEG.chanlocs(cfg.channels).type})
     warning('EYE-Channels (from EYE-EEG toolbox) detected. It is not recommended to include these channels in the continuousArtefactDetect() function as the scale is usually very different. Please remove before using this function')
 end
 
-ampth     = cfg.amplitudeThreshold; % in µV
+ampth     = cfg.amplitudeThreshold; % in uV
 winms     = cfg.windowsize;         % in ms
 stepms    = cfg.stepsize;           % in ms steps
 chanArray = cfg.channels;           % which channels to check?
