@@ -65,7 +65,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                  'logreverse': log decreasing spacing
 %                  'quantiles' (default): heuristic spacing at the quantiles
 %
-%   cfg.codingschema(string): default: 'references', could be 'effects', this is
+%   cfg.codingschema(string): default: 'reference', could be 'effects', this is
 %                   relevant if you define categorical input variables.
 %                   Reference coding is also known as treatment coding
 %
