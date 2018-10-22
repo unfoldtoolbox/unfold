@@ -217,7 +217,7 @@ for currPred= 1:length(paramList)
             % This is supoptimal and I'm sorry if it creates inconveniences.
             % We would need to introduce a whole new field to carry around
             % to compensate for this.
-            warning('auto spacing for continuous variables exlcudes all zeros. Specfiy manually if necessary using ''predictAt''')
+            warning('Auto spacing for continuous variables excludes all zeros. If necessary, specify manually using ''predictAt''')
             contValueSelect = auto_spacing(cfg,values(values~=0));
         end
         

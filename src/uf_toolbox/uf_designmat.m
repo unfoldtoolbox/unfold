@@ -713,9 +713,9 @@ function check_rank(X)
     isnancol = any(isnan(X));
     X = X(:,~isnancol);
     if any(isnancol)
-        warning('Rank check: removed %i columns with nans in it, rank estimation might be faulty',sum(isnancol));
+        warning('Rank check: There are %i columns with NaN values in it, rank estimation might be faulty',sum(isnancol));
     end
     if rank(X)<size(X,2)
-        warning('Rank is smaller than matrix size. Do you have two columns that are identical? Other linear dependencies can occur. Check for collinearity')
+        warning('Rank is smaller than matrix size! Do you have two columns that are identical? Other linear dependencies can occur. Check for collinearity')
     end
 end
