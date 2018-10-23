@@ -20,7 +20,7 @@ function output = uf_predictContinuous(ufresult,varargin)
 %       'linear'   - the auto_n values are placed linearly over the range of the predictor
 %       'average'  - only evaluates at the average of the predictor. This
 %       is useful if you are interested in the marginal response
-%   cfg.auto_n (integer) : default 7; the number of automatically evaluated values
+%   cfg.auto_n (integer) : default 10; the number of automatically evaluated values
 %
 %Return:
 %   Betas with evaluated betas at specified continuous values.
