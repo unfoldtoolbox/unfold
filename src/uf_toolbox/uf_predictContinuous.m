@@ -20,7 +20,7 @@ function output = uf_predictContinuous(ufresult,varargin)
 %       'linear'   - the auto_n values are placed linearly over the range of the predictor
 %       'average'  - only evaluates at the average of the predictor. This
 %       is useful if you are interested in the marginal response
-%   cfg.auto_n (integer) : default 7; the number of automatically evaluated values
+%   cfg.auto_n (integer) : default 10; the number of automatically evaluated values
 %
 %Return:
 %   Betas with evaluated betas at specified continuous values.
@@ -217,7 +217,7 @@ for currPred= 1:length(paramList)
             % This is supoptimal and I'm sorry if it creates inconveniences.
             % We would need to introduce a whole new field to carry around
             % to compensate for this.
-            warning('auto spacing for continuous variables exlcudes all zeros. Specfiy manually if necessary using ''predictAt''')
+            warning('Auto spacing for continuous variables excludes all zeros. If necessary, specify manually using ''predictAt''')
             contValueSelect = auto_spacing(cfg,values(values~=0));
         end
         
