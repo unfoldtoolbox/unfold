@@ -13,7 +13,7 @@ simCFG= finputcheck(varargin,...
     {'datalength','integer',[],10*60;
     'noise','boolean',[],1;
     'srate','integer',[],10;
-    'basis','string',{'box','hanning','dirac'},'box'
+    'basis','string',{'box','hanning','dirac','posneg'},'box'
     },'mode','ignore');
 
 assert(~ischar(simCFG),simCFG)
@@ -41,6 +41,8 @@ switch simCFG.basis
         sig.shape = hanning(length(sig.time)); %P3
     case 'dirac'
         sig.shape = [1 zeros(1,length(sig.time)-1)];
+    case 'posneg'
+        sig.shape = [hanning(floor(length(sig.time)/2)); -hanning(ceil(length(sig.time)/2))]; %P3
 end
 
 %% ##################
