@@ -40,8 +40,6 @@ function ufresult = uf_addmarginal(ufresult,varargin)
 
 
 
-
-
 % parse inputs
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[]; ...
@@ -49,6 +47,12 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 
 if(ischar(cfg)); error(cfg);end
+
+% check whether the user tried to enter EEG.unfold directly into this 
+% function without running uf_condense first
+if ~isfield(ufresult,'param') & isfield(ufresult,'unfold')
+    error('\n%s(): You cannot directly enter the unfold output into this function - you have to run uf_condense() first',mfilename)
+end
 
 % In order to add the marginal, we need evaluated splines (uf_predictContinuous) first.
 % here we are looking for spline_converted or continuous_converted. I.e. if

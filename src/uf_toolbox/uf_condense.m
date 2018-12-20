@@ -1,20 +1,20 @@
 function output = uf_condense(EEG,varargin)
-%% Condense results in new structure. Apply timebasis (if necessary) 
-%Returns an "ufresult"-struct that contains the predictor betas over time
+% Condense results in new structure. Apply timebasis (if necessary). 
+%Returns an "ufresult"-structure that contains the predictor betas over time
 %and accompanying information. This structure is further used in all
-%plotting functions. This function also applys the timebasis (if you
+%plotting functions. This function also applies the time basis (if you
 %specified something else than the default 'stick' in
-%uf_timeexpandDesignmat()
+%uf_timeexpandDesignmat() )
 %
 %Arguments:
-%   EEG(struct): A Struct containing EEG.unfold.beta_dc
+%   EEG(struct): A struct containing EEG.unfold.beta_dc
 %   cfg.deconv (integer): 1, use EEG.unfold.beta_dc, the deconvolved betas
 %                         0, use EEG.unfold.beta_nodc, betas without
-%                         deconvolution
+%                            deconvolution
 %                         -1 (default), autocheck which fields are avaiable
-%                         and returns both
-%   cfg.channel(array): Restrict the beta-output to a subset of
-%                         channels. Default is all channels
+%                            and returns both
+%   cfg.channel(array):   Restrict the beta-output to a subset of
+%                            channels. Default is all channels
 %
 %Return:
 %   ufresult.beta= (nchans x time x parameters)
@@ -29,7 +29,6 @@ function output = uf_condense(EEG,varargin)
 %ufresult = uf_condense(EEG)
 %
 %ufresult.param(X):
-%
 %* name: name of the variable, e.g.: 'continuousA'
 %* value: value of the predictor, e.g. '50'
 %* event: event of the variable, e.g.: 'eventA'

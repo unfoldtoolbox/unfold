@@ -1,7 +1,7 @@
 function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
-% Helper function to generate spline-part of designmatrix
+%Helper function to generate spline-part of designmatrix
 %
-% Argument:
+%Argument:
 %   cfg.name(string): (optional, default: "spline_default") A name for the
 %           spline predictor
 %
@@ -60,24 +60,21 @@ spl = [];
 spl.nSplines = cfg.nsplines;
 spl.name = cfg.name;
 
+assert(~all(isnan(cfg.paramValues(:))),'all paramValues are nans')
 if strcmp(cfg.splinefunction,'2D')
-    assert(any(~all(isnan(cfg.paramValues))),'all paramValues are nans')
     if size(cfg.paramValues,2) == 2
         cfg.paramValues = cfg.paramValues';
     end
-    spl.paramValues = cfg.paramValues;
-    splmin = min(spl.paramValues,[],2);
-    splmax= max(spl.paramValues,[],2);
+    splmin = min(cfg.paramValues,[],2);
+    splmax= max(cfg.paramValues,[],2);
 else
-    assert(~all(isnan(cfg.paramValues)),'all paramValues are nans')
     if size(cfg.paramValues,2) == 1
         cfg.paramValues = cfg.paramValues';
     end
-    spl.paramValues = cfg.paramValues;
-    splmin = min(spl.paramValues);
-    splmax= max(spl.paramValues);
+    splmin = min(cfg.paramValues);
+    splmax= max(cfg.paramValues);
 end
-
+spl.paramValues = cfg.paramValues;
 
 
 %spl.range = range(spl.paramValues);
@@ -233,7 +230,7 @@ end
 EEG.unfold.splines{end+1} = spl;
 
 nanlist = isnan(spl.paramValues);
-spl.X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
+% spl.X(nanlist,:) = 0; % remove nan-entries from splines from designmatrix (for the splines they were removed already)
 EEG.unfold.X = [EEG.unfold.X spl.X]; % add spline columns
 
 

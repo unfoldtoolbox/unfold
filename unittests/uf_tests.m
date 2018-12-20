@@ -61,20 +61,26 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
 % The function has to be defined before the test-case loop due to matlab
 % constraints in inline-function placement.
     function do_the_testing(testCase,EEG,cfgDesign)
+        testCase
         for d = designmat'
+            d
             cfgDesignLoop = cfgDesign;
             cfgDesignLoop.coding = d{1};
             cfgDesignLoop.splinespacing = d{2};
             EEGd = uf_designmat(EEG,cfgDesignLoop);
             
             for t = timeexpand'
-                
+                t
                 EEGt = uf_timeexpandDesignmat(EEGd,'timelimits',t{1},'method',t{2},'timeexpandparam',t{3},'sparse',t{4});
                 
                 for g = glmfit'
+                    g
                     EEGg= uf_glmfit(EEGt,'method',g{1},'channel',g{2});
                     assert(~any(isnan(EEGg.unfold.beta_dc(:))),'error, found nan after fit');
                     for b = beta2EEG'
+                        b   
+                        
+
                         EEGb = EEGg;
                         if b{1} == 0
                             EEGb = uf_epoch(EEGb,'timelimits',t{1});
@@ -121,9 +127,8 @@ for testCase = [15 8 1]
         case {5,6}
             cfgDesign.formula = 'y ~ 1+ continuousA';
         case {7,8}
-            cfgDesign.formula = 'y ~ 1';
+            cfgDesign.formula = 'y ~ 1 + spl(splineA,10)';
             
-            cfgDesign.spline = {{'splineA',10}}; % In addition use one spline
         case {9,10}
             cfgDesign.formula = {'y~1','y~1'};
             cfgDesign.eventtypes = {'stimulusA','stimulusB'};

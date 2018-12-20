@@ -39,7 +39,11 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
-
+% check whether the user tried to enter EEG.unfold directly into this 
+% function without running uf_condense first
+if ~isfield(ufresult,'param') & isfield(ufresult,'unfold')
+    error('\n%s(): You cannot directly enter the unfold output into this function - you have to run uf_condense() first',mfilename)
+end
 
 data = ufresult.(cfg.betaSetName);
 
@@ -59,9 +63,9 @@ if ~isempty(cfg.baseline)
    data= bsxfun(@minus,data ,mean(data(:,(ufresult.times>=cfg.baseline(1))& (ufresult.times<cfg.baseline(2)),:),2));
 end
 
-% caculate common coloraxis
+% calculate common coloraxis
 if ischar(cfg.caxis) && strcmp(cfg.caxis,'same')
-    cfg.caxis = prctile(data(:),[1 99]);
+    cfg.caxis = prctile(data(:),[5 95]);
     cfg.caxis = [-max(abs(cfg.caxis)) max(abs(cfg.caxis))];
 end
 

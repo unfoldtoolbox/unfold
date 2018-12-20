@@ -19,14 +19,42 @@
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
     <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <script type="text/javascript" src="_static/matomoTrackingOptOut.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Content Tutorials" href="contenttutorials.html" />
-    <link rel="prev" title="Toolbox Overview" href="overview.html" />
+    <link rel="next" title="Theoretical Background" href="contenttutorials.html" />
+    <link rel="prev" title="Getting Started" href="overview.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
+
+<!-- Matomo -->
+<script type="text/javascript">
+
+  if (typeof(Storage) !== 'undefined') {
+  	if (localStorage.getItem('matomoTrackingEnabled') === null) {
+  		localStorage.setItem('matomoTrackingEnabled', 'true');
+  	}
+  }
+  if (localStorage.getItem('matomoTrackingEnabled') !== 'false') {
+
+  var _paq = _paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  /*_paq.push(['disableCookies']);*/
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://www.unfoldtoolbox.org/piwik/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+}
+</script>
+<!-- End Matomo Code -->
+
 
   </head><body>
 
@@ -60,27 +88,24 @@
   <ul class="dropdown-menu globaltoc"
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="overview.html">Toolbox Overview</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="overview.html">Getting Started</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Unfold’s toolbox workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#specification-for-input-data">Specification for Input-Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#imputation-of-missing-data">Imputation of missing data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#removing-artefactual-data">Removing artefactual data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#toolbox-variables">Toolbox variables</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#artefacts-missing-data-predictors">Artefacts &amp; missing data/predictors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#removing-artifactual-data">Removing artifactual data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#imputation-of-missing-data">Imputation of missing data</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#introduction-to-linear-modeling">Introduction to linear modeling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#why-deconvolution">Why deconvolution?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#how-does-deconvolution-work">How does deconvolution work?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contenttutorials.html#introduction-to-additive-spline-linear-modeling">Introduction to additive/spline linear modeling</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Tutorials / Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut01.html">Quickstart: 2x2 ANOVA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut02.html">Longstart: 2x2 ANOVA</a></li>
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut03.html">Non-Linear Predictors using splines</a></li>
@@ -89,7 +114,7 @@
 <li class="toctree-l2"><a class="reference internal" href="toolbox-tut06.html">2nd level (group/subject) statistics</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html">Essential functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html#data-cleaning">Data cleaning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="unfold.html#massive-univariate-linear-modelling">Massive univariate linear modelling</a></li>
@@ -102,7 +127,13 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="impressum.html">Impressum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">Data Structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#minimal-data-specifications">Minimal Data Specifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-eeg-unfold">Fields of <code class="docutils literal notranslate"><span class="pre">EEG.unfold()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datastructures.html#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -133,23 +164,20 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary">
   <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="overview.html">Toolbox Overview</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="overview.html">Getting Started</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Unfold’s toolbox workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#specification-for-input-data">Specification for Input-Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#imputation-of-missing-data">Imputation of missing data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#removing-artefactual-data">Removing artefactual data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#comparison-between-deconvolved-and-non-deconvolved-classical">Comparison between deconvolved and non-deconvolved (classical)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#toolbox-variables">Toolbox variables</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-ufresult">Fields of <code class="docutils literal notranslate"><span class="pre">ufresult()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fields-of-unfold-splines">Fields of <code class="docutils literal notranslate"><span class="pre">unfold.splines()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#massive-univariate-modeling-rerp">Massive univariate modeling (rERP)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#artefacts-missing-data-predictors">Artefacts &amp; missing data/predictors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#removing-artifactual-data">Removing artifactual data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#imputation-of-missing-data">Imputation of missing data</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Content Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Toolbox Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function-documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="impressum.html">Impressum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contenttutorials.html">Theoretical Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="toolboxtutorials.html">Tutorials / Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Function Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">Data Structures</a></li>
 </ul>
 
         </div>
@@ -157,7 +185,7 @@
     <div class="col-md-9 content">
       
   <div class="section" id="unfold-s-toolbox-workflow">
-<h1>Unfold’s toolbox workflow<a class="headerlink" href="#unfold-s-toolbox-workflow" title="Permalink to this headline">¶</a></h1>
+<h1>Unfold’s toolbox workflow</h1>
 <p>We start with continuous data with events that mark times in the data that are of interest. Usually these are stimulus onsets, buttonpresses etc.</p>
 <p>A minimal example is the following</p>
 <div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">EEG</span> <span class="p">=</span> <span class="n">uf_designmat</span><span class="p">(</span><span class="s">&#39;eventtypes&#39;</span><span class="p">,{</span><span class="s">&#39;fixation&#39;</span><span class="p">},</span><span class="s">&#39;formula&#39;</span><span class="p">,</span><span class="s">&#39;1+cat(category)&#39;</span><span class="p">)</span>
@@ -182,121 +210,29 @@
 <dd>Most commonly users estimate the parameters for all subjects and then test the parameters against an H0 of no effect. If no prior knowledege on the time/location of the effect is known, we recommend to use cluster-permutation based statistics. We recommend the EPT-TFCE toolbox. We focus on single subject beta-estimates and leave the statistics up to the user.</dd>
 </dl>
 </div>
-<div class="section" id="specification-for-input-data">
-<h1>Specification for Input-Data<a class="headerlink" href="#specification-for-input-data" title="Permalink to this headline">¶</a></h1>
-<p>Data need to be in continuous form. We use the default format of EEG.</p>
-<p>The minimal required fields (the usual EEGlab-structure) are:</p>
-<ul class="simple">
-<li>EEG.data (chan x time)</li>
-<li>EEG.times (vector of time points in milliseconds)</li>
-<li>EEG.srate (samplingrate in Hz)</li>
-<li>EEG.event (structure of events, same structure as in EEGlab)<ul>
-<li>event.type (e.g. ‘stimulus’ or ‘keypress’)</li>
-<li>event.latency (in samples)</li>
-<li>event.customField (<code class="xref mat mat-func docutils literal notranslate"><span class="pre">customField()</span></code> = name of your variable, e.g. <code class="xref mat mat-func docutils literal notranslate"><span class="pre">color()</span></code>. The content should be in this case a string ‘red’ or, for continuous variables, a number)</li>
-</ul>
-</li>
-</ul>
+<div class="section" id="massive-univariate-modeling-rerp">
+<h1>Massive univariate modeling (rERP)</h1>
+<p>It is possible to use the toolbox for massive univariate linear modeling (also known as regression ERP, rERP) without any deconvolution applied. A minimal script looks like this:</p>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">EEG</span> <span class="p">=</span> <span class="n">uf_designmat</span><span class="p">(</span><span class="s">&#39;eventtypes&#39;</span><span class="p">,{</span><span class="s">&#39;fixation&#39;</span><span class="p">},</span><span class="s">&#39;formula&#39;</span><span class="p">,</span><span class="s">&#39;1+cat(category)&#39;</span><span class="p">)</span>
+<span class="n">EEG</span> <span class="p">=</span> <span class="n">uf_epoch</span><span class="p">(</span><span class="n">EEG</span><span class="p">,</span><span class="s">&#39;timelimits&#39;</span><span class="p">,[</span><span class="o">-</span><span class="mf">0.5</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">EEG</span> <span class="p">=</span> <span class="n">uf_glmfit_nodc</span><span class="p">(</span><span class="n">EEG</span><span class="p">)</span>
+<span class="c">% (strictly speaking optional, but recommended)</span>
+<span class="n">ufresult</span> <span class="p">=</span> <span class="n">uf_condense</span><span class="p">(</span><span class="n">EEG</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In addition, we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial <a class="reference internal" href="toolbox-tut04.html"><span class="doc">With and without deconvolution</span></a>.</p>
+</div>
+<div class="section" id="artefacts-missing-data-predictors">
+<h1>Artefacts &amp; missing data/predictors</h1>
+<p>There are some important differences in the workflow to a classical EEG experiment. This mostly regards to the handling of bad data (artefacts) and the removal/estimation of missing predictor values of some events (imputation)</p>
+<div class="section" id="removing-artifactual-data">
+<h2>Removing artifactual data</h2>
+<p>The toolbox requires continuous, uncleaned data. Removing data before the deconvolution would possibly also remove events that overlap partially in ‘clean’ events. Therefore the classical removal of continuous data, or removal of epochs does not work directly.</p>
+<p>The function <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_continuousArtifactExclude()</span></code> allows one to reject continuous portions of data that are were marked on the continuous signal. We expect a ‘winrej’-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment). The function then removes (puts to 0) the entries of EEG.unfold.Xdc corresponding to these time points. They are thereby effectively removed from being modeled. One side effect is, that parts of an ERP can be estimated by different amounts of trials.</p>
 </div>
 <div class="section" id="imputation-of-missing-data">
-<h1>Imputation of missing data<a class="headerlink" href="#imputation-of-missing-data" title="Permalink to this headline">¶</a></h1>
-<p>In linear models, missing data need to be imputed (‘interpolated’) or the event needs to be excluded. We currently offer four methods to deal with this in the function <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_imputeMissing()</span></code> (to be called after the design specification):</p>
-<dl class="docutils">
-<dt>drop</dt>
-<dd>this removes events that have a missing field in a single explanatory variable</dd>
-<dt>marginal</dt>
-<dd>fills in a random sample from the values in other events. This preserves the overall distribution of missing events</dd>
-<dt>mean</dt>
-<dd>fill in missing predictor-values with the mean of the remaining events.</dd>
-<dt>median</dt>
-<dd>fill in missing predictor-values with the median of the remaining events.</dd>
-</dl>
-</div>
-<div class="section" id="removing-artefactual-data">
-<h1>Removing artefactual data<a class="headerlink" href="#removing-artefactual-data" title="Permalink to this headline">¶</a></h1>
-<p>Because we start with continuous data, usual removal of data stretches does not work the same. The function <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_continuousArtifactExclude()</span></code> allows one to reject continuous portions of data that are either marked automatically or manually. We expect a ‘winrej’-matrix, the same format as the matrices used by eeglab (that is: columns sample start, sample end and each row one segment)</p>
-</div>
-<div class="section" id="comparison-between-deconvolved-and-non-deconvolved-classical">
-<h1>Comparison between deconvolved and non-deconvolved (classical)<a class="headerlink" href="#comparison-between-deconvolved-and-non-deconvolved-classical" title="Permalink to this headline">¶</a></h1>
-<p>we offer several functions to compare deconvolved and non-deconvolved analyses. See tutorial <a class="reference internal" href="toolbox-tut04.html"><span class="doc">With and without deconvolution</span></a></p>
-</div>
-<div class="section" id="toolbox-variables">
-<h1>Toolbox variables<a class="headerlink" href="#toolbox-variables" title="Permalink to this headline">¶</a></h1>
-<p>Fields of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">EEG.unfold()</span></code></p>
-<dl class="docutils">
-<dt>splines</dt>
-<dd>all information on the splines are saved in here (see below). Each spline is added at splines{end+1}</dd>
-<dt>formula</dt>
-<dd>contains all formulas specified in <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_designmat()</span></code></dd>
-<dt>X</dt>
-<dd>The designmatrix. This can be used for ‘classical’ mass-univariate linear modeling (<code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_epoch()</span></code> and <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_glmfit_nodc()</span></code>)</dd>
-<dt>variabletypes</dt>
-<dd>Type of each variable/predictor, can be ‘categorical’, ‘interaction’, ‘continuous’ and ‘spline’</dd>
-<dt>variablenames</dt>
-<dd>Name of each variable/predictor without modifiers for level / spline modifier (e.g. factorA, sac_amplitude)</dd>
-<dt>colnames:</dt>
-<dd>The name of each column of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">X()</span></code>. This field contains the modifier for level and spline (e.g. factorA_face or sac_amplitude_3.5)</dd>
-<dt>cols2variablenames</dt>
-<dd>A list connecting the columns of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">X()</span></code> with the variables.</dd>
-<dt>cols2eventtypes</dt>
-<dd>A list connecting the columns of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">X()</span></code> with possibly multiple events.</dd>
-<dt>eventtypes</dt>
-<dd>The names of the events that are modeled. Only interesting if multiple different events were modeled.</dd>
-<dt>Xdc</dt>
-<dd>Timeexpanded designmatrix [nsamples x (npredictors x ntimebasisfunctions)]. Output of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_timeexpandDesignmat()</span></code>. If you need to modify this, have a look at <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_designmat_addcol()</span></code> to see which fields should be modified.</dd>
-<dt>timebasis</dt>
-<dd>The basis-function of the timeexpand for the deconvolution. This matrix could be the identity matrix in case of “stick”/dirac-functions. Used only for splines/fourier time-basis functions</dd>
-<dt>times: [1×20 double]</dt>
-<dd>A vector containing the time in seconds over what range the timeexpand occurred. This encodes the time of the resulting ERP</dd>
-<dt>Xdc_terms2cols</dt>
-<dd>A list connecting the columns of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">Xdc()</span></code> with columns of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">X()</span></code></dd>
-<dt>beta_dc</dt>
-<dd>deconvolved betas. Output of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_glmfit()</span></code>. This is the main outcome of this toolbox</dd>
-<dt>beta_nodc</dt>
-<dd>non-deconvolved betas. This is a mass univariate fit where each timepoint and each electrode were fitted independently. Output of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_glmfit_nodc()</span></code></dd>
-<dt>channel</dt>
-<dd>for which channel the deconvolved betas have been calculated</dd>
-<dt>effects_mean</dt>
-<dd>In case of effects coding contains the mean of the designmatrix columns</dd>
-</dl>
-<div class="section" id="fields-of-ufresult">
-<h2>Fields of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">ufresult()</span></code><a class="headerlink" href="#fields-of-ufresult" title="Permalink to this headline">¶</a></h2>
-<p>the ufresult structure is the output of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_condense()</span></code>. This function removes the time-splines if used and possibly evaluates splines at (automatically) specific quantiles.</p>
-<dl class="docutils">
-<dt>unfold</dt>
-<dd>same as EEG.unfold</dd>
-<dt>times</dt>
-<dd>same as ufresult.unfold.basistime, thus the epoch-time in s</dd>
-<dt>chanlocs</dt>
-<dd>same as EEG.chanlocs</dd>
-<dt>param</dt>
-<dd>a structure defining for each beta-value which event, what predictor, which variable-type and what the corresponding value is.</dd>
-<dt>beta_nodc</dt>
-<dd>the betas without deconvolution [channel x time x predictors]</dd>
-<dt>beta</dt>
-<dd>the betas with deconvolution [channel x time x predictors]</dd>
-</dl>
-</div>
-<div class="section" id="fields-of-unfold-splines">
-<h2>Fields of <code class="xref mat mat-func docutils literal notranslate"><span class="pre">unfold.splines()</span></code><a class="headerlink" href="#fields-of-unfold-splines" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>paramValues</dt>
-<dd>the parameter values of each event, e.g. for saccade amplitude: [1.3, 2.3, 6, 1.2 …]</dd>
-<dt>nSplines</dt>
-<dd>the number of splines used for modelling</dd>
-<dt>knots</dt>
-<dd>the knot sequence. This is necessary to evaluate splines at a later point in time</dd>
-<dt>splineFunction</dt>
-<dd>the function used to define the spline, could be a custom function.</dd>
-<dt>removedSplineIdx</dt>
-<dd>The index of the spline which was removed during spline-generation. It is necessary to remove one spline in order to not have any collinearities. Depending on configuration either a middle or the first spline is removed.</dd>
-<dt>X</dt>
-<dd>the entries of X times the spline (i.e. the subset of X)</dd>
-<dt>name</dt>
-<dd>name of the spline</dd>
-<dt>colnames</dt>
-<dd>column names that the spline will get in EEG.unfold.X</dd>
-</dl>
+<h2>Imputation of missing data</h2>
+<p>In linear models, missing data need to be imputed (‘interpolated’) or the event needs to be excluded. We currently offer four methods to deal with this in the function <code class="xref mat mat-func docutils literal notranslate"><span class="pre">uf_imputeMissing()</span></code> (to be called after the design specification). See the documentation of impute missing for more details.</p>
 </div>
 </div>
 
@@ -313,9 +249,47 @@
     </p>
     <p>
         &copy; Copyright 2018, Benedikt Ehinger, Olaf Dimigen.<br/>
-      Last updated on Jun 01, 2018.<br/>
+      Last updated on Jun 04, 2018.<br/>
     </p>
-  </div>
+
+    <div id="optout-form">
+      <p>We want to use a unique web analytics cookie identification number assigned to your computer in order to measure how many unique visitors come to this webpage. You can find our <a href='./_static/impressum.html'> privacy police here.</a> We use the data only to track how many visitors come to this page.</p>
+    </div>
+
+
+    <p class="matomo-optout" lang="en">
+    <span class="js" style="display:none;">
+        <input type="checkbox" name="matomo-optout" id="matomo-optout-en" checked>
+        <label for="matomo-optout-en"></label>
+    </span>
+    <span class="nojs">It appears you have deactived JavaScript in your browser. This feature is only available with JavaScript turned on. If you don’t want your data to be collected, you can still turn on <em>Do Not Track</em> in your browser which is a general setting and is being respected by our Matomo installation.</span>
+    </p>
+    <script>
+    if (dnt && doNotTrackRespected) {
+	/**
+	 * if browser DoNotTrack setting is activated show doNotTrackActive text
+	 */
+	for (var langDNT in langSnippets) {
+		$('.matomo-optout[lang="' + langDNT + '"]').html(langSnippets[langDNT].doNotTrackActive);
+	}
+} else {
+	if (typeof(Storage) !== 'undefined') {
+		/**
+		 * if localStorage exists show status text and set event listener to checkbox
+		 */
+		matomoDisplayStatus();
+		$('input[name="matomo-optout"]').on('change', function() {
+			matomoChangeStatus();
+		});
+	} else {
+		for (var langOldBrowser in langSnippets) {
+			$('.matomo-optout[lang="' + langOldBrowser + '"]').html(langSnippets[langOldBrowser].localStorageNotAvailable);
+		}
+	}
+}
+</script>
+
+</div>
 </footer>
   </body>
 </html>

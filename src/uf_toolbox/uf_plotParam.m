@@ -1,9 +1,9 @@
 function [varargout] = uf_plotParam(ufresult,varargin)
-% Plots time vs. Voltage in separate plots for each predictor, where there
-% are multiple lines for each predictor
+% plots time vs. voltage ("regression-ERPs") in separate plots for each 
+% predictor, where there are multiple lines for each predictor
 %
-% 'ufresult' needs to have the 'ufresult' structure, the output from
-% "uf_condense"
+% 'ufresult' needs to contain the 'ufresult' structure, the output from
+% uf_condense()
 %
 % Uses the 'gramm'-toolbox for plotting
 %
@@ -12,7 +12,7 @@ function [varargout] = uf_plotParam(ufresult,varargin)
 %
 %    'predictAt' (cell): a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
 %           This is a shortcut to uf_continuousPredict. We generally
-%           recommend to explicitly use the uf_continuousPredict function.
+%           recommend to explicitly use the c function.
 %
 %    'deconv' ([-1 0 1]):default: -1; whether to plot ufresult.beta (1) or
 %       ufresult.beta_nodc(0) or everything/autodetect (-1). Autodetect would
@@ -63,13 +63,17 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
 
-
+% check whether the user tried to enter EEG.unfold directly into this 
+% function without running uf_condense first
+if ~isfield(ufresult,'param') & isfield(ufresult,'unfold')
+    error('\n%s(): You cannot directly enter the unfold output into this function - you have to run uf_condense() first',mfilename)
+end
 
 betaSetName = uf_unfoldbetaSetname(ufresult,varargin{:});
 
 if isempty(cfg.channel) && size(ufresult.(betaSetName{1}),1) == 1
     cfg.channel = 1;
-    fprintf('a single channel detected, none specified, thus using this one')
+    fprintf('\na single channel detected, none specified, thus using this one')
 end
 if ischar(cfg.channel)
    assert(~isempty(ufresult.chanlocs),'ufresult.chanlocs is empty, it is necessary to be non-empty if you want to specify a channel by string, use numbers instead or populate ufresult.chanlocs') 
@@ -83,19 +87,19 @@ assert(~(cfg.add_marginal&&cfg.add_intercept),'cannot add average AND intercept 
 % Find out whether we want beta_dc, beta_nodc and if there are other fields
 % that have the same size that we should plot as columns.
 
-if ~isempty(cfg.predictAt{1}{1})
-    fprintf('Evaluating parameters at auto or specified values');
-    ufresult = uf_predictContinuous(ufresult,'deconv',cfg.deconv);
+if ~isempty(cfg.predictAt{1}{1}) % bugfix OD: this was ~isempty
+    fprintf('\nEvaluating parameters at auto or specified values');
+    ufresult = uf_predictContinuous(ufresult,'deconv',cfg.deconv,'predictAt',cfg.predictAt);
 end
 %% Prepare data
 % select parameters to plot, or else plot all available
 
 if isempty(cfg.plotParam)
-    display('plotting all parameters')
+    fprintf('\nplotting all parameters')
     paramList = {ufresult.param.name};
     paramIdx = 1:length(ufresult.param);
 else
-    display('plotting selected parameters')
+    fprintf('\nplotting selected parameters')
     paramIdx = [];
     if isstr(cfg.plotParam)
         % if only a single parameter is requested
@@ -156,11 +160,11 @@ for bName =betaSetName
             
             interceptIdx = cellfun(@(x)~isempty(x),strfind({ufresult.param(paramIdx).name},'(Intercept)'));
             if sum(interceptIdx) == 0
-                warning('no intercept found, did you select a parameter but not the intercepts?')
+                warning('%s(): no intercept found, did you select a parameter but not the intercepts?',mfilename)
                 continue
             end
             if sum(eventIdx&interceptIdx)>1
-                error('multiple intercepts per event are impossible')
+                error('%s(): multiple intercepts per event are impossible',mfilename)
             end
             %extract it
             betaIntercept = data(:,eventIdx&interceptIdx);
@@ -204,7 +208,7 @@ if cfg.figure && isempty(cfg.gramm)
     else
         channame = num2str(cfg.channel);
     end
-    figure('name',sprintf('unfold-toolbox channel %s',channame))
+    figure('name',sprintf('unfold toolbox, channel %s',channame))
 end
 clear g
 

@@ -1,9 +1,10 @@
 function [EEG] = uf_imputeMissing(EEG,varargin)
+%Impute Missing Values
 % Deal with predictors for which some values are missing in design matrix
 % You can either impute missing values or remove the predictors events for 
 % which some values are missing
 %
-% Arguments:
+%Arguments:
 % cfg.method:
 %  * 'drop'     : (similar to R) Drop the whole event from the designmat (fill
 %                 it with 0). This will lead to the event not being used
@@ -15,12 +16,12 @@ function [EEG] = uf_imputeMissing(EEG,varargin)
 %  * 'mean'     : fill in the mean value
 %  * 'median'   : (Default) fill in the median value
 %
-% Returns:
+%Returns:
 % EEG.unfold.X in which missing NAN-values were imputed ('marginal', 'mean',
 % 'median') or in which the events with missing predictor information were 
 % removed ('drop'), which means put to 0
 %
-% Example:
+%Example:
 %   EEG = uf_imputeMissing(EEG)
 
 fprintf('\n%s(): Looking for missing predictor information...',mfilename)

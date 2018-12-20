@@ -69,6 +69,12 @@ EEG.data(1,1) = 10^10;
 
 test_fit(EEG,'lsmr')
 
+%% ICA test
+EEG.icaact = EEG.data;
+EEG1 = uf_glmfit(EEG,'ica',1);
+EEG0 = uf_glmfit(EEG,'ica',0);
+assert(all(EEG1.unfold.beta_dc(:) == EEG0.unfold.beta_dc(:)),'ICA error');
+
 
 function test_fit(EEG,method)
 EEG = uf_glmfit(EEG,'method',method);

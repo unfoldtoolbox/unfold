@@ -1,13 +1,13 @@
 function output = uf_predictContinuous(ufresult,varargin)
 %% Evaluates a continuous/spline parameter at specific values
 % This is similar to a predict function, but does not add the marginal of
-% the other parameters. For this please make use of uf_addmarignals().
+% the other parameters. For this please make use of uf_addmarginals().
 %
-% Because model-estimates / parameters are defined for each time-point&electrode and can
-% also encompass multiple betas (in the case of splines), this
-% becomes non trivial and thus this function.
-% Note that this will overvwrite the ufresult.beta field
-
+% Because model-estimates / parameters are defined for each time-point and
+% electrode and can also encompass multiple betas (in the case of spline
+% predictors), this becomes non trivial and thus this function.
+% Note that this will overwrite the ufresult.beta field
+%
 %Arguments:
 %   cfg.predictAt(cell): One entry per parameter:
 %       {{'par1',[10 20 30]},{'par2',[0,1,2]}}.
@@ -20,10 +20,10 @@ function output = uf_predictContinuous(ufresult,varargin)
 %       'linear'   - the auto_n values are placed linearly over the range of the predictor
 %       'average'  - only evaluates at the average of the predictor. This
 %       is useful if you are interested in the marginal response
-%   cfg.auto_n (integer) : default 7; the number of automatically evaluated values
+%   cfg.auto_n (integer) : default 10; the number of automatically evaluated values
 %
 %Return:
-%   Result-Betas with evaluated betas at specified continuous values.
+%   Betas with evaluated betas at specified continuous values.
 %
 %*Example:*
 %    You calculated for a continuous variable "parameterA" a beta of 3. 
@@ -41,6 +41,12 @@ cfg = finputcheck(varargin,...
     },'mode','error');
 
 if(ischar(cfg)); error(cfg);end
+
+% check whether the user tried to enter EEG.unfold directly into this 
+% function without running uf_condense first
+if ~isfield(ufresult,'param') & isfield(ufresult,'unfold')
+    error('\n%s(): You cannot directly enter the unfold output into this function - you have to run uf_condense() first',mfilename)
+end
 
 % check if function has been run before
 % this will lead to mistakes and errors because some betas will not be the betas we expect anymore - don't allow that!
@@ -211,7 +217,7 @@ for currPred= 1:length(paramList)
             % This is supoptimal and I'm sorry if it creates inconveniences.
             % We would need to introduce a whole new field to carry around
             % to compensate for this.
-            warning('auto spacing for continuous variables exlcudes all zeros. Specfiy manually if necessary using ''predictAt''')
+            warning('Auto spacing for continuous variables excludes all zeros. If necessary, specify manually using ''predictAt''')
             contValueSelect = auto_spacing(cfg,values(values~=0));
         end
         

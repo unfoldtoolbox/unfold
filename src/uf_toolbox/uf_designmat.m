@@ -44,14 +44,6 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                  If more than one formula are specified, we expect you to specify
 %                  the eventtypess each formula should be applied to.
 %
-%   cfg.spline(cell): define a b-spline non-parametric continuous effect. For example:
-%                   cfg.spline = {{'speed',15},{'size',10}};
-%                   This adds two non-parametric splines, speed with 15
-%                   knots and size with 10 knots, thus in total 14+9=23
-%                   parameters (we remove one spline due to the Linear
-%                   Modeling aspect). Can be specified more conveniently
-%                   directly inside the formula
-%                   2D splines have to be specified in the form {'xpos','ypos',10}
 %
 %   cfg.categorical(cell-array): default {}, list of which of the EEG.event fields
 %                   should be treated as an categorical effect (thus
@@ -59,8 +51,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                   variables are categorical in the formula.
 %                   You can specify the order of the predictors. For
 %                   example:
-%                   {'predictorA',{'level3','level1','level2'};
-%                    'predictorB',{'level2','level1'}}
+%                   {'predictorA',{'level3','level1','level2'}; 'predictorB',{'level2','level1'}}
 %                   For predictorA, the level3 is now used as a reference
 %                   group. For predictorB the level2 is now used.
 %                   The second column of the cell array is optional. E.g.
@@ -74,9 +65,10 @@ function [EEG] = uf_designmat(EEG,varargin)
 %                  'logreverse': log decreasing spacing
 %                  'quantiles' (default): heuristic spacing at the quantiles
 %
-%   cfg.codingschema(string): default: 'references', could be 'effects', this is
+%   cfg.codingschema(string): default: 'reference', could be 'effects', this is
 %                   relevant if you define categorical input variables.
 %                   Reference coding is also known as treatment coding
+%
 %
 %Returns:
 %     EEG-struct: Returns the EEG structure with the additional fields in EEG.unfold
@@ -86,6 +78,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %     * formula:    The original cfg.formula
 %     * event:      the cfg.eventtypes
 %     * cols2eventtypes:   For each column of 'X' which event it represents
+%
 %
 %*Example:*
 %   A classical 2x2 factorial design with interaction
@@ -116,7 +109,7 @@ function [EEG] = uf_designmat(EEG,varargin)
 %|   cfgDesign.formula = {'y ~ 1 + cat(level_predictability)*cat(target_fixation) + spl(sac_amplitude,10)','y~1'};
 %|
 %|   EEG = uf_addDesignmat(EEG,cfgDesign);
-
+%
 
 cfg = finputcheck(varargin,...
     {'categorical',   'cell', [], {};...
@@ -127,12 +120,10 @@ cfg = finputcheck(varargin,...
     'codingschema','string',{'effects','reference'},'reference';
     },'mode','ignore');
 
-
-
 if(ischar(cfg)); error(cfg);end
 
 if isempty(cfg.eventtypes)
-    error('no eventtypes specified even though this is neccesary.')
+    error('%s(): No event types (eventtypes) specified. This is a required input to generate the design matrix.',mfilename)
 end
 
 if ~iscell(cfg.eventtypes)
@@ -152,9 +143,7 @@ if iscell(cfg.formula)
         for k = 1:length(cfg.eventtypes)
             cfgSingle.eventtypes = cfg.eventtypes{k};
             cfgSingle.formula= cfg.formula{k};
-            if ~isempty(cfg.spline)
-                cfgSingle.spline = cfg.spline{k};
-            end
+            
             
             %do the summersault
             
@@ -250,14 +239,8 @@ for s = 1:length(spl2D)
     assert(floor(spl2D{s}{2}) == spl2D{s}{2},'spline number has to be an integer!')
     
 end%% First check for unique variablenames
-
-%% auto fill in default_spline for the cfg.spline defined splines
-for s = 1:length(cfg.spline )
-    if size(cfg.spline{s},2) == 2
-        cfg.spline{s} = @default_spline;
-    end
-end
-cfg.spline = [cfg.spline spl circspl spl2D];
+%%
+cfg.spline = [spl circspl spl2D];
 
 numericix = [];
 % check categorical input and combine
@@ -581,16 +564,28 @@ if ~isempty(cfg.spline)
         else
             [EEG, ~,nanlist] = uf_designmat_spline(EEG,'name',cfg.spline{s}{1},'nsplines',cfg.spline{s}{2}(1),'paramValues',t{:,cfg.spline{s}{1}},'splinespacing',cfg.splinespacing,'splinefunction',cfg.spline{s}{3},'cyclical_bounds',bounds);
         end
-        EEG.unfold.X(nanlist,:) = 0;
+        % There are two types of "nans". One if there are multiple events
+        % of different type, we could have a whole row being nan, these we
+        % want to put the nans to 0 to exclude them from the model fit.
+        % But if we model that event, the nan should stay so we can impute
+        % it later.
+        
+        %this was calculated way above already (removeIndex) but for sake
+        %of clarity we do it here again
+
+        EEG.unfold.X(isnan(t.latency),:) = 0;
+        
+        % This retains "real" nans
     end
 end
 
 
 
 % Designmat Checks
-if any(any(isnan(EEG.unfold.X)))
+subsetX = EEG.unfold.X(~all(isnan(EEG.unfold.X),2),:);
+if any(isnan(subsetX(:)))
     warning('NaNs detected in designmat, try to impute them before fitting the model')
-    fprintf(['nans found in: ',EEG.unfold.colnames{any(isnan(EEG.unfold.X))}])
+    fprintf(['nans found in: ',EEG.unfold.colnames{any(isnan(subsetX))}])
     fprintf('\n')
     
 end
@@ -718,9 +713,9 @@ function check_rank(X)
     isnancol = any(isnan(X));
     X = X(:,~isnancol);
     if any(isnancol)
-        warning('Rank check: removed %i columns with nans in it, rank estimation might be faulty',sum(isnancol));
+        warning('Rank check: There are %i columns with NaN values in it, rank estimation might be faulty',sum(isnancol));
     end
     if rank(X)<size(X,2)
-        warning('Rank is smaller than matrix size. Do you have two columns that are identical? Other linear dependencies can occur. Check for collinearity')
+        warning('Rank is smaller than matrix size! Do you have two columns that are identical? Other linear dependencies can occur. Check for collinearity')
     end
 end
