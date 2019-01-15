@@ -2,7 +2,7 @@ function [EEG] = uf_designmat(EEG,varargin)
  %% Generate Designmatrix out of EEG.event structure and a formula
 % Input an EEG event structure and you will get an EEG.unfold.X field with
 % the designmatrix.If you add multiple eventtypess+formulas as cell-arrays, this function will iteratively
-% call itself and combine it to one big designmatrix.The designmatrix is not yet ready to do deconvolution, use
+% call itself and combine it to one big designmatrix. The designmatrix is not yet ready to do deconvolution, use
 % uf_timeexpandDesignmat for this.
 %
 %Arguments:
@@ -322,11 +322,13 @@ for k = 1:length(cfg.eventtypes)
 end
 removeIndex = setdiff(1:size(t,1),indexList);
 
+
+
 % we want only the designmatrix of triggers we want to model
 for p = 1:size(t,2)
     %this awkward construction is entirely matlabs fault ;)
     try
-        t{removeIndex,p} =nan;
+        t{removeIndex,p} = nan;
         t(:,p) = standardizeMissing(t(:,p),nan);
         
     catch
@@ -338,7 +340,7 @@ end
 %% display infos on the number of events used
 % because other output is printed, mark these sections (due to recursive
 % call, its not easy to print all this information in one nice table)
-fprintf('Modeling %i event(s) of [%s] using formula: %s \n',size(t,1),eventStr,cfg.formula_nozzz)
+fprintf('Modeling %i event(s) of [%s] using formula: %s \n',size(t,1)-length(removeIndex),eventStr,cfg.formula_nozzz)
 
 %%
 
