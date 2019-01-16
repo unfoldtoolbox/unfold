@@ -388,7 +388,7 @@ for p = 1:size(t_clean,2)
         fprintf('non-string events: ')
         fprintf('%i,',find(~cellfun(@isstr,t_clean{:,p})))
         fprintf('\n')
-        error('Input Event Values have to be string or numeric. Event:%s was class: %s \n string found in %i out of %i events (sometimes one or a couple of events have NANS instead of strings) ',t.Properties.VariableNames{p},class(t_clean{:,p}),sum(cellfun(@isstr,t_clean{:,p})),size(t_clean,1))
+        error('Input Event Values have to be string or numeric. Event:%s was class: %s \n string found in %i out of %i events (sometimes one or a couple of events have NANS instead of strings) ',t_clean.Properties.VariableNames{p},class(t_clean{:,p}),sum(cellfun(@isstr,t_clean{:,p})),size(t_clean,1))
     elseif all(cellfun(@isstr,t_clean{:,p}))
         % If all of them are strings, we need to check that this is a
         % categorical variable
