@@ -10,6 +10,7 @@ addpath(fullfile(projectFolder,'lib','erplab'))
 addpath(fullfile(projectFolder,'lib','gramm'))
 addpath(fullfile(projectFolder,'lib','lsmr'))
 addpath(fullfile(projectFolder,'lib','luong_bruno'))
+addpath(fullfile(projectFolder,'lib','cbrewer'))
 addpath(fullfile(projectFolder,'lib','ept_TFCE','TFCE','Dependencies'))
 addpath(genpath(fullfile(projectFolder,'lib','eegvis','topo_butter')))
 

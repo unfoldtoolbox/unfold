@@ -96,7 +96,7 @@ X = EEG.unfold.Xdc;
 
 disp('solving the equation system');
 t = tic;
-beta = nan(size(EEG.unfold.Xdc,2),EEG.nbchan);
+
 if cfg.ica
     data = EEG.icaact;
 else

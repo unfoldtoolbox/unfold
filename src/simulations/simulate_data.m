@@ -1,4 +1,4 @@
-function [EEG] = simulate_data2(signals,varargin)
+function [EEG] = simulate_data(signals,varargin)
 
 % 'eventname', 'stimulusA', 'type','intercept', 'overlap',0 [range 0 1],
 
@@ -11,7 +11,7 @@ function [EEG] = simulate_data2(signals,varargin)
 
 simCFG= finputcheck(varargin,...
     {'datalength','integer',[],10*60;
-    'noise','boolean',[],1;
+    'noise','real',[],1;
     'srate','integer',[],10;
     'basis','string',{'box','hanning','dirac','posneg'},'box'
     },'mode','ignore');

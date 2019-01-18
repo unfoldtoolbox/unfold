@@ -83,6 +83,7 @@ EEG.unfold = rmfield(EEG.unfold,rmList);
 
 
 % this generates the stick-matrix
+assert(EEG.pnts ~= 0,'Error: EEG.pnts is 0')
 eventvec = zeros(size(EEG.unfold.X,2),EEG.pnts);
 for e = 1:length(EEG.event)
     
