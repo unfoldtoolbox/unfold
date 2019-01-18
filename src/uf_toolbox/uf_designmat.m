@@ -591,6 +591,7 @@ if any(isnan(subsetX(:)))
     fprintf('\n')
     
 end
+EEG.unfold.codingschema = cfg.codingschema;
 
 
 
@@ -707,7 +708,6 @@ EEG2.unfold.cols2variablenames = EEG2.unfold.cols2variablenames+max(deconvAll.co
 % and reset them to 0 (0 meaning the intercept)
 deconvAll.cols2variablenames = [deconvAll.cols2variablenames EEG2.unfold.cols2variablenames];
 
-deconvAll.codingschema = cfg.codingschema;
 check_rank(deconvAll.X)
 end
 
