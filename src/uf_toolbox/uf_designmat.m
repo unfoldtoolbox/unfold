@@ -372,7 +372,7 @@ for p = 1:size(t_clean,2)
         %variables to string categorical variables. Else the reordering of
         %the levels does not work.
         
-        if ~isempty(numericix) && strcmp(t_clean.Properties.VariableNames{p},categoricalLevelsOrder(numericix)) %numericix from line ~210
+        if ~isempty(numericix) && ismember(t_clean.Properties.VariableNames{p},categoricalLevelsOrder(numericix)) %numericix from line ~210
             is_nan = isnan(t_clean{:,p});
             t_clean.(t_clean.Properties.VariableNames{p}) = arrayfun(@(x)num2str(x),t_clean{:,p},'UniformOutput',0);
             t_clean{is_nan,p} = repmat({''},sum(is_nan),1);
