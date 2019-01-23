@@ -39,7 +39,7 @@ Here two types of events are visible, red **stimuli** events and green **saccade
 
 **Deconvolution**
 
-The key insight in how deconvolution using LMs works is, that each sample of the timeseries can be thought of a linear summation of kernel responses with respectively different times in the kernels. As an example take a voltage at sample $n$. Assume that there are three previous events that we think could overlap to explain this voltage. This voltage is the result of, for example, a summation of kernel A at t==5 and kernel B t==2 and kernel B at t==7. Yet another sample $n_2$ might have only two events **but with slightly different kernel-timings** e.g. A at t==1 and B at *t==2*. We now have an example where B is at t==2, but A is at t==1 once and at t==5 the other time. This allows us to disentangle the signal.
+The key insight in how deconvolution using LMs works is, that each sample of the timeseries can be thought of a linear summation of kernel responses with respectively different times in the kernels. As an example take a voltage at sample :math:`n`. Assume that there are three previous events that we think could overlap to explain this voltage. This voltage is the result of, for example, a summation of kernel A at t==5 and kernel B t==2 and kernel B at t==7. Yet another sample :math:`n_2` might have only two events **but with slightly different kernel-timings** e.g. A at t==1 and B at *t==2*. We now have an example where B is at t==2, but A is at t==1 once and at t==5 the other time. This allows us to disentangle the signal.
 
 In practice this works by timeexpanding our designmatrix. For the following example, the designmatrix was a design with two columns/predictors. One for the stimulus-kernel and one for the saccade-kernel.
 
@@ -67,10 +67,10 @@ The connection of (formal) convolution and timeexpansion
 -----------------------------------------------------------
 In linear deconvolution, we make use of the knowledge that each observed sample of the continuous EEG sample can be described as the linear sum of (possibly) several overlapping event-related EEG responses. Depending on the latencies of the neighboring events, these overlapping responses occur at different times relative to the current event instance. In the following we will assume two events, A & B. The observed continuous EEG at time point t can be described as follows: 
 $$EEG(t)=∑_(i=1)^(n_A)ERP_A(t-eventOnsetA_i)+ ∑_(i=1)^(n_B)ERP_B(t-eventOnsetB_i)$$
-With $i$ an instance of an event.
+With :math:`i` an instance of an event.
 
-The (unknown) function $EEG_A (t-eventOnsetA_i )$  can be thought of as the “true” ERP activity at the continuous EEG time point t. Because instances of events occur at different time points, they are centered by the $t-eventOnsetA_i$ term, we refer to this centered time (the distance to the event) as local time $\tau$. 
+The (unknown) function :math:`EEG_A (t-eventOnsetA_i )` can be thought of as the “true” ERP activity at the continuous EEG time point t. Because instances of events occur at different time points, they are centered by the :math:`t-eventOnsetA_i` term, we refer to this centered time (the distance to the event) as local time :math:`\tau`. 
 
-This is indead a classical convolution. If we replace the event onsets by a vector $g$ with zeros everywhere and ones  at the samples of event onset, we get:
+This is indead a classical convolution. If we replace the event onsets by a vector :math:`g` with zeros everywhere and ones  at the samples of event onset, we get:
 $$EEG(t)=g_A*ERP_A+g_B*ERP_B$$
-A sum of convolutions. This is the process we need to reverse, that is, we need to estimate $ERP_A$ and $ERP_B$ given $EEG(t)$ and $g$. 
+A sum of convolutions. This is the process we need to reverse, that is, we need to estimate :math:`ERP_A` and :math:`ERP_B` given :math:`EEG(t)` and :math:`g`. 

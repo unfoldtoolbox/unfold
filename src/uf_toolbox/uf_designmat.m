@@ -374,7 +374,7 @@ for p = 1:size(t_clean,2)
         %variables to string categorical variables. Else the reordering of
         %the levels does not work.
         
-        if ~isempty(numericix) && strcmp(t_clean.Properties.VariableNames{p},categoricalLevelsOrder(numericix)) %numericix from line ~210
+        if ~isempty(numericix) && ismember(t_clean.Properties.VariableNames{p},categoricalLevelsOrder(numericix)) %numericix from line ~210
             is_nan = isnan(t_clean{:,p});
             t_clean.(t_clean.Properties.VariableNames{p}) = arrayfun(@(x)num2str(x),t_clean{:,p},'UniformOutput',0);
             t_clean{is_nan,p} = repmat({''},sum(is_nan),1);
@@ -591,7 +591,12 @@ if any(isnan(subsetX(:)))
     fprintf('\n')
     
 end
+
 check_rank(EEG.unfold.X)
+
+EEG.unfold.codingschema = cfg.codingschema;
+
+
 
 
 
@@ -707,7 +712,6 @@ EEG2.unfold.cols2variablenames = EEG2.unfold.cols2variablenames+max(deconvAll.co
 % and reset them to 0 (0 meaning the intercept)
 deconvAll.cols2variablenames = [deconvAll.cols2variablenames EEG2.unfold.cols2variablenames];
 
-deconvAll.codingschema = cfg.codingschema;
 check_rank(deconvAll.X)
 end
 
