@@ -591,7 +591,7 @@ if any(isnan(subsetX(:)))
     fprintf('\n')
     
 end
-
+check_rank(EEG.unfold.X)
 
 
 
