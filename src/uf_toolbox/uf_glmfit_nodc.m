@@ -58,6 +58,10 @@ end
 beta = nan(size(data,1),size(data,2),size(X,2));
 if strcmp(cfg.method,'pinv')
     %% Pseudoinverse
+    % pseudoinverse solution can make use of basisFunctions. We therefore
+    % overwrite the beta vector
+    beta = nan(size(data,1),size(EEG.unfold.timebasis,1),size(X,2));
+
     Xinv = pinv(X);
     for c = cfg.channel
         % This is X^-1 * (time-basisFunction * Data) => We move the data first
