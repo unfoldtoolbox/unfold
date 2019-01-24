@@ -474,10 +474,11 @@ end
 variablenames = F.VariableNames(1:end-1);
 has_intercept = any(strcmp(colnames,'(Intercept)'));
 
-assert(all(cols2variablenames~=0),'error: at least one predictor has only a single value')
 if isempty(colnames)
-    error('did you specify y~ -1? You need at least a single column in your designmatrix')
+    error('did you specify y~ -1? You need at least a single column in your designmatrix. (y ~ -1 + spl(XY) is currently not supported')
 end
+assert(all(cols2variablenames~=0),'error: at least one predictor has only a single value')
+
 is_interaction = cellfun(@(x)any(x),strfind(colnames,':'));
 
 if sum(is_interaction)>0
