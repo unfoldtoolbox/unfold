@@ -66,6 +66,7 @@ cfg.windowlength = diff(cfg.reallims)+1;
 
 cfg.windowtimes = linspace(cfg.reallims(1),cfg.reallims(2),cfg.windowlength)/EEG.srate;
 
+assert(cfg.windowlength>0,'Your window length is 0. Did you specify timelimits correctly and is  EEG.srate set correctly?')
 if cfg.windowlength>10000
     warning('are you sure you want to have an epoch the size of: %f samples, or did put the limits in ms instead of s?',cfg.windowlength)
     pause()
