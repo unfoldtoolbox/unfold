@@ -136,7 +136,7 @@ for type = {'default','cyclical','custom','cyclical_formula','2D'}
         
     end
     if strcmp(cfgSim.type,'2D')
-        assert(sum((modelled(:)-data(:)).^2) < 0.001,'could not recover function!')
+        assert(sum((modelled(:)-data(:)).^2) < 0.002,'could not recover function!')
     else
         
     assert(sum((EEG.data- result').^2) < 0.001,'could not recover function!')
@@ -148,7 +148,7 @@ end
 EEGtmp = simulate_test_case(7,'noise',0,'basis','box');
 EEGtmp.event(1).splineA = nan;
 EEGtmp = uf_designmat(EEGtmp,'eventtypes','stimulusA','formula','y~1+spl(splineA,4)');
-assert(all(isnan(EEGtmp.unfold.X(1,:))))
+assert(all(isnan(EEGtmp.unfold.X(1,2:end))))
 
 
 

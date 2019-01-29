@@ -20,7 +20,7 @@ test_timeexpandDesignmat
 
 % Multi-Test
 cfg = struct();
-cfg.designmat.coding = {'dummy','reference'};
+cfg.designmat.coding = {'effects','reference'};
 cfg.designmat.splinespacing = {'linear','quantile'};
 cfg.timeexpandDesignmat.timelimits = {[-0.5,1.5],[-0.5,-0.1],[1 2]};
 cfg.timeexpandDesignmat.method = {'stick','splines','fourier'};

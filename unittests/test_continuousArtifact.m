@@ -7,7 +7,7 @@ cfgClean = [];
 cfgClean.amplitudeThreshold=150;
 cfgClean.windowsize=1000; %in ms
 cfgClean.stepsize=100; %in ms
-cfgClean.combineSegements=200; %in ms
+cfgClean.combineSegments=200; %in ms
 cfgClean.channels=1;
 
 
