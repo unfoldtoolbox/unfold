@@ -22,7 +22,7 @@ run('init_unfold.m')
 
 
 ### Simple example
-Check out the [toolbox tutorials](https://www.unfoldtoolbox.org/docs_sphinx/_build/html/toolboxtutorials.html) for more information!
+Check out the [toolbox tutorials](https://www.unfoldtoolbox.org/toolboxtutorials.html) for more information!
 ```
 EEG = tutorial_simulate_data('2x2')
 EEG = uf_designmat('eventtypes',{'fixation'},'formula','y ~ 1+ cat(stimulusType)*cat(color)')
