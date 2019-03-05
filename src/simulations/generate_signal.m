@@ -38,7 +38,7 @@ for runner = 1:length(eventTimes)
 end
 
 if cfg.noise
-    data = data + 0.5*randn(size(data));
+    data = data + cfg.noise*randn(size(data));
 end
 
 % make pseudo EEG-lab interface
