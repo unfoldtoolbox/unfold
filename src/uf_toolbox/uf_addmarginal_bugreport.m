@@ -87,57 +87,37 @@ if isempty(cfg.channel)
     cfg.channel = 1:size(ufresult.(cfg.betaSetname),1);
 end
 
-paramEvents       = {ufresult.param.event}; 
-paramNames        = {ufresult.param.name};  
+% paramEventsUnique = unique([ufresult.param.event]); % N = 10 (???)
+paramEvents       = [ufresult.param.event]; % length = 48, cause some contain many
+paramNames        = {ufresult.param.name};  % length = 24
 
 % make copy ufresult_avg
 fprintf('\nRe-running uf_condense() to recover unconverted splines\n')
 ufresult_avg = uf_condense(ufresult); % re-genererate, (without "evaluated" predictors)
 ufresult_avg = uf_predictContinuous(ufresult_avg,'auto_method','average'); % get mean of continuous/spline predictors
 
-
-% Comparing two cell arrays is not so easy, so we have to manually find out
-% which two event combinations exist.
-uniqueParamEvents = [];
-for cTest = paramEvents
-   is_unique_event = 1;
-   for cAgainst = uniqueParamEvents
-       if all(strcmp(cAgainst{1},cTest{1}))
-           is_unique_event = 0;
-           break
-       end
-   end
-   if is_unique_event
-       uniqueParamEvents = [uniqueParamEvents cTest];
-   end
-       
-end
-% you know, or just take ufresult.unfold.eventtypes:
-assert(length(uniqueParamEvents) == length(ufresult.unfold.eventtypes))
 %% go tru unique event types
-for e = uniqueParamEvents%unique(paramEvents)
+for e = unique(paramEvents)
     
     % find indices where current event type (e.g., "123", "saccade", "fixation") exists in paramEvents
-    % (note: this can be multiple times, one for each evaluated parameter)
-    e_Idx = [];
-    for cTest= 1:length(paramEvents)
-       if all(strcmp(e{1},paramEvents{cTest}))
-           e_Idx = [e_Idx cTest];
-       end
-    end
+    % (note: this can be multiple times!)
+    e_Idx = find(strcmp(e,paramEvents));
         
-
-    % I don't remember why I had this in here :S
-    %     if length(e_Idx) == 1
-    %         continue 
-    %     end
+    % why?
+    if length(e_Idx) == 1
+        continue 
+    end
             
-    % get the parameters associated with the current events
+    % ---------------------------------------------------------------------
+    % Major Bug (2019-04-04): 
+    % e_Idx is based on paramEvents, which can have substantially more entries than paramNames
+    % creating an error here (index exceeded)
+    % ---------------------------------------------------------------------
+    % The following code was so obsfuscated that I was unable to debug
+    % this...
+    
     eventParamNames = paramNames(e_Idx);
     
-    % we have to do it only once per parameter, so if a parameter occurs
-    % multiple times, we can add the same marginal
-
     for p = unique(eventParamNames)
         
         % Find the names & types of the other parameters
@@ -145,30 +125,15 @@ for e = uniqueParamEvents%unique(paramEvents)
         otherEvents     = setdiff(e_Idx,currEvent);
         otherParamNames = unique(paramNames(otherEvents));
         
-
-        % now we now over what which columns we have to average in
-        % ufresult, but we want to average the response to the average
-        % covariate in "ufresult_avg". Therefore we have to search for the
-        % parameter there
-
         ufresultavg_ix  = [];
         for pOther = otherParamNames
             ufresultavg_ix(end+1) = find(strcmp(pOther{1},{ufresult_avg.param.name}));
         end
         
-
-        % We don't want to add to any categorical predictors, they are
-        % encoded as differences and adding the marginal should be left to
-        % the user (this is inconsistent - but - I found it much more
-        % helpful this way, we could add a flag).
-        
-        % don't do categorical
-        removeix = strcmp('categorical',{ufresult_avg.param(ufresultavg_ix).type});            
-        % and also don't do interaction (note thte removeix |  in the
-        % beginning)
-        removeix = removeix | strcmp('interaction',{ufresult_avg.param(ufresultavg_ix).type}); 
-        
-        % Don't use those
+        % exclude all categorical predictors
+        % (they should be covered by the effects/dummy coding schema already ?!)
+        removeix = strcmp('categorical',{ufresult_avg.param(ufresultavg_ix).type});            % categorical?
+        removeix = removeix | strcmp('interaction',{ufresult_avg.param(ufresultavg_ix).type}); % interaction?
         ufresultavg_ix(removeix) = []; % remove
         
         % calculate the marginal over all other predictors
