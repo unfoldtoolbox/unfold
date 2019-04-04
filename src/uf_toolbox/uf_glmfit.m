@@ -243,15 +243,18 @@ eventcell = cellfun(@(x)iscell(x(1)),EEG.unfold.eventtypes)*1;
 eventnan = cellfun(@(x)isnan(x(1)),EEG.unfold.eventtypes(~eventcell));
 eventnan = find(~eventcell);
 
+betatmp = beta(:,1:end-length(eventnan));
+if ~isempty(betatmp)
+    % in special cases we might not have a proper beta but only mTRF betas
+    betaOut = reshape(betatmp,size(beta,1),size(EEG.unfold.timebasis,1),sum(~ismember(EEG.unfold.cols2eventtypes,eventnan)));
+    EEG.unfold.beta_dc = betaOut;
+else
+    EEG.unfold.beta_dc = [];
+end
 
-betaOut = reshape(beta(:,1:end-length(eventnan)),size(beta,1),size(EEG.unfold.timebasis,1),sum(~ismember(EEG.unfold.cols2eventtypes,eventnan)));
-
-
-
-EEG.unfold.beta_dc = betaOut;
 if length(eventnan)>0
     %     EEG.betaCustomrow = beta(end+1-length(eventnan):end);
-    EEG.unfold.beta_dcCustomrow = beta(:,end+1-length(eventnan):end);
+    EEG.unfold.beta_dcCustomrow = beta(:,(end+1-length(eventnan)):end);
 end
 EEG.unfold.channel = cfg.channel;
 
