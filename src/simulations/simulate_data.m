@@ -30,7 +30,8 @@ cfg.noise = simCFG.noise;
 
 sig = struct();
 sig.time= 0:1/cfg.srate:(1-1/cfg.srate); % 1 second stimulus
-
+% sig.time = 0:1/cfg.srate:(0.2-1/cfg.srate);%
+% warning('BEHINGER MODIFIED THIS')
 
 
 sig.shape=zeros(1,length(sig.time),1);
@@ -44,6 +45,9 @@ switch simCFG.basis
     case 'posneg'
         sig.shape = [hanning(floor(length(sig.time)/2)); -hanning(ceil(length(sig.time)/2))]; %P3
 end
+
+% sig.shape= [sig.shape; zeros(1,80)'];
+
 
 %% ##################
 
