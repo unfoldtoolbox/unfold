@@ -3,7 +3,7 @@ function output = uf_condense(EEG,varargin)
 %Returns an "ufresult"-structure that contains the predictor betas over time
 %and accompanying information. This structure is further used in all
 %plotting functions. This function also applies the time basis (if you
-%specified something else than the default 'stick' in
+%have specified something else than the default 'stick' in
 %uf_timeexpandDesignmat() )
 %
 %Arguments:
@@ -17,7 +17,7 @@ function output = uf_condense(EEG,varargin)
 %                            channels. Default is all channels
 %
 %Return:
-%   ufresult.beta= (nchans x time x parameters)
+%   ufresult.beta = (nchans x time x parameters)
 %   ufresult.beta_nodc = (nchans x time x parameters) (only if unfold=0 or -1)
 %   ufresult.param = (struct size: parameters) each field contains the values of the respective parameter.
 %   ufresult.unfold = EEG.unfold

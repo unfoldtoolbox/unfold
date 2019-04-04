@@ -87,7 +87,7 @@ if isempty(cfg.channel)
     cfg.channel = 1:size(ufresult.(cfg.betaSetname),1);
 end
 
-% paramEventsUnique = unique([ufresult.param.event]); % ???
+% paramEventsUnique = unique([ufresult.param.event]); % N = 10 (???)
 paramEvents       = [ufresult.param.event]; % length = 48, cause some contain many
 paramNames        = {ufresult.param.name};  % length = 24
 
@@ -103,15 +103,20 @@ for e = unique(paramEvents)
     % (note: this can be multiple times!)
     e_Idx = find(strcmp(e,paramEvents));
         
-    % only exists once? --> continue with loop
+    % why?
     if length(e_Idx) == 1
         continue 
     end
+            
+    % ---------------------------------------------------------------------
+    % Major Bug (2019-04-04): 
+    % e_Idx is based on paramEvents, which can have substantially more entries than paramNames
+    % creating an error here (index exceeded)
+    % ---------------------------------------------------------------------
+    % The following code was so obsfuscated that I was unable to debug
+    % this...
     
-    % get the .name info for this event type (e.g. "intercept", "saccade", "targetfixation")
-    
-    % Major Bug (2019-04-04): paramNames can have less entries than unique(paramEvents), creating an error
-    eventParamNames = paramNames(e_Idx);  % paramNames = 24
+    eventParamNames = paramNames(e_Idx);
     
     for p = unique(eventParamNames)
         
