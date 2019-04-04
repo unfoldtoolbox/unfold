@@ -341,7 +341,9 @@ end
 % because other output is printed, mark these sections (due to recursive
 % call, its not easy to print all this information in one nice table)
 fprintf('Modeling %i event(s) of [%s] using formula: %s \n',size(t,1)-length(removeIndex),eventStr,cfg.formula_nozzz)
-
+if size(t,1)-length(removeIndex)== 0
+    error('no events found for the specified eventtype')
+end
 %%
 
 % Check everything necessary is there
