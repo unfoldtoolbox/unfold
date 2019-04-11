@@ -22,8 +22,14 @@ ufresult_average = uf_predictContinuous(ufresult,'auto_method','average');
 ufresult_predict = uf_predictContinuous(ufresult,'predictAt',{{'continuousA',[0 1]},{'contB',[0 1]},{'splineA',[-1 0 1]}});
 ufresult_marginal = uf_addmarginal(ufresult_predict);
 
+
+
 % the stimulus3 sould be unaffected, it's just an intercept
 assert(1==near(ufresult_marginal.beta(:,:,5),ufresult_predict.beta(:,:,5))) % this column should not have been impacted.
+
+% the stimulus2 conditionA should be unaffected, it is a categorical
+% variable
+near(ufresult_marginal.beta(:,:,2),ufresult_predict.beta(:,:,2))
 
 % the stimulus 2, parameter 3 is continuous = 0, so it should be the same
 % as the intercept
