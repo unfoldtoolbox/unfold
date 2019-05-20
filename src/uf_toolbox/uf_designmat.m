@@ -68,6 +68,10 @@ function [EEG] = uf_designmat(EEG,varargin)
 %   cfg.codingschema(string): default: 'reference', could be 'effects', this is
 %                   relevant if you define categorical input variables.
 %                   Reference coding is also known as treatment coding
+%                   could be 'full', but in that case an overcomplete
+%                   designmatrix is returned. The resulting betas are not
+%                   estimable functions and would need to be combined by an
+%                   estimable contrast
 %
 %
 %Returns:
@@ -117,7 +121,7 @@ cfg = finputcheck(varargin,...
     'eventtypes','',[],[];...
     'spline','cell',[],{};...
     'splinespacing','string',{'linear','quantile'},'quantile';
-    'codingschema','string',{'effects','reference'},'reference';
+    'codingschema','string',{'effects','reference','full'},'reference';
     },'mode','ignore');
 
 if(ischar(cfg)); error(cfg);end

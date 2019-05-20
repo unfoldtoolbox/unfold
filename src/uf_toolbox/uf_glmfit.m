@@ -254,7 +254,9 @@ end
 
 if length(eventnan)>0
     %     EEG.betaCustomrow = beta(end+1-length(eventnan):end);
-    EEG.unfold.beta_dcCustomrow = beta(:,(end+1-length(eventnan)):end);
+    customBeta = beta(:,(end+1-length(eventnan)):end);
+    customBeta = reshape(customBeta,size(customBeta,1),length(EEG.unfold.times),[]);
+    EEG.unfold.beta_dcCustomrow = customBeta;
 end
 EEG.unfold.channel = cfg.channel;
 
