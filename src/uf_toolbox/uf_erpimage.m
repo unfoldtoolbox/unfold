@@ -1,5 +1,7 @@
 function [varargout] = uf_erpimage(EEG,varargin)
-
+% This function produces ERPimages with/without modelled data.
+% There is no support for group-level data (yet) you would need to trick
+% the function somehow :S
 assert(isfield(EEG,'data'))
 assert(ndims(EEG.data) == 2) % data have to be continuous
 if 1 == 0
