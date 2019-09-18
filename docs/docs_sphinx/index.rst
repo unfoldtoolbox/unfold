@@ -13,16 +13,17 @@
 
 Unfold - EEG Deconvolution Toolbox
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-A toolbox for *deconvolution* of overlapping EEG signals and *(non)-linear modeling*
+A toolbox for *deconvolution* of overlapping EEG (Pupil, LFP etc.) signals and *(non)-linear modeling*
 
 
-Second draft of reference paper
+Reference Papers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`Download our reference paper Ehinger & Dimigen 2018 from bioRxiv <https://www.biorxiv.org/content/early/2018/08/30/360156>`_
+`Download our reference paper Ehinger & Dimigen 2018 from bioRxiv <https://www.biorxiv.org/content/early/2018/08/30/360156>`_ (accepted in peerJ).
 
-This is a draft version, we are very happy to receive comments and criticism (info@unfoldtoolbox.org)
+We recently published a new preprint on the analysis of Eyetracking/EEG data, with *unfold* playing a prominent role `Dimigen & Ehinger 2019 <https://www.biorxiv.org/content/10.1101/735530v1>`_
 
-If you use the toolbox, please cite us as: Ehinger BV & Dimigen O, *Unfold: An integrated toolbox for overlap correction, non-linear modeling, and regression-based EEG analysis*, bioRxiv, https://doi.org/10.1101/360156 
+
+If you use the toolbox, please cite us as: Ehinger BV & Dimigen O, *Unfold: An integrated toolbox for overlap correction, non-linear modeling, and regression-based EEG analysis*, bioRxiv, https://doi.org/10.1101/360156
 
 Why deconvolution and non-linear modeling?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -39,6 +40,9 @@ What can you do with *unfold*?
 * Use temporal basis functions (Fourier & Splines)
 * (Optional) **regularization** using glmnet
 
+Unmixed - Unfold addon for mixed Models
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+A new addon *unmixed*, allowing to use mixed models can be found in its alpha version version `here <https://github.com/unfoldtoolbox/unmixed>`_
 
 Requirements
 ^^^^^^^^^^^^^^^^^

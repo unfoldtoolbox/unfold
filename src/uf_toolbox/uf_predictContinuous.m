@@ -26,11 +26,11 @@ function output = uf_predictContinuous(ufresult,varargin)
 %   Betas with evaluated betas at specified continuous values.
 %
 %*Example:*
-%    You calculated for a continuous variable "parameterA" a beta of 3. 
-%    You want to know what the predicted signal of parameterA = [10,20,30] is. 
+%    You calculated for a continuous variable "parameterA" a beta of 3.
+%    You want to know what the predicted signal of parameterA = [10,20,30] is.
 %    You call the function:
 %      ufresult = uf_predictContinuous(ufresult,'predictAt',{{'parameterA',[10 20 30]}}
-%    The output then would be the respective values 30,60 and 90. 
+%    The output then would be the respective values 30,60 and 90.
 
 
 cfg = finputcheck(varargin,...
@@ -42,7 +42,7 @@ cfg = finputcheck(varargin,...
 
 if(ischar(cfg)); error(cfg);end
 
-% check whether the user tried to enter EEG.unfold directly into this 
+% check whether the user tried to enter EEG.unfold directly into this
 % function without running uf_condense first
 if ~isfield(ufresult,'param') & isfield(ufresult,'unfold')
     error('\n%s(): You cannot directly enter the unfold output into this function - you have to run uf_condense() first',mfilename)
@@ -97,7 +97,6 @@ elseif cfg.deconv == -1 % auto detect, recursive call
         end
     end
     
-    
     return
     %-------------- End Recursive part
 end
@@ -116,7 +115,9 @@ end
 
 betaNew = [];
 epochNew = ufresult.param(1); %needs to be removed
-for currPred= 1:length(paramList)
+
+
+for currPred = 1:length(paramList)
     predIDX = paramList(currPred);
     
     % if we are at the last predictor, this one goes to the end of the
@@ -165,11 +166,11 @@ for currPred= 1:length(paramList)
                 for iD = 1:size(Xspline1,1)
                     aux = Xspline1(iD,:)'*Xspline2(iD,:);
                     Xspline(iD,:) = aux(:)';
-                end    
+                end
             else
-                Xspline = spl.splinefunction(splValueSelect,spl.knots); 
+                Xspline = spl.splinefunction(splValueSelect,spl.knots);
             end
-        elseif spl.knots(1) == spl.knots(2) 
+        elseif spl.knots(1) == spl.knots(2)
             warning('deprecated spline-function detection,detected default bspline')
             Xspline = default_spline(splValueSelect,spl.knots(3:end-2));
         else
@@ -179,7 +180,7 @@ for currPred= 1:length(paramList)
         
         Xspline(:,spl.removedSplineIdx) = [];
         
-         for c = 1:size(Xspline,1)
+        for c = 1:size(Xspline,1)
             % we have a [channel x time x beta] * [beta x 1] vector product
             % to calculate => loop over channel
             for chan = 1:size(b,1)
@@ -205,11 +206,11 @@ for currPred= 1:length(paramList)
         end
         
     elseif strcmp(ufresult.unfold.variabletypes{variableIdx},'continuous')
+        
         % we have either a categorical or a continuous predictor here
         customContValue = strcmp(predNameList,ufresult.unfold.colnames(predIDX(1)));
         if any(customContValue)
             contValueSelect = predValueSelectList{customContValue}{2};
-            
         else
             values = ufresult.unfold.X(:,predIDX(1));
             % we do not have access at this point to which 'X' entry belongs to that event.
@@ -217,7 +218,7 @@ for currPred= 1:length(paramList)
             % This is supoptimal and I'm sorry if it creates inconveniences.
             % We would need to introduce a whole new field to carry around
             % to compensate for this.
-            warning('Auto spacing for continuous variables excludes all zeros. If necessary, specify manually using ''predictAt''')
+            warning(sprintf('The predictor ''%s'' is evaluated at its mean or at (auto-spaced) percentiles. Note that the computation of the mean/percentiles for continuous variables excludes all cases where the predictor value is zero. If necessary, specify the values at which to evaluate the predictor manually using ''predictAt''',ufresult.unfold.variablenames{variableIdx}))
             contValueSelect = auto_spacing(cfg,values(values~=0));
         end
         
