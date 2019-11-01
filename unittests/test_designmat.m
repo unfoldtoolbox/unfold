@@ -163,16 +163,32 @@ end
 
 EEGtmp = uf_designmat(EEGtest,cfgDesign);
 shouldBeFunction(EEGtmp,{'(Intercept)','splineA','splineB','2_(Intercept)','2_splineA','2_splineB'},'variablenames')
-strcmp(EEGtmp.unfold.splines{1}.name,'splineA')
-strcmp(EEGtmp.unfold.splines{2}.name,'splineB')
-strcmp(EEGtmp.unfold.splines{3}.name,'2_splineA')
-strcmp(EEGtmp.unfold.splines{4}.name,'2_splineB')
+assert(strcmp(EEGtmp.unfold.splines{1}.name,'splineA'))
+assert(strcmp(EEGtmp.unfold.splines{2}.name,'splineB'))
+assert(strcmp(EEGtmp.unfold.splines{3}.name,'2_splineA'))
+assert(strcmp(EEGtmp.unfold.splines{4}.name,'2_splineB'))
+%% Bug #76
+EEGtest = EEGsim;
+for e = 1:length(EEGtest.event)
+    EEGtest.event(e).condRandom = randi(3,1);
+end
+cfgDesign = [];
 
+cfgDesign.coding = 'reference';
+cfgDesign.formula   = {'y~1+cat(condRandom)*continuousA', 'y~1+cat(condRandom)*continuousA'};
+cfgDesign.eventtypes = {'stimulus2',                       'stimulus3'};
+
+EEGtest = uf_designmat(EEGtest,cfgDesign);
+
+correct  = {'(Intercept)'   , 'condRandom_2', 'condRandom_3', 'continuousA' , 'condRandom_2:continuousA' , 'condRandom_3:continuousA' , '2_(Intercept)'  , '2_condRandom_2' , '2_condRandom_3' , '2_continuousA'  , '2_condRandom_2:2_continuousA', '2_condRandom_3:2_continuousA'};
+shouldBeFunction(EEGtest,correct,'colnames');
+correct =     {'(Intercept)','condRandom','continuousA','condRandom:continuousA' ,'2_(Intercept)','2_condRandom' ,'2_continuousA','2_condRandom:2_continuousA'};
+shouldBeFunction(EEGtest,correct,'variablenames');
 end
 
 function shouldBeFunction(EEG,shouldBe,field)
 for k = 1:length(EEG.unfold.(field))
-    is = EEG.unfold.(field){k};
+ is = EEG.unfold.(field){k};
     assert(strcmp(is,shouldBe{k}),sprintf('error in %s, should be %s',is,shouldBe{k}))
 end
 end
