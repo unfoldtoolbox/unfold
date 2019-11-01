@@ -25,6 +25,23 @@ cfg = finputcheck(varargin,...
     },'mode','ignore');
 if(ischar(cfg)), error(cfg); end
 
+% Latencies in EEGlab convention do not have to be integer samples.
+% Convert latencies to sample-rounded latencies. Eeglab by default uses "floor" which is unintuitive to us 
+% and inconsistent with how we generate Xdc. Also other tools e.g. fieldtrip use "round"
+% Eeglab:
+% Line 115 in epoch.m
+%
+% Fieldtrip: 
+% https://github.com/fieldtrip/fieldtrip/blob/b029f63b965a4e796a931bb7c109fdd9e66faea8/fileio/ft_read_event.m#L691
+% https://github.com/fieldtrip/fieldtrip/blob/26aee7b1be549389abb8627cd0242e8bfce1af47/trialfun/ft_trialfun_trial.m#L50
+%
+% Unfold:
+% https://github.com/unfoldtoolbox/unfold/blob/5f72ad62065b126afd124694ebc20f63277d0c2b/src/uf_toolbox/uf_timeexpandDesignmat.m#L103
+
+for e = 1:length(EEG.event)
+    EEG.event(e).latency = round(EEG.event(e).latency);
+end
+
 %% Remove events in windows with bad (continuous) EEG data
 % This routine checks whether an event is contained in the rejection window
 % If yes, it removes it from further analyses
