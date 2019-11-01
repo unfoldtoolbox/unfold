@@ -75,6 +75,17 @@ function [winrej, chanrej] = basicrap(EEG, chanArray, ampth, windowms, stepms, f
 winrej  = [];
 chanrej = [];
 
+% comment: no defaults were defined for input 9 and 10
+% I have added defaults for use in the "unfold" toolbox,
+% OD, Nov-1, 2019
+
+if nargin < 10 % added for use in unfold toolbox
+    numChanThreshold = 1; % required number of channels with bad values
+end
+
+if nargin < 9 % added for use in unfold toolbox
+    thresholdType = 'peak-to-peak'; % default type of thresholding to use 
+end
 
 if nargin<8
         forder = 26;
