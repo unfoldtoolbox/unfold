@@ -105,6 +105,7 @@ else
     data = EEG.data;
 end
 
+assert(any(~isnan(data(:))),'Error: We found a NaN in your specified timeseries-data')
 %% Remove data that is unnecessary for the fit
 % this helps calculating better tolerances for lsmr
 emptyRows = sum(abs(X),2) == 0;
