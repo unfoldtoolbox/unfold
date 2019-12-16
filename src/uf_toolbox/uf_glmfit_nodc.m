@@ -80,9 +80,9 @@ elseif strcmp(cfg.method,'matlab') % save time
         spparms('spumoni',2)
     end
     for c = cfg.channel
-        beta(:,:,c) = X \ squeeze(data(c,:,:))';
+        beta(c,:,:) = (X \ squeeze(data(c,:,:))')';
     end
-    beta =     permute(beta,[3 2 1]);
+%     beta =     permute(beta,[3 2 1]);
     
 elseif strcmp(cfg.method,'glmnet')
     warning('time-basis function currently not implemented')
