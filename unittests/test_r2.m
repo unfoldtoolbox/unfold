@@ -55,11 +55,13 @@ EEG = uf_designmat(EEG,cfgDesign);
 EEG = eeg_checkset(EEG);
 EEG = uf_timeexpandDesignmat(EEG,'timelimits',[0 1]);
 EEG = uf_glmfit(EEG);
+
+EEG = uf_glmfit(EEG,'method','glmnet','fold_event',{'pause'});
 ufresult = uf_condense(EEG);
 %%
 r2 = uf_modelcheck(EEG,'method','R2','fold_event','pause');
 cv_r2 = uf_modelcheck(EEG,'method','crossValR2','fold_event',{'pause'});
-mean(cv_r2)
+r2_cv  = mean(cv_r2)
 r2
 
 %%
