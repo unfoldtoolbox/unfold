@@ -32,7 +32,7 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 %    compared to the fit of the model). We use the glmnet recommended
 %    'lambda_1se', i.e. minimum lambda + 1SE buffer towards more strict
 %    regularisation.
-%
+%   
 %
 %   cfg.lsmriterations: (default 400), defines how many steps the iterative
 %      solver should search for a solution. While the solver is mostly monotonic (see paper), it is recommended
@@ -41,6 +41,8 @@ function [EEG,beta] = uf_glmfit(EEG,varargin)
 %
 %   cfg.glmnetalpha: (default 1, as in glmnet), can be 0 for L2 norm, 1 for L1-norm or
 %                    something inbetween for elastic net
+%   cfg.fold_event: (defaultempty), (development / no unit-test) defines EEG.events on which the
+%                    crossvalidation folds for glmnet should be placed
 %
 %   cfg.channel(array): Restrict the beta-calculation to a subset of
 %               channels. Default is all channels
@@ -75,6 +77,7 @@ cfg = finputcheck(varargin,...
     {'method', 'string',{'par-lsmr','lsmr','matlab','pinv','glmnet'}, 'lsmr';
     'lsmriterations','integer',[],400;
     'glmnetalpha','real',[],1;... # used for glmnet
+    'fold_event','',[],[];...
     'precondition','boolean',[],1;... % inofficial
     'channel','integer',[],1:size(EEG.data,1);
     'ica','boolean',[],0;
@@ -211,7 +214,17 @@ elseif strcmp(cfg.method,'glmnet')
         t = tic;
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         %glmnet needs double precision
-        fit = cvglmnet(X,(double(data(e,:)')),'gaussian',struct('alpha',cfg.glmnetalpha));
+        if isempty(cfg.fold_event)
+            fit = cvglmnet(X,(double(data(e,:)')),'gaussian',struct('alpha',cfg.glmnetalpha));
+        else
+            [train,test]=uf_cv_getFolds(EEG,'fold_event',cfg.fold_event);
+            foldid = nan(1,size(EEG.data,2));
+            for f = 1:length(test)
+                foldid(test(f).ix) = f;
+            end
+            foldid(emptyRows) = [];
+            fit = cvglmnet(X,(double(data(e,:)')),'gaussian',struct('alpha',cfg.glmnetalpha),[],[],foldid);
+        end
         
         %find best cv-lambda coefficients
         beta(:,e) = cvglmnetCoef(fit,'lambda_1se')';
