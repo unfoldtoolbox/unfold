@@ -1,7 +1,7 @@
 function r2 = uf_modelcheck(EEG,varargin)
 
 cfg = finputcheck(varargin,...
-    {'method', 'string',{'R2','commonalityR2','crossValR2','crossValcommonalityR2'}, 'r2';
+    {'method', 'string',{'R2','commonalityR2','crossValR2','crossValcommonalityR2'}, 'R2';
     'fold_event','','',{}; %can be string or cell
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
@@ -19,45 +19,17 @@ assert(isfield(EEG.unfold,'Xdc'))
 switch cfg.method
     case {"crossValR2","crossValcommonalityR2"}
         
-        assert(~isempty(cfg.fold_event),'You have to specify a fold-event')
-        % find fold-events
-        lat = {EEG.event.latency};
-        if ischar(cfg.fold_event)
-            cfg.fold_event ={cfg.fold_event};
-        end
-        lat = [lat{ismember({EEG.event.type},cfg.fold_event)}];
-        % add first & last sample
-        lat = [1 lat size(EEG.data,2)];
-        lat = unique(lat); %remove double latencies
-        % check for no-overlap there
-        assert(all(any(EEG.unfold.Xdc(round(lat),:),2)==0),'Error: The folding events have modelled overlap')
-        
-        Xdc = EEG.unfold.Xdc;
-        
+        [train,test]=uf_cv_getFolds(EEG,'fold_event',cfg.fold_event);
         r2 = []; % in case of crossValcommonalityR2 this is necessary
         
         % for each fold
-        for fold = 1:(length(lat)-1)
+        for fold = 1:length(train)
             fprintf('Running fold %i',fold)
             % select test & train time-ix
-            test_ix = round(lat(fold)):round(lat(fold+1)-1);
-            train_ix = [1:round(lat(fold))-1 round(lat(fold+1)):size(EEG.data,2)];
-            % blank Xdc
-            Xdc_test = Xdc;
-            Xdc_test(train_ix,:) = 0;
-            Xdc_train = Xdc;
-            Xdc_train(test_ix,:) = 0;
-            % check that there are any left in the fold
-            try
-                assert(any(any(Xdc_train,2)));
-                assert(any(any(Xdc_test,2)));
-            catch
-                warning('found empty fold between latency %i and %i',round(lat(fold)),round(lat(fold+1)-1))
-                continue
-            end
+            
             % refit model
             EEGfold = EEG;
-            EEGfold.unfold.Xdc = Xdc_train;
+            EEGfold.unfold.Xdc = train(fold).Xdc;
             EEGfold = uf_glmfit(EEGfold);
             
             
@@ -66,20 +38,20 @@ switch cfg.method
                     % potentially one could implement here a selection of
                     % only some variables. %% enhancement %%
                     
-                    r2_fold=  commonalityR2(EEGfold,EEG.data(:,test_ix),Xdc_test(test_ix,:));
+                    r2_fold=  commonalityR2(EEGfold,EEG.data(:,test(fold).ix),test(fold).Xdc(test(fold).ix,:));
                     r2_fold.fold = repmat(fold,size(r2_fold,1),1);
                     r2 = [r2;r2_fold];
                     
                     
                 case "crossValR2"
-                    r2(fold) = calc_r2(EEG.data(:,test_ix),Xdc_test(test_ix,:),EEGfold.unfold.beta_dc);
+                    r2(fold) = calc_r2(EEG.data(:,test(fold).ix),test(fold).Xdc(test(fold).ix,:),EEGfold.unfold.beta_dc);
                     
                     %  calculate R2
                     
             end
             
         end
-
+        
     case "commonalityR2"
         r2 = commonalityR2(EEG);
     case "R2"
@@ -136,7 +108,7 @@ for k = sort(unique(Xdc_terms2variablenames),'ascend')
         
         r2_commonality(k) = r2_total-r2_ca ;
     end
-
+    
     
     varNames{end+1} = EEG.unfold.variablenames{k};
     
@@ -150,7 +122,7 @@ function r2 = calc_r2(data,Xdc,beta)
 model_ix = any(Xdc,2);
 residuals = (data' - Xdc*beta(:,:)')';
 
-residSS = sum(residuals(model_ix).^2,2);
-totSS = (sum(model_ix)-1) * var(data(:,model_ix));
-r2 = 1-residSS/totSS;
+residSS = sum(residuals(:,model_ix).^2,2);
+totSS = (sum(model_ix)-1) * var(data(:,model_ix),[],2);
+r2 = 1-residSS./totSS;
 end
