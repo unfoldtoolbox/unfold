@@ -109,7 +109,8 @@ uniqueParamEvents = [];
 for cTest = paramEvents
    is_unique_event = 1;
    for cAgainst = uniqueParamEvents
-       if all(strcmp(cAgainst{1},cTest{1}))
+       %if all(strcmp(cAgainst{1},cTest{1}))
+       if all(ismember(cTest{1},cAgainst{1})) % HOTFIX: Bene, please check, I do not fully grasp context here
            is_unique_event = 0;
            break
        end
