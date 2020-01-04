@@ -115,7 +115,7 @@ for cTest = paramEvents
        end
    end
    if is_unique_event
-       uniqueParamEvents = [uniqueParamEvents cTest];
+       uniqueParamEvents = [uniqueParamEvents cTest]
    end
        
 end

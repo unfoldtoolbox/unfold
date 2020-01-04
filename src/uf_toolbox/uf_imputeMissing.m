@@ -47,8 +47,12 @@ for pred = missingColumn
       
     %% find rows containing the event type
     cols2eventtypes = EEG.unfold.cols2eventtypes(pred);
-    eventrows = strcmp(EEG.unfold.eventtypes{cols2eventtypes},{EEG.event(:).type})';
-   
+    
+    % eventrows = strcmp(EEG.unfold.eventtypes{cols2eventtypes},{EEG.event(:).type})';
+    % --> this creates error if "EEG.unfold.eventtypes{cols2eventtypes}" is a cell with more than on entry (e.g. {'stimA','stimB'} 
+    % because strcmp only works either if one function input is scalar or if both function inputs have the same size
+    eventrows = ismember({EEG.event(:).type},EEG.unfold.eventtypes{cols2eventtypes})'; % #bugfix by O.D., 2020-01-04
+    
     %% get rows of this predictor with NaNs
     nanvals = isnan(EEG.unfold.X(:,pred));
     % consider only NaNs that are in "eventrows":
