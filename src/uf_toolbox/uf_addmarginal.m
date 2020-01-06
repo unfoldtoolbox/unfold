@@ -104,7 +104,8 @@ ufresult_avg = uf_predictContinuous(ufresult_avg,'auto_method','average'); % get
 
 % find the unique events
 uniqueParamEvents = ufresult.unfold.eventtypes;
-%% go trough each unique event type
+
+%% go trough unique event types
 for e = uniqueParamEvents%unique(paramEvents)
     
     % find indices where current event type (e.g., "123", "saccade", "fixation") exists in paramEvents

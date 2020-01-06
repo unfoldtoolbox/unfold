@@ -27,8 +27,9 @@ function [WinRej] = uf_continuousArtifactDetect(EEG,varargin)
 % 'windowsize':         - moving window width (in msec, default: 2000 ms)
 % 'stepsize':           - moving window step (default: 1000 ms)
 % 'combineSegments':    - marked segment(s) closer than this value will be joined together
+% 'channels':           - channels to check for artifacts (e.g. [1:64]), default: all
 %
-%Example:
+% Example:
 % winrej = uf_continuousArtifactDetect(EEG)
 %
 %Reference:
