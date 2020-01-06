@@ -17,7 +17,7 @@ assert(isfield(EEG.unfold,'Xdc'))
 
 
 switch cfg.method
-    case {"crossValR2","crossValcommonalityR2"}
+    case {'crossValR2','crossValcommonalityR2'}
         
         [train,test]=uf_cv_getFolds(EEG,'fold_event',cfg.fold_event);
         r2 = []; % in case of crossValcommonalityR2 this is necessary
@@ -34,7 +34,7 @@ switch cfg.method
             
             
             switch cfg.method
-                case "crossValcommonalityR2"
+                case 'crossValcommonalityR2'
                     % potentially one could implement here a selection of
                     % only some variables. %% enhancement %%
                     
@@ -43,7 +43,7 @@ switch cfg.method
                     r2 = [r2;r2_fold];
                     
                     
-                case "crossValR2"
+                case 'crossValR2'
                     r2(fold) = calc_r2(EEG.data(:,test(fold).ix),test(fold).Xdc(test(fold).ix,:),EEGfold.unfold.beta_dc);
                     
                     %  calculate R2
@@ -52,9 +52,9 @@ switch cfg.method
             
         end
         
-    case "commonalityR2"
+    case 'commonalityR2'
         r2 = commonalityR2(EEG);
-    case "R2"
+    case 'R2'
         assert(isfield(EEG.unfold,'beta_dc'),'Please run uf_glmfit first manually to get non-crossvalidated R2')
         
         r2 = calc_r2(EEG.data,EEG.unfold.Xdc,EEG.unfold.beta_dc);
