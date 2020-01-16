@@ -18,7 +18,7 @@ A toolbox for *deconvolution* of overlapping EEG (Pupil, LFP etc.) signals and *
 
 Reference Papers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`Download our reference paper Ehinger & Dimigen 2018 from bioRxiv <https://www.biorxiv.org/content/early/2018/08/30/360156>`_ (accepted in peerJ).
+`Download our reference paper Ehinger & Dimigen 2019 <https://doi.org/10.7717/peerj.7838>`_ (peerJ).
 
 We recently published a new preprint on the analysis of Eyetracking/EEG data, with *unfold* playing a prominent role `Dimigen & Ehinger 2019 <https://www.biorxiv.org/content/10.1101/735530v1>`_
 
