@@ -17,7 +17,7 @@ if 1 == 0
     cfgtmp.sort_align = 'stimulus2';
     cfgtmp.channel = 1;
     %cfgtmp.timelimits = [-0.1 0.5];
-    cfgtmp.searchtime = [-10 10];
+    cfgtmp.sort_time = [-10 10];
     
 end
 % raw = default erpimage on raw data
@@ -32,12 +32,13 @@ cfg = finputcheck(varargin,...
     'remove','cell',[],{};     % which event(s) predictor(s) pair(s) to remove {'eventA',{'(Intercept)','stimA'}} (or a cell array of such cell arrays)
     'keep','cell',[],{};       % which event(s) predictor(s) pair(s) to keep   {'eventA',{'stimB'}} (or a cell array of such cell arrays)
     'alignto','cell',[],{};    % what should be the event to align the erpimage?
-    'sort_align','',[],[];     % default same as alignto
+    'sort_align','',[],[];     % default same as alignto (i.e. if you want to search for alignmentevents starting from a different event)
     'sort_by','',[],'latency'; % could be in plotting function? What Eventfield to sort by
+    'sort_time','real',[],[];  % when to when to look for the sort_align event
+    'sort_direction','string',{'forward','backward'},'forward'; % in case of multiple events, take first or last?
     'split_by','',[],[];       % make multiple subplots with separate ERPimages
     'winrej','real',[],[];     % remove parts of the continuous data
     'plot','boolean',[],0;     % if called without requesting output,
-    'searchtime','real',[],[]; % when to when to look for the sort_align event
     'timelimits','real',[],[]; %from when to when
     'channel','integer',[],[]; 
     'figure','boolean',[],0;
@@ -147,7 +148,19 @@ end
 [keep_epoch]= ~isnan(eeg_getepochevent(EEG_new_epoch,cfg.alignto,[0,0],'type')); % output in ms
 EEG_new_epoch.data = EEG_new_epoch.data(:,:,keep_epoch);
 
-sort_vector = eeg_getepochevent(EEG_new_epoch,cfg.sort_align,cfg.searchtime,cfg.sort_by); % output in ms
+[sort_vector,sort_vector_cell] = eeg_getepochevent(EEG_new_epoch,cfg.sort_align,cfg.sort_time,cfg.sort_by); % output in ms
+sort_isempty = cellfun(@(x)isempty(x),sort_vector_cell);
+switch cfg.sort_direction
+    case 'forward'
+        sort_tmp = cellfun(@(x)x(1),sort_vector_cell(~sort_isempty));
+    case 'backward'
+        sort_tmp = cellfun(@(x)x(end),sort_vector_cell(~sort_isempty));
+    otherwise
+        error('unspecified sortdirection')
+end
+sort_vector = nan(size(sort_vector));% not strictly necessary, but maybe I made a mistake somewhere
+sort_vector(~sort_isempty) = sort_tmp;
+% select only those that we want to keep anyway
 sort_vector = sort_vector(keep_epoch);
 
 %% draw ERPimage
