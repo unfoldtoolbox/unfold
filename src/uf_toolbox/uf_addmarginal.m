@@ -102,33 +102,24 @@ fprintf('\nRe-running uf_condense() to recover unconverted splines\n')
 ufresult_avg = uf_condense(ufresult); % re-genererate, (without "evaluated" predictors)
 ufresult_avg = uf_predictContinuous(ufresult_avg,'auto_method','average'); % get mean of continuous/spline predictors
 
+% find the unique events
+uniqueParamEvents = ufresult.unfold.eventtypes;
 
-% Comparing two cell arrays is not so easy, so we have to manually find out
-% which two event combinations exist.
-uniqueParamEvents = [];
-for cTest = paramEvents
-   is_unique_event = 1;
-   for cAgainst = uniqueParamEvents
-       if all(strcmp(cAgainst{1},cTest{1}))
-           is_unique_event = 0;
-           break
-       end
-   end
-   if is_unique_event
-       uniqueParamEvents = [uniqueParamEvents cTest];
-   end
-       
-end
-% you know, or just take ufresult.unfold.eventtypes:
-assert(length(uniqueParamEvents) == length(ufresult.unfold.eventtypes))
-%% go tru unique event types
+%% go trough unique event types
 for e = uniqueParamEvents%unique(paramEvents)
     
     % find indices where current event type (e.g., "123", "saccade", "fixation") exists in paramEvents
     % (note: this can be multiple times, one for each evaluated parameter)
     e_Idx = [];
     for cTest= 1:length(paramEvents)
-       if all(strcmp(e{1},paramEvents{cTest}))
+        % if there are multiple eventmarking-events, we have to check all
+        % of them
+        % In principle we would like to do paramEvent{cTest} == e{1} but
+        % because this is a test of cell array of strings to cell array of
+        % strings, we need a workaround.
+        tmp = cellfun(@(x)strcmp(x,paramEvents{cTest}),e{1},'UniformOutput',0);
+        tmp = cat(1,tmp{:});
+       if all(any(tmp,2))
            e_Idx = [e_Idx cTest];
        end
     end

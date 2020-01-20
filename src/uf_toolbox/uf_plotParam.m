@@ -95,11 +95,11 @@ end
 % select parameters to plot, or else plot all available
 
 if isempty(cfg.plotParam)
-    fprintf('\nplotting all parameters')
+    fprintf('\nplotting all parameters\n')
     paramList = {ufresult.param.name};
     paramIdx = 1:length(ufresult.param);
 else
-    fprintf('\nplotting selected parameters')
+    fprintf('\nplotting selected parameters\n')
     paramIdx = [];
     if isstr(cfg.plotParam)
         % if only a single parameter is requested
