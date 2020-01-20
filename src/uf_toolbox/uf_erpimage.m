@@ -15,11 +15,10 @@ if 1 == 0
     cfgtmp.sort_align = 'stimulus2';
     cfgtmp.channel = 1;
     %cfgtmp.timelimits = [-0.1 0.5];
-    cfgtmp.sort_time = [-10 10];
+    cfgtmp.sort_time = [-1 1.];
     
 end
 cfg = finputcheck(varargin,...
-<<<<<<< HEAD
     {'type','string',{'raw','deconv','nodeconv','residuals','fullmodel','deconvDirect'},'deconv'; % 
     'remove','cell',[],{};     % which event(s) predictor(s) pair(s) to remove {'eventA',{'(Intercept)','stimA'}} (or a cell array of such cell arrays)
     'keep','cell',[],{};       % which event(s) predictor(s) pair(s) to keep   {'eventA',{'stimB'}} (or a cell array of such cell arrays)
@@ -155,7 +154,7 @@ end
 [keep_epoch]= ~isnan(eeg_getepochevent(EEG_modelled,cfg.alignto,[0,0],'type')); % output in ms
 EEG_modelled.data = EEG_modelled.data(:,:,keep_epoch);
 
-[sort_vector,sort_vector_cell] = eeg_getepochevent(EEG_new_epoch,cfg.sort_align,cfg.sort_time,cfg.sort_by); % output in ms
+[sort_vector,sort_vector_cell] = eeg_getepochevent(EEG_modelled,cfg.sort_align,cfg.sort_time*1000,cfg.sort_by); % output in ms
 sort_isempty = cellfun(@(x)isempty(x),sort_vector_cell);
 switch cfg.sort_direction
     case 'forward'
