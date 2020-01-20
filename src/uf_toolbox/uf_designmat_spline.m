@@ -10,7 +10,11 @@ function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
 %           E.g. [-3 4,1,2,3, ... 4]
 %
 %   cfg.nsplines(integer): number of splines to use. too many lead to
-%               overfitting, to few to underfitting
+%               overfitting, to few to underfitting. This number will be 
+%               transformed into the number of knots later. As different 
+%               spline functions have different requiements to the number 
+%               of knots, we specify this number and fix the number of
+%               knots later.
 %
 %   cfg.knotsequence(real): optional (if nsplines is specified). Give the
 %               sequence of knots explicitly (else they are put on the
@@ -57,7 +61,7 @@ assert(~isempty(cfg.nsplines) | ~isempty(cfg.knotsequence),'you need to specify 
 assert(~isempty(cfg.paramValues),'paramValues were empty')
 
 spl = [];
-spl.nSplines = cfg.nsplines;
+spl.nSplines = cfg.nsplines; 
 spl.name = cfg.name;
 
 assert(~all(isnan(cfg.paramValues(:))),'all paramValues are nans')
@@ -107,7 +111,12 @@ end
 
 
 
-
+if strcmp(cfg.splinefunction,'cyclical')
+    %the spline function removes two splines, thus we have to add one of
+    %them
+    spl.nSplines = spl.nSplines + 1;
+end
+    
 
 if strcmp(cfg.splinefunction,'default') || strcmp(cfg.splinefunction,'2D')  % jpo 15.04.2018: not sure about this
     % the function adds two splines to the knotsequence, we temporaly
@@ -142,6 +151,8 @@ end
 if strcmp(cfg.splinefunction,'default')
     % and we add them again
     spl.nSplines = spl.nSplines+2;
+elseif strcmp(cfg.splinefunction,'cyclical')
+    spl.nSplines = spl.nSplines-1;
 end
 
 if ~ischar(cfg.splinefunction)
