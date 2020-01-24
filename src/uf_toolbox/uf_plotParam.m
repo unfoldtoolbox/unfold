@@ -213,6 +213,15 @@ end
 clear g
 
 
+if max(size(plotName)) == 1
+%if there exists only a single plot, we have to repeat the variable for
+%gramm
+plotName = repmat(plotName, size(ufresult.times));
+plotLinestyle = repmat(plotLinestyle, size(ufresult.times));
+plotValue = repmat(plotValue, size(ufresult.times));
+plotColLabel = repmat(plotColLabel,size(ufresult.times));
+end
+
 
 % Combine name + event incase we plot everything in one plot
 if length(unique(plotEvent)) == 1
@@ -231,6 +240,7 @@ switch cfg.sameyaxis
     case 'independent'
         facet_scale = 'independent';
 end
+
 
 % Generate gramm, update old one if it exists
 if isempty(cfg.gramm)
