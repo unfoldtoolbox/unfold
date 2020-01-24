@@ -43,5 +43,18 @@ switch type
                 EEG.event(e).color= 'red';
             end
         end
+    case 'trf'
+        EEG = tutorial_simulate_data('2x2');
+        % Add a "channels" reflecting our TRF predictor values
+        EEG.data(end+1,:) = rand(size(EEG.data,2),1);
+        
+        % generate a kernel that we want to recover
+        kernel = hanning(100);
+        kernel(50:end) = kernel(50:end) - 0.7*hanning(51);
+        tmp  = conv(EEG.data(end,:),kernel);
+        tmp = tmp - mean(tmp);
+        
+        % add the TRF to the already simulated EEG data
+        EEG.data(1,:) = EEG.data(1,:) + tmp(1:size(EEG.data,2));
         
 end

@@ -252,23 +252,31 @@ beta = beta'; % I prefer channels X betas (easier to multiply things to)
 
 
 % We need to remove customrows, as they were not timeexpanded.
-eventcell = cellfun(@(x)iscell(x(1)),EEG.unfold.eventtypes)*1;
-eventnan = cellfun(@(x)isnan(x(1)),EEG.unfold.eventtypes(~eventcell));
-eventnan = find(~eventcell);
+% eventcell = cellfun(@(x)iscell(x(1)),EEG.unfold.eventtypes)*1;
 
-betatmp = beta(:,1:end-length(eventnan));
+eventnan = find(cellfun(@(x)isnan(x(1)),EEG.unfold.variabletypes));
+
+
+betatmp = beta(:,1:(end-length(eventnan)));
 if ~isempty(betatmp)
-    % in special cases we might not have a proper beta but only mTRF betas
-    betaOut = reshape(betatmp,size(beta,1),size(EEG.unfold.timebasis,1),sum(~ismember(EEG.unfold.cols2eventtypes,eventnan)));
+    % beta right now:
+    % channel x Xdc-columns = channel x (times * n-predictors)
+    %
+    % beta should be:
+    % channel x times x n-predictor
+    %
+    nchannel = size(beta,1);
+    betaOut = reshape(betatmp,nchannel,size(EEG.unfold.timebasis,1),sum(~ismember(EEG.unfold.cols2variablenames,eventnan)));
     EEG.unfold.beta_dc = betaOut;
 else
+    % in special cases we might not have a proper beta but only covariates betas
     EEG.unfold.beta_dc = [];
 end
 
 if length(eventnan)>0
     %     EEG.betaCustomrow = beta(end+1-length(eventnan):end);
     customBeta = beta(:,(end+1-length(eventnan)):end);
-    customBeta = reshape(customBeta,size(customBeta,1),length(EEG.unfold.times),[]);
+%     customBeta = reshape(customBeta,size(customBeta,1),[]);
     EEG.unfold.beta_dcCustomrow = customBeta;
 end
 EEG.unfold.channel = cfg.channel;

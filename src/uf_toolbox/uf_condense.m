@@ -81,10 +81,15 @@ end
 % find out which (if any) parameters are modeled by splines, we only want to add the
 % combined spline estimate, not each individually.
 
-[splIdxList,paramList] = uf_getSplineidx(EEG);
+[splIdxList,~] = uf_getSplineidx(EEG);
 
 
-paramList = 1:size(EEG.unfold.X,2);
+
+% Parameters are the one, that have a specified variabletype. THe others
+% are additional columns that shouldn't be bookkeeped here.
+paramList = find(cellfun(@(x)~all(isnan(x)),EEG.unfold.variabletypes));
+paramList = find(ismember(EEG.unfold.cols2variablenames,paramList));
+% remove the customColumns
 
 
 
@@ -122,7 +127,14 @@ for pred = paramList
         value{loopRunner} = nan;
         name(loopRunner)= EEG.unfold.colnames(pred);
     end
-    event(loopRunner)= EEG.unfold.eventtypes(EEG.unfold.cols2eventtypes(pred));
+    evt = EEG.unfold.eventtypes(EEG.unfold.cols2eventtypes(pred));
+    
+    % in case of TRF, change it to string NAN, this makes our life a lot
+    % easier
+    if isnan(evt{1}{1})
+        evt{1} = {'nan'};
+    end
+    event(loopRunner)= evt;
     type(loopRunner) = EEG.unfold.variabletypes(EEG.unfold.cols2variablenames(pred));
     loopRunner = loopRunner+1;
 %     end

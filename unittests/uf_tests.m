@@ -13,8 +13,7 @@ test_glmfit
 test_imputeMissing
 test_splines
 test_timeexpandDesignmat
-
-
+test_timeexpandDesignmat_addTRF
 
 
 
