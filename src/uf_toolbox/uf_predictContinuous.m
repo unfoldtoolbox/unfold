@@ -267,7 +267,9 @@ switch cfg.auto_method
         warning('moving min/max inside by 0.05 of total range in order to reduce bad extreme-estimates');
         contValueSelect = linspace(contmin+0.05*ran,contmax-0.05*ran,cfg.auto_n);
     case 'quantile'
-        contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
+        %contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
+        %contValueSelect = quantile(predVal,linspace(1/cfg.auto_n,1-1/cfg.auto_n,cfg.auto_n-1)); % VERSION OLAF
+        contValueSelect = quantile(predVal,linspace( 1/(cfg.auto_n+1), 1-1/(cfg.auto_n+1), cfg.auto_n)) % update Olaf
     case 'average'
         contValueSelect = nanmean(predVal);
 end
