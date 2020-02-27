@@ -269,7 +269,7 @@ switch cfg.auto_method
     case 'quantile'
         %contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
         %contValueSelect = quantile(predVal,linspace(1/cfg.auto_n,1-1/cfg.auto_n,cfg.auto_n-1)); % VERSION OLAF
-        contValueSelect = quantile(predVal,linspace( 1/(cfg.auto_n+1), 1-1/(cfg.auto_n+1), cfg.auto_n)) % update Olaf
+        contValueSelect = quantile(predVal,linspace( 1/(cfg.auto_n+1), 1-1/(cfg.auto_n+1), cfg.auto_n)); % update Olaf
     case 'average'
         contValueSelect = nanmean(predVal);
 end
