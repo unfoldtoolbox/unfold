@@ -7,7 +7,7 @@ testCase = [15]
 EEG = simulate_test_case(testCase,'noise',0,'basis','box');
 cfgDesign = [];
 
-cfgDesign.coding = 'dummy';
+cfgDesign.codingschema = 'reference';
 cfgDesign.formula   = {'y~1 + cat(conditionA) + continuousA','y~1'};
 cfgDesign.eventtypes = {{'stimulus2'},{'stimulus1','stimulus3'}};
 

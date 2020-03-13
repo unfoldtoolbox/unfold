@@ -14,7 +14,8 @@ test_imputeMissing
 test_splines
 test_timeexpandDesignmat
 test_timeexpandDesignmat_addTRF
-
+test_checkmodelfit
+test_erpimage
 
 
 % Multi-Test
