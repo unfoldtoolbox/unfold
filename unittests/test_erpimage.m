@@ -1,4 +1,4 @@
-
+function test_erpimage
 testCase = [15];
 
 EEGsim = simulate_test_case(testCase,'noise',1,'basis','posneg','srate',50,'datalength',10*60);
