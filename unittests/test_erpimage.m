@@ -32,6 +32,16 @@ catch
 end
 %% default call
 uf_erpimage(uf,'channel',1)
+%% Check types
+figure
+subplot(3,1,1),uf_erpimage(uf,'channel',1,'type','residual'),title('residual')
+subplot(3,1,2),uf_erpimage(uf,'channel',1,'type','modelled'),title('modelled')
+subplot(3,1,3),uf_erpimage(uf,'channel',1,'type','raw'),title('raw')
+%%
+figure
+subplot(3,1,1),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',0),title('addResiduals = 0')
+subplot(3,1,2),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',1),title('addResiduals = 1')
+subplot(3,1,3),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',2),title('addResiduals = 2')
 
 %%
 figure
@@ -44,7 +54,7 @@ cfgPlot.sort_direction = 'forward';
 cfgPlot.caxis = [-6,6];
 cfgPlot.sort_time = [0 0];
 cfgPlot.sort_by = 'continuousA';
-cfgPlot.keep = {{'stimulus2',{'continuousA'}}}
+cfgPlot.keep = {{'stimulus2',{'continuousA'}}};
 
 
 cfgPlot.overlap = 1;

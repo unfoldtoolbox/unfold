@@ -100,7 +100,32 @@ function [varargout] = uf_erpimage(EEG,varargin)
 assert(isfield(EEG,'data'),'uf_erpimage needs the EEG file after uf_glmfit, before uf_condense')
 % assert(ismatrix(EEG.data)) % data have to be continuous
 
-cfg = finputcheck(varargin,...
+%% parse & check input
+[cfg,EEG_epoch,ufresult] = parse_input(EEG,varargin,nargout);
+%% calculate using remove/keep which betas to set to 0
+keep = which_parameter_to_keep(ufresult,cfg);
+%% calculate data according to remove/keep & the full-beta modelled data
+[data,data_yhat] = get_data(ufresult,cfg,keep,EEG_epoch);
+%% add all together to a EEG structure, also adds the residuals if necessary
+[EEG_out] = get_EEG(ufresult,cfg,data,data_yhat,EEG,EEG_epoch);
+
+%% calculate the stuff for the erpimage
+[EEG_out,sort_vector] = get_sortvector(cfg,EEG_out);
+
+%% draw ERPimage  or get output
+if cfg.plot == 1
+    plot_erpimage(EEG_out,cfg,sort_vector)
+end
+if nargout>0
+    outdata = EEG_out.data;
+    outsort = sort_vector;
+    varargout{1} = outdata;
+    varargout{2} = outsort;
+end
+end
+
+function [cfg,EEG_epoch,ufresult] = parse_input(EEG,input,n_argout_caller)
+cfg = finputcheck(input,...
     {...%#'method','string',{'raw','deconv','nodeconv','residuals','fullmodel','deconvDirect'},'deconv'; %
     'type','string',{'raw','modelled','residual'},'modelled'; % whether to use raw data
     'datafield','string',[],'beta'; % which field to plot, popular: beta & beta_nodc
@@ -121,7 +146,7 @@ cfg = finputcheck(varargin,...
     ... % Plot Options
     'split_by','',[],[];       % make multiple subplots with separate ERPimages
     'winrej','real',[],[];     % remove parts of the continuous data
-    'plot','boolean',[],nargout==0;     % if called without requesting output,
+    'plot','boolean',[],n_argout_caller==0;     % if called without requesting output,
     'timelimits','real',[],[]; %from when to when
     'channel','integer',1:size(EEG.data,1),[];
     'figure','boolean',[],0;
@@ -155,6 +180,9 @@ else
     
 end
 assert(isfield(ufresult,cfg.datafield),sprintf('"datafield":%s, not found',cfg.datafield))
+end
+
+function [keep] = which_parameter_to_keep(ufresult,cfg)
 %% Find which parameters to keep in the model
 events  = [ufresult.unfold.eventtypes];
 variable= [ufresult.unfold.variablenames]; % predictors
@@ -203,47 +231,59 @@ if ~(isempty(cfg.remove) && isempty(cfg.keep))
 end
 
 keep = sort(keep);
-%%
-if cfg.type == "modelled" || cfg.type == "residual"
-    beta = ufresult.(cfg.datafield)(cfg.channel,:,keep);
-    beta = squeeze(mean(beta,1));
-    if cfg.type == "residual" || cfg.addResiduals
-        beta_full = ufresult.(cfg.datafield)(cfg.channel,:,:);
-        beta_full = squeeze(mean(beta_full,1));
-    end
-    assert(~all(isnan(beta(:))),'found only nans, did you specify & calculate the correct channel?')
-    
-    if cfg.overlap
-        % go back to the continuous domain and multiply via Xdc
-        data = ufresult.unfold.Xdc(:,ismember(ufresult.unfold.Xdc_terms2cols,keep))*beta(:); % time x 1
-        if cfg.type == "residual" || cfg.addResiduals
-            data_yhat = ufresult.unfold.Xdc*beta_full(:);
-        end
-    else
-        if length(keep) == 1
+end
+
+function [data,data_yhat] = get_data(ufresult,cfg,keep,EEG_epoch)
+% Function to calculate yhat=X*b with possibility to remove some of the
+% betas (set them to 0)
+    function data = calculate_yhat(X,ufresult,cfg,keep)
+        beta = ufresult.(cfg.datafield)(cfg.channel,:,keep);
+        
+        assert(~all(isnan(beta(:))),'found only nans, did you specify & calculate the correct channel?')
+        beta = squeeze(mean(beta,1));
+        if size(beta,1) == 1
             beta = beta'; % because of the "nice" behaviour of matlab to turn every Nx1 to a 1xN we have to undo that
         end
-        % directly use unfold.X
-        data = ufresult.unfold.X(:,keep)*beta';
-        data = data'; % time x trial
-         if cfg.type == "residual" || cfg.addResiduals
-            
-            data_yhat = ufresult.unfold.X*beta_full';
-            data_yhat = data_yhat';
-         end
-    end
-    
-    
-    % add a first (singleton) dimension mimicking a single channel
-    data = permute(data,[3 1 2]);
-    if exist("data_yhat","var")
-        data_yhat = permute(data_yhat,[3 1 2]);
+        if size(ufresult.unfold.Xdc,1) == size(X,1) 
+            % timeexpanded
+            keepX = ismember(ufresult.unfold.Xdc_terms2cols,keep);
+            beta = beta(:);
+        else
+            %normal designmat
+            keepX = keep;
+            beta = beta';
+        end
+        
+        data = X(:,keepX)*beta;
+        data = full(data);
+        if size(ufresult.unfold.Xdc,1) ~= size(X,1) % no-dc case
+        data = data';
+        end
+        % end
+        % add a first (singleton) dimension mimicking a single channel
+        data = permute(data,[3 1 2]);
     end
 
-    
-elseif cfg.type == "raw"
+if cfg.type == "raw"
     data = mean(EEG_epoch.data(cfg.channel,:,:),1);
+    data_yhat = nan;
+else
+    if cfg.overlap
+        data      = calculate_yhat(ufresult.unfold.Xdc,ufresult,cfg,keep);
+        data_yhat = calculate_yhat(ufresult.unfold.Xdc,ufresult,cfg,1:size(ufresult.unfold.X,2));
+    else
+        data      = calculate_yhat(ufresult.unfold.X,ufresult,cfg,keep);
+        data_yhat = calculate_yhat(ufresult.unfold.X,ufresult,cfg,1:size(ufresult.unfold.X,2));
+    end
+    
+    if cfg.addResiduals == 1
+        % in case of addResiduals == 2 the residuals are already calculated
+        data_yhat = calculate_yhat(ufresult.unfold.Xdc,ufresult,cfg,1:size(ufresult.unfold.X,2));
+    end
 end
+end
+
+function [EEG_out] = get_EEG(ufresult,cfg,data,data_yhat,EEG,EEG_epoch)
 %% Generate a EEG structure with the new data,
 EEG_new = eeg_emptyset;
 EEG_new.srate = EEG.srate;
@@ -254,34 +294,31 @@ if ~cfg.overlap || cfg.type == "raw"
     % in case of no overlap (or raw), the new data are already epoched
     EEG_out = EEG_epoch;
     EEG_out.data = data;
-    keepIX = 1:size(EEG_out.data,3); 
 else
     % first generate continuous data
     EEG_new.data = data;
     % now cut the data once more. This reintroduces overlapping potentials
     % - exactly what we want here
-    [EEG_out,keepIX] = uf_epoch(EEG_new,'timelimits',ufresult.unfold.times([1,end])+[0 diff(ufresult.times([1:2]))],'winrej',cfg.winrej);
+    EEG_out = uf_epoch(EEG_new,'timelimits',ufresult.unfold.times([1,end])+[0 diff(ufresult.times([1:2]))],'winrej',cfg.winrej);
     
 end
 %%
 % Adding back residuals
-if cfg.addResiduals || cfg.type == "residual"
-    assert(cfg.type~="raw",'cannot add residuals in case of "raw"')
+if cfg.addResiduals~=0 || cfg.type == "residual"
     fprintf('adding residuals\n')
     EEG_residuals = EEG_new;
     % this is the fully modelled data
     EEG_residuals.data  = data_yhat;
-    if cfg.overlap
+    if ismatrix(EEG_residuals.data) % if channel x time => continuous EEG
         %in case of overlap we have continuous residuals and have to cut
         %them once more to epochs
-        EEG_new.event = EEG_epoch.event;
         EEG_residuals = uf_epoch(EEG_residuals,'timelimits',ufresult.unfold.times([1,end])+[0 diff(ufresult.times([1:2]))],'winrej',cfg.winrej);
     end
     
     % calculate residuals as y-yhat    
     EEG_residuals.data = mean(EEG_epoch.data(cfg.channel,:,:),1) - EEG_residuals.data;
 
-    %%
+    
     if cfg.type == "residual"
         % show only residuals
         EEG_out.data = EEG_residuals.data;
@@ -291,9 +328,9 @@ if cfg.addResiduals || cfg.type == "residual"
     end
     clear EEG_residuals % free RAM
 end
+end
 
-
-%% check out which epoch to keep
+function [EEG_out,sort_vector] = get_sortvector(cfg,EEG_out)
 [keep_epoch]= ~isnan(eeg_getepochevent(EEG_out,cfg.alignto,[0,0],'type')); % output in ms
 assert(sum(keep_epoch)>0,'Did not find any events to align to in the epochs')
 EEG_out.data = EEG_out.data(:,:,keep_epoch);
@@ -318,36 +355,29 @@ sort_vector(~sort_isempty) = sort_tmp;
 % select only those that we want to keep anyway
 
 sort_vector = sort_vector(keep_epoch);
+end
 
-%% draw ERPimage
+function [] = plot_erpimage(EEG_out,cfg,sort_vector)
 if isempty(cfg.caxis)
     cfg.caxis = prctile(EEG_out.data(:),[5 95]);
     cfg.caxis = [-max(abs(cfg.caxis)) max(abs(cfg.caxis))];
 end
-
-if cfg.plot == 1
-    if isempty(cfg.split_by)
-        
-        
-        erpimage(EEG_out.data,sort_vector,EEG_out.times,'',10,0,'caxis',cfg.caxis);
-    else
-        evt_tmp = {EEG.event.(cfg.split_by)};
-        evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
-        splitlevel = unique(evt);
-        n_splits = length(splitlevel);
-        for n = 1:n_splits
-            subplot(n_splits,1,n)
-            evt_ix = strcmp(evt,splitlevel{n});
-            erpimage(EEG_out.data(:,:,evt_ix),sort_vector(evt_ix),EEG_out.times,'',10,0,'caxis',cfg.caxis);
-            title(sprintf('split by:%s, level:%s, effect of:%s',cfg.split_by,splitlevel{n},cfg.keep{1}{2}{:}))
-        end
-    end
-    cmap = cbrewer('div','RdBu',256);
-    colormap(cmap(end:-1:1,:));
-elseif nargout>0
+if isempty(cfg.split_by)
     
-    outdata = EEG_out.data;
-    outsort = sort_vector;
-    varargout{1} = outdata;
-    varargout{2} = outsort;
+    
+    erpimage(EEG_out.data,sort_vector,EEG_out.times,'',10,0,'caxis',cfg.caxis);
+else
+    evt_tmp = {EEG.event.(cfg.split_by)};
+    evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
+    splitlevel = unique(evt);
+    n_splits = length(splitlevel);
+    for n = 1:n_splits
+        subplot(n_splits,1,n)
+        evt_ix = strcmp(evt,splitlevel{n});
+        erpimage(EEG_out.data(:,:,evt_ix),sort_vector(evt_ix),EEG_out.times,'',10,0,'caxis',cfg.caxis);
+        title(sprintf('split by:%s, level:%s, effect of:%s',cfg.split_by,splitlevel{n},cfg.keep{1}{2}{:}))
+    end
+end
+cmap = cbrewer('div','RdBu',256);
+colormap(cmap(end:-1:1,:));
 end
