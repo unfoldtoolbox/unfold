@@ -44,7 +44,7 @@ for k = 1:10
     EEG.event(end).type = 'pause';
     
 end
-
+EEG.data(2,:,:) = EEG.data(1,:,:)+1000*(rand(size(EEG.data(1,:,:)))-.5); % add a second channel
 %% Create the model
 cfgDesign = [];
 cfgDesign.codingschema = 'reference';
@@ -58,19 +58,21 @@ EEG = uf_glmfit(EEG);
 
 ufresult = uf_condense(EEG);
 %%
+r2 = uf_checkmodelfit(EEG,'method','R2','fold_event','pause','channel',1);
+
+%%
 r2 = uf_checkmodelfit(EEG,'method','R2','fold_event','pause');
 cv_r2 = uf_checkmodelfit(EEG,'method','crossValR2','fold_event',{'pause'});
-
+median(cv_r2,2)
 
 %%
 r2 = uf_checkmodelfit(EEG,'method','partialR2');
-assert(size(r2,1) == 3)
+assert(size(r2,1) == 6)
 r2_subset = uf_checkmodelfit(EEG,'method','partialR2','variablename',{'continuousA','continuousB'});
-assert(size(r2_subset,1) == 2)
-assert(all(r2_subset{:,2} == r2{2:end,2}))
+assert(size(r2_subset,1) == 4)
 %%
 cv_r2 = uf_checkmodelfit(EEG,'method','crossValpartialR2','fold_event',{'pause'});
-groupsummary(cv_r2,'variablenames',{'median','std'},{'r2_ca'})
+groupsummary(cv_r2,{'variablenames','channel'},{'median','std'},{'r2_ca'})
 r2 = uf_checkmodelfit(EEG,'method','crossValpartialR2','variablename',{'continuousA','continuousB'},'fold_event','pause');
 assert(length(unique(r2.variablenames))==2) % check variable selection
 %%
