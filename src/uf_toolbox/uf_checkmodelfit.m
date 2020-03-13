@@ -1,7 +1,8 @@
-function r2 = uf_modelcheck(EEG,varargin)
-
+function r2 = uf_checkmodelfit(EEG,varargin)
+% Function to get R2, AIC/BIC, and partialR2 (same a
+% DESCRIPTION
 cfg = finputcheck(varargin,...
-    {'method', 'string',{'R2','commonalityR2','crossValR2','crossValcommonalityR2'}, 'R2';
+    {'method', 'string',{'R2','partialR2','crossValR2','crossValpartialR2'}, 'R2';
     'fold_event','','',{}; %can be string or cell
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
@@ -17,10 +18,10 @@ assert(isfield(EEG.unfold,'Xdc'))
 
 
 switch cfg.method
-    case {'crossValR2','crossValcommonalityR2'}
+    case {'crossValR2','crossValpartialR2'}
         
         [train,test]=uf_cv_getFolds(EEG,'fold_event',cfg.fold_event);
-        r2 = []; % in case of crossValcommonalityR2 this is necessary
+        r2 = []; % in case of crossValpartialR2 this is necessary
         
         % for each fold
         for fold = 1:length(train)
@@ -34,11 +35,11 @@ switch cfg.method
             
             
             switch cfg.method
-                case 'crossValcommonalityR2'
+                case 'crossValpartialR2'
                     % potentially one could implement here a selection of
                     % only some variables. %% enhancement %%
                     
-                    r2_fold=  commonalityR2(EEGfold,EEG.data(:,test(fold).ix),test(fold).Xdc(test(fold).ix,:));
+                    r2_fold=  partialR2(EEGfold,EEG.data(:,test(fold).ix),test(fold).Xdc(test(fold).ix,:),varargin);
                     r2_fold.fold = repmat(fold,size(r2_fold,1),1);
                     r2 = [r2;r2_fold];
                     
@@ -52,8 +53,8 @@ switch cfg.method
             
         end
         
-    case 'commonalityR2'
-        r2 = commonalityR2(EEG);
+    case 'partialR2'
+        r2 = partialR2(EEG,EEG.data,EEG.unfold.Xdc,varargin);
     case 'R2'
         assert(isfield(EEG.unfold,'beta_dc'),'Please run uf_glmfit first manually to get non-crossvalidated R2')
         
@@ -70,51 +71,58 @@ end
 % refit the model
 % calculate R2
 end
-function r2_commonality = commonalityR2(EEG,testData,testXdc)
+function partial_r2 = partialR2(EEG,testData,testXdc,input)
+    cfg = finputcheck(input,...
+    {'variablename','cell','',{}; % cell of variablename names {'varnameA','varnameB'}
+    },'mode','ignore');
+if ischar(cfg); error(cfg);end
+   
 
-if nargin == 3
-    %crossvalidated r2
+   % r2partial = r2_total - r2_without
     r2_total    = calc_r2(testData,testXdc,      EEG.unfold.beta_dc);
     
-else
-    r2_total    = calc_r2(EEG.data,   EEG.unfold.Xdc,   EEG.unfold.beta_dc);
-end
-Xdc_terms2variablenames = EEG.unfold.cols2variablenames(EEG.unfold.Xdc_terms2cols); %which Xdc columns belong to which variables
-varNames = [];
-for k = sort(unique(Xdc_terms2variablenames),'ascend')
-    EEG_ca = EEG;
-    % banish these columns from the design matrix
-    % Enhancement: One could try permuting them similar to Mussal [et al]...
-    % & Churchland 2019. s
-    ix_k = Xdc_terms2variablenames == k;
-    EEG_ca.unfold.Xdc(:,ix_k) = [];
-    EEG_ca.unfold.Xdc_terms2cols(ix_k) = [];
-    %     EEG_ca.unfold.eventtypes(k) = [];
-    EEG_ca.unfold.variablenames(k) = [];
-    EEG_ca.unfold.cols2eventtypes(k) = [];
-    EEG_ca.unfold.cols2variablenames(k) = [];
-    
-    EEG_ca = uf_glmfit(EEG_ca);
-    
-    if nargin == 3
+    % go over each variable in the model
+    Xdc_terms2variablenames = EEG.unfold.cols2variablenames(EEG.unfold.Xdc_terms2cols); %which Xdc columns belong to which variables
+    varNames = [];partial_r2 = [];
+    for k = sort(unique(Xdc_terms2variablenames),'ascend')
+        % in case we prespecified which ones to run, check if it is in the
+        % list, else skip
+        if ~isempty(cfg.variablename)
+            current_var = EEG.unfold.variablenames{k};
+
+            if ~any(strcmp(current_var,cfg.variablename))
+                fprintf('Skipping partialR2 for variablename:%s\n',current_var)
+                continue
+            end
+            fprintf('Calculating partialR2 for variablename:%s\n',current_var)
+        end
+        
+        EEG_ca = EEG;
+        % banish these columns from the design matrix
+        % Enhancement: One could try permuting them similar to Mussal [et al]...
+        % & Churchland 2019. s
+        ix_k = Xdc_terms2variablenames == k;
+        EEG_ca.unfold.Xdc(:,ix_k) = [];
+        EEG_ca.unfold.Xdc_terms2cols(ix_k) = [];
+        %     EEG_ca.unfold.eventtypes(k) = [];
+        EEG_ca.unfold.variablenames(k) = [];
+        EEG_ca.unfold.cols2eventtypes(k) = [];
+        EEG_ca.unfold.cols2variablenames(k) = [];
+
+        EEG_ca = uf_glmfit(EEG_ca);
+
+        
         % crossvalidated R2
         testXdc_ca = testXdc;
         testXdc_ca(:,ix_k) = [];
         r2_ca = calc_r2(testData,testXdc_ca,EEG_ca.unfold.beta_dc);
         
-        r2_commonality(k) = r2_total-r2_ca;
-    else
-        r2_ca = calc_r2(EEG.data,EEG_ca.unfold.Xdc,EEG_ca.unfold.beta_dc);
-        
-        r2_commonality(k) = r2_total-r2_ca ;
+        partial_r2(end+1) = r2_total-r2_ca;
+        varNames{end+1} = EEG.unfold.variablenames{k};
+
     end
-    
-    
-    varNames{end+1} = EEG.unfold.variablenames{k};
-    
-end
-r2_commonality = table(varNames',r2_commonality','VariableNames',{'variablenames','r2_ca'});
-r2_commonality.r2_total = repmat(r2_total,size(r2_commonality,1),1);
+    partial_r2 = table(varNames',partial_r2','VariableNames',{'variablenames','r2_ca'});
+    partial_r2.r2_total = repmat(r2_total,size(partial_r2,1),1);
 end
 
 % What has been modeled at all?

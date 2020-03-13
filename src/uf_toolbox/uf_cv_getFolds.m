@@ -6,6 +6,7 @@ cfg = finputcheck(varargin,...
     'nfold','integer',[],10; % used for equalEntries
     'allowOverlap','boolean',[],0; % only allows CV when there is no overlap between events (thus the folds are "independent")
     },'mode','ignore');
+
 if cfg.method=="event"
     assert(~isempty(cfg.fold_event),'You have to specify a fold-event')
 end
