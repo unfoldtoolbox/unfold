@@ -47,7 +47,7 @@ for e = 1:length(EEG.event)
     EEG.event(e).type= ['test_' num2str(randi(6,1))];
 end
 cfgDesign = [];
-cfgDesign.coding = 'dummy';
+cfgDesign.codingschema = 'reference';
 cfgDesign.formula   = {'y~1+continuousA','y~1+continuousA'};
 cfgDesign.eventtypes = {{'test_1','test_5','test_3'},{'test_3','test_5'}};
 

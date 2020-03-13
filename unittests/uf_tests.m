@@ -17,10 +17,10 @@ test_timeexpandDesignmat_addTRF
 test_checkmodelfit
 test_erpimage
 
-
+%%
 % Multi-Test
 cfg = struct();
-cfg.designmat.coding = {'effects','reference'};
+cfg.designmat.codingschema = {'effects','reference'};
 cfg.designmat.splinespacing = {'linear','quantile'};
 cfg.timeexpandDesignmat.timelimits = {[-0.5,1.5],[-0.5,-0.1],[1 2]};
 cfg.timeexpandDesignmat.method = {'stick','splines','fourier'};
