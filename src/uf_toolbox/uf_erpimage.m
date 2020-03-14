@@ -41,10 +41,10 @@ function [varargout] = uf_erpimage(EEG,varargin)
 %
 % Modify y_hat / modelled data
 %
-%  cfg.keep (cell):   default {}. Requires a: {{{},{}}} (yes, a cell of cell of cells - sorry :|
+%  cfg.keep (cell):   default {}. Requires a: {}
 %                           Possibilty to specify what event-predictor combinations to keep.
 %                           In case of "event1:~1+condA, event2:~1+condB"
-%                           {{'event1',{'condA'}},{'event2',{'2_(Intercept)'}}}
+%                           {'condA','2_(Intercept)'}
 %                           would plot single trials without
 %                           event1:(Intercept) and event2:condB
 %
@@ -158,13 +158,18 @@ if ischar(cfg); error(cfg);end
 assert(isempty(cfg.keep)|isempty(cfg.remove),'either keep or remove, but dont specify both')
 assert(~isempty(cfg.channel),'please specify a channel (or set of channels) for the ERPimage')
 
-if isstr(cfg.alignto)
+if ischar(cfg.alignto)
     cfg.alignto = {cfg.alignto};
 end
-assert(iscell(cfg.alignto))
+if ~isempty(cfg.sort_alignto) && ischar(cfg.sort_alignto)
+    cfg.sort_alignto = {cfg.sort_alignto};
+end
 if isempty(cfg.sort_alignto)
     cfg.sort_alignto = cfg.alignto;
 end
+
+assert(iscell(cfg.alignto))
+assert(iscell(cfg.sort_alignto))
 if cfg.figure
     figure
 end
@@ -184,8 +189,7 @@ end
 
 function [keep] = which_parameter_to_keep(ufresult,cfg)
 %% Find which parameters to keep in the model
-events  = [ufresult.unfold.eventtypes];
-variable= [ufresult.unfold.variablenames]; % predictors
+
 
 % default is to keep all
 keep = 1:length(ufresult.unfold.colnames);
@@ -201,16 +205,10 @@ if ~(isempty(cfg.remove) && isempty(cfg.keep))
         fieldcontent = cfg.remove;
     end
     for instance = fieldcontent
-        current_event = instance{1}(1);
-        ix_evt= find(cellfun(@(x)isequal(current_event,x),events));
-                    
-
-        assert(length(ix_evt) == 1,'Could not find event:%s, did you misspell something?',current_event{1})
-        for field= instance{1}{2}
-            ix_variable = find(cellfun(@(x)isequal(field{1},x),variable));
-            assert(length(ix_variable) == 1,'Could not find event:%s, field:%s, did you misspell something?',current_event{1},field{1})
-            list = [list find(ufresult.unfold.cols2eventtypes == ix_evt & ufresult.unfold.cols2variablenames == ix_variable)];
-        end
+        ix_variable = find(strcmp(instance{1},ufresult.unfold.variablenames));
+        assert(length(ix_variable) == 1,'Could not find variablename:%s, did you misspell something?',instance{1})
+        list = [list find(ufresult.unfold.cols2variablenames == ix_variable)];
+        
     end
     
     
@@ -367,15 +365,18 @@ if isempty(cfg.split_by)
     
     erpimage(EEG_out.data,sort_vector,EEG_out.times,'',10,0,'caxis',cfg.caxis);
 else
-    evt_tmp = {EEG.event.(cfg.split_by)};
+%     [sort_vector,~] = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],cfg.split_by); % output in ms
+    evt_tmp = {EEG_out.urevent.(cfg.split_by)};
     evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
+    
     splitlevel = unique(evt);
     n_splits = length(splitlevel);
     for n = 1:n_splits
         subplot(n_splits,1,n)
         evt_ix = strcmp(evt,splitlevel{n});
         erpimage(EEG_out.data(:,:,evt_ix),sort_vector(evt_ix),EEG_out.times,'',10,0,'caxis',cfg.caxis);
-        title(sprintf('split by:%s, level:%s, effect of:%s',cfg.split_by,splitlevel{n},cfg.keep{1}{2}{:}))
+        
+        title(sprintf('split by:%s, level:%s',cfg.split_by,splitlevel{n}))
     end
 end
 cmap = cbrewer('div','RdBu',256);
