@@ -122,7 +122,7 @@ cfg = finputcheck(varargin,...
     'spline','cell',[],{};...
     'splinespacing','string',{'linear','quantile'},'quantile';
     'codingschema','string',{'effects','reference','full'},'reference';
-    },'mode','error');
+    },'mode','ignore');
 
 if(ischar(cfg)); error(cfg);end
 
