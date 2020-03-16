@@ -18,7 +18,7 @@ addpath(fullfile(projectFolder,'lib','glmnet_matlab'))
 
 if ~exist('eeg_checkset','file')
     try
-        eeglab
+        eeglab redraw
     catch
         warning('%s():EEGLAB could not be found in your path. You should be fine EXCEPT for using uf_epoch (for massive univariate modeling without overlap correction) which requires EEGLAB.\n',mfilename)
         addpath(fullfile(projectFolder,'lib','eeglab'))
