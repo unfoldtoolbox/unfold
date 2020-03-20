@@ -5,9 +5,11 @@ A toolbox for deconvolution of overlapping EEG signals and (non)-linear modeling
 * Linear deconvolution
 * Model specification using R-style formulas (EEG~1+face+age)
 * Programmed in a modular fashion
-* Regularization using glmnet
-* Spline-Regression
+* Spline regression 
+* Regularization (using glmnet)
 * Temporal basis functions (Fourier & Splines)
+* Estimate temporal response functions (TRFs) for time-continuous predictors
+* Cross-validation
 
 ### Installation
 ``` 
