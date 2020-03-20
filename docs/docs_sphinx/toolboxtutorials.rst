@@ -15,3 +15,6 @@ These matlab tutorials will guide you through the steps of using the unfold tool
 	toolbox-tut04
 	toolbox-tut05
 	toolbox-tut06
+	toolbox-tut07
+	toolbox-tut08
+	toolbox-tutPeerj
