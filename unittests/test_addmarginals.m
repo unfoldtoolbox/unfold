@@ -123,21 +123,15 @@ EEG = uf_timeexpandDesignmat(EEG,'timelimits',[-0.5 1.5]);
 EEG = uf_glmfit(EEG);
 
 ufresult = uf_condense(EEG);
-%%
-uf_plotParam((uf_predictContinuous(ufresult,'predictAt',{{'splineA',linspace(-2,2,11)}})))
-%%
-uf_plotParam(uf_addmarginal(uf_predictContinuous(ufresult,'predictAt',{{'splineA',linspace(-2,2,11)}}),'marginal','MEM'))
-pAt = {{'splineA',linspace(-2,2,11)},{'splineB',linspace(-2,2,11)}};
-uf_plotParam(uf_addmarginal(uf_predictContinuous(ufresult,'predictAt',pAt),'marginal','MEM'))
-uf_plotParam(uf_addmarginal(uf_predictContinuous(ufresult,'predictAt',pAt),'marginal','AME'))
+
 %%
 x = uf_predictContinuous(ufresult,'predictAt',{{'splineA',0},{'splineB',0}});
 assert(near(sum(x.beta(:,6,1:2)),0.5^3)==1)
 %%
-x = uf_addmarginal(uf_predictContinuous(ufresult),'marginal','MEM');
+x = uf_addmarginal(uf_predictContinuous(ufresult),'type','MEM');
 assert(near((mean([EEG.event.splineA])+0.5)^3,x.beta(:,6,1))==1);
 %%
-x = uf_addmarginal(uf_predictContinuous(ufresult),'marginal','AME');
+x = uf_addmarginal(uf_predictContinuous(ufresult),'type','AME');
 %theoretical:
 %mean((0.5+linspace(-2,2,100)).^3)
 %practical:
