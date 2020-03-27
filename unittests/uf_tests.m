@@ -6,16 +6,16 @@ function uf_tests()
 % original signal is and throws an error if the difference is too large
 
 %separate tests
-% % test_addmarginals
-% % test_continuousArtifact
-% % test_designmat
-% % test_glmfit
-% % test_imputeMissing
-% % test_splines
-% % test_timeexpandDesignmat
-% % test_timeexpandDesignmat_addTRF
-% % test_checkmodelfit
-% % test_erpimage
+test_addmarginals
+test_continuousArtifact
+test_designmat
+test_glmfit
+test_imputeMissing
+test_splines
+test_timeexpandDesignmat
+test_timeexpandDesignmat_addTRF
+test_checkmodelfit
+test_erpimage
 
 %%
 % Multi-Test
