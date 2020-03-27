@@ -86,7 +86,7 @@ function [varargout] = uf_erpimage(EEG,varargin)
 %  cfg.split_by (string):   default []. Use subplots to split the
 %                       erpimage by a categorical variable. Directly uses
 %                       EEG.event.(cfg.split_by)
-%  cfg.figure (integer):   default: 0, plot into a new figure?
+%  cfg.figure (integer):   default: 1, plot into a new figure?
 %  cfg.caxis (2 integer):   Specify caxis, by default let eeglab decide
 
 %
@@ -149,7 +149,7 @@ cfg = finputcheck(input,...
     'plot','boolean',[],n_argout_caller==0;     % if called without requesting output,
     'timelimits','real',[],[]; %from when to when
     'channel','integer',1:size(EEG.data,1),[];
-    'figure','boolean',[],0;
+    'figure','boolean',[],1;
     'caxis','real',[],[];
     },'mode','error');
 
