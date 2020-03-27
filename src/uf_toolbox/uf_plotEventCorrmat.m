@@ -5,8 +5,8 @@ function corrOut = uf_plotEventCorrmat(EEG,varargin)
 %
 %Arguments:
 %   eventtypes (cell): Subselect the eventtypes, by default chooses all
-%   figure (0/1): whether the corrmat should be plotted (default) or only
-%               returned
+%   plot (0/1): whether the corrmat should be plotted (default) or only
+%               returned (deprecated "figure")
 %
 %Returns:
 %   correlationMatrix
@@ -17,6 +17,7 @@ function corrOut = uf_plotEventCorrmat(EEG,varargin)
 
 cfg = finputcheck(varargin,...
     {'eventtypes',   'cell', [], {};...
+    'plot','boolean',[],1;...
     'figure','boolean',[],1;...
     },'mode','ignore');
 if(ischar(cfg)); error(cfg);end
@@ -39,7 +40,7 @@ t2.fixDurPrevious = diff([nan(1);t2.time]);
 
 nanrows = any(isnan(t2{:,:}),2);
 corrData = corr(t2{~nanrows,:});
-if cfg.figure
+if cfg.plot && cfg.figure %(figure is deprecated)
     escapeString = @(tStr)regexprep(tStr,'(_)','\\$1');
     
     figure,
@@ -53,8 +54,9 @@ if cfg.figure
     
     
     caxis([-1 1]),colorbar
+    set(gca,'XTickLabelRotation',45);
+
 end
 corrOut = array2table(corr(t2{~isnan(t2.fixDurCurrent) & ~isnan(t2.fixDurPrevious),:}),'VariableNames',t2.Properties.VariableNames,'RowNames',t2.Properties.VariableNames);
 
-set(gca,'XTickLabelRotation',45);
 

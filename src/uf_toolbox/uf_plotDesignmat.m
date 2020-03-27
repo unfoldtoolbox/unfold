@@ -36,14 +36,28 @@ if cfg.timeexpand
     % center the plotting window around some event in middle of EEG.event
     % If we center instead around some fixed latency (e.g. middle of recording)
     % there may not be any experimental events around to see.
-
+    
     
     modeledEvents = [EEG.unfold.eventtypes{:}];
-    eventstruct = EEG.event;
-    eventstruct(~ismember({eventstruct.type},modeledEvents)) = [];
-    ix_midEvent = round(length(eventstruct)/2); % take "center" event
-    midEventSmp = round(eventstruct(ix_midEvent).latency);
-    midEventLat = EEG.times(midEventSmp); % in ms
+    % we remove the TRFs
+    eventNan = cellfun(@(x)all(isnan(x)),modeledEvents);
+    modeledEvents(eventNan) = [];
+    
+    % temporary change "nan" to "trf" for later plotting label
+    
+    EEG.unfold.eventtypes(eventNan) = {{'trf'}};
+    
+    if isempty(modeledEvents)
+        % only TRFs
+        midEventLat = EEG.times(round(end/2));
+        
+    else
+        eventstruct = EEG.event;
+        eventstruct(~ismember({eventstruct.type},modeledEvents)) = [];
+        ix_midEvent = round(length(eventstruct)/2); % take "center" event
+        midEventSmp = round(eventstruct(ix_midEvent).latency);
+        midEventLat = EEG.times(midEventSmp); % in ms
+    end
     
     % time_lim = EEG.times(ceil(end/2)) + [-100,100] * 1000;
     
@@ -57,7 +71,7 @@ if cfg.timeexpand
     yAxis = EEG.times(time_ix)/1000;
     X = EEG.unfold.Xdc(time_ix,:);
     shiftByOne = 0; % dont shift the XTicks by one
-
+    
 else
     yAxisLabel = 'event number';
     X = EEG.unfold.X;
@@ -152,7 +166,7 @@ if cfg.timeexpand
         
         % look for event latencies of events in the plotted region
         latix = find((lat < (time_lim(2))) & (lat > (time_lim(1))));
-                    
+        
         % plot all event onsets as horizontal lines with different colors per event
         if ~isempty(latix) && length(latix) < 1000 % only do this if less than 1000 events (otherwise buggy)
             
@@ -182,20 +196,20 @@ if cfg.timeexpand
                 
                 
             end
-             if sum(makeGray)>0
-            legendlist{end+1,1} = 'non-modeled';
-            legendlist{end,2} = 0;
-            legendlist{end,3} = legendlist{find([legendlist{:,2}],1),3};
-            legendlist(find([legendlist{:,2}]),:) = [];
-
-            
-             end
-        legend([legendlist{:,3}],[legendlist(:,1)])
+            if sum(makeGray)>0
+                legendlist{end+1,1} = 'non-modeled';
+                legendlist{end,2} = 0;
+                legendlist{end,3} = legendlist{find([legendlist{:,2}],1),3};
+                legendlist(find([legendlist{:,2}]),:) = [];
+                
+                
+            end
+            legend([legendlist{:,3}],[legendlist(:,1)])
         else
             warning('more than 1000 events found in the restricted timeframe, this makes matlab crash and we are not plotting them')
         end
         
-       
+        
         
         % change ylim to zoom in to the event that is in middle of cut data
         %latTmp = lat(latix);

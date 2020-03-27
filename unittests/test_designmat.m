@@ -6,7 +6,7 @@ testCase = [15];
 EEGsim = simulate_test_case(testCase,'noise',0,'basis','box');
 cfgDesign = [];
 
-cfgDesign.coding = 'reference';
+cfgDesign.codingschema = 'reference';
 cfgDesign.formula   = {'y~1',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
 cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
 
@@ -56,7 +56,7 @@ assert(size(EEG2.unfold.X,2) == 4)
 assert(strcmp(EEG2.unfold.variablenames{EEG2.unfold.cols2variablenames(end)},'conditionA:conditionB:continuousA'))
 %% Renaming checks
 cfgDesign = [];
-cfgDesign.coding = 'dummy';
+cfgDesign.codingschema = 'reference';
 cfgDesign.formula   = {'y~1+spl(splineA,4)+conditionA',       'y~1+conditionA*continuousA+splineA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
 cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
 
@@ -72,7 +72,7 @@ shouldBeFunction(EEGtmp,{'(Intercept)','conditionA','splineA','2_(Intercept)','2
 
 %% Renaming check interactions
 cfgDesign = [];
-cfgDesign.coding = 'dummy';
+cfgDesign.codingschema = 'reference';
 cfgDesign.formula   = {'y~1+ conditionA + conditionB','y~1+conditionC + conditionA:conditionB:conditionC','y~1+conditionC*conditionB'};
 cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
 
@@ -102,7 +102,7 @@ for e= 1:length(EEGtest.event)
 end
 
 cfgDesign = [];
-cfgDesign.coding = 'dummy';
+cfgDesign.codingschema = 'reference';
 cfgDesign.formula   = {'y~1+ cat(catA)+ catB'};
 cfgDesign.eventtypes = {'stimulus1'};
 cfgDesign.categorical = {'catA',{'B','C','A'};
@@ -121,7 +121,7 @@ shouldBeFunction(EEGtmp,{'(Intercept)'  'catA_B'  'catA_C'  'catB_3'  'catB_1'},
 
 %% Checking Ticket #47
 cfgDesign = [];
-cfgDesign.coding = 'dummy';
+cfgDesign.codingschema = 'reference';
 cfgDesign.formula   = {'y~1+ cat(catB)'};
 cfgDesign.eventtypes = {'stimulus1'};
 cfgDesign.categorical = {'catB',{3,2,1}};

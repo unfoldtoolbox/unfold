@@ -13,14 +13,14 @@ test_glmfit
 test_imputeMissing
 test_splines
 test_timeexpandDesignmat
+test_timeexpandDesignmat_addTRF
+test_checkmodelfit
+test_erpimage
 
-
-
-
-
+%%
 % Multi-Test
 cfg = struct();
-cfg.designmat.coding = {'effects','reference'};
+cfg.designmat.codingschema = {'effects','reference'};
 cfg.designmat.splinespacing = {'linear','quantile'};
 cfg.timeexpandDesignmat.timelimits = {[-0.5,1.5],[-0.5,-0.1],[1 2]};
 cfg.timeexpandDesignmat.method = {'stick','splines','fourier'};
@@ -65,7 +65,7 @@ beta2EEG = allcomb_wrapper(cfg.beta2EEG);
         for d = designmat'
             d
             cfgDesignLoop = cfgDesign;
-            cfgDesignLoop.coding = d{1};
+            cfgDesignLoop.codingschema = d{1};
             cfgDesignLoop.splinespacing = d{2};
             EEGd = uf_designmat(EEG,cfgDesignLoop);
             
@@ -117,7 +117,7 @@ for testCase = [15 8 1]
     EEG = simulate_test_case(testCase,'noise',0,'basis','box');
     cfgDesign = [];
     cfgDesign.eventtypes = {'stimulusA'};
-    cfgDesign.coding = 'dummy';
+    cfgDesign.codingschema = 'dummy';
     switch testCase
         case {1,2}
             cfgDesign.formula = 'y ~ 1';
