@@ -11,7 +11,7 @@
       :align: center
       :width: 30 %
 
-Unfold - EEG Deconvolution Toolbox
+Unfold 1.1 - EEG Deconvolution Toolbox
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A toolbox for *deconvolution* of overlapping EEG (Pupil, LFP etc.) signals and *(non)-linear modeling*
 
@@ -39,6 +39,7 @@ What can you do with *unfold*?
 * Model **multiple events**, e.g. *Stimulus*, *Response* and *Fixation*
 * Use temporal basis functions (Fourier & Splines)
 * (Optional) **regularization** using glmnet
+* Temporal Response Functions (TRFs)
 
 Unmixed - Unfold addon for mixed Models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
