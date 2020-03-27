@@ -54,7 +54,7 @@ cfgPlot.sort_direction = 'forward';
 cfgPlot.caxis = [-6,6];
 cfgPlot.sort_time = [0 0];
 cfgPlot.sort_by = 'continuousA';
-cfgPlot.keep = {{'stimulus2',{'continuousA'}}};
+cfgPlot.keep = {'continuousA'};
 
 
 cfgPlot.overlap = 1;
@@ -69,7 +69,7 @@ cfgPlot.channel=1;
 cfgPlot.alignto = 'stimulus2';
 cfgPlot.sort_alignto = {'stimulus3'};
 cfgPlot.sort_direction = 'forward';
-cfgPlot.remove = {{'stimulus3',{'3_(Intercept)'}}}
+cfgPlot.remove = {'3_(Intercept)'};
 
 cfgPlot.caxis = [-6,6];
 
