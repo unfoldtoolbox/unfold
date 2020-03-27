@@ -22,6 +22,8 @@ function ufresult = uf_addmarginal(ufresult,varargin)
 %   cfg.channel      (all) Calculate only for a subset of channels (numeric)
 %   cfg.betaSetname  ("beta" = deconvolution model) string that indicates which unfold.(field) to use 
 %                    (i.e. ufresult.beta for deconvolution vs. ufresult.beta_nodc for a massive univariate model)
+%   cfg.type ("MEM" or "AME") calculate marginal effect at the mean (MEM) or average
+%                    marginal effect (AME) of each spline/continuous predictor. "AME" default option.
 %
 % Example
 % For instance the model 1 + cat(facA) + continuousB
@@ -54,8 +56,9 @@ function ufresult = uf_addmarginal(ufresult,varargin)
 % parse inputs
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[]; ...
-    'betaSetname','string','','' ...
-    },'mode','ignore');
+    'betaSetname','string','','';...
+    'type','string','','MEM'},...
+    'mode','ignore');
 
 if(ischar(cfg)); error(cfg); end
 
@@ -106,10 +109,59 @@ paramNames        = {ufresult.param.name};
 % make copy ufresult_avg
 fprintf('\nRe-running uf_condense() to recover unconverted splines\n')
 ufresult_avg = uf_condense(ufresult); % re-genererate, (without "evaluated" predictors)
-ufresult_avg = uf_predictContinuous(ufresult_avg,'auto_method','average'); % get mean of continuous/spline predictors
+
+
+% Calculate marginal effect
+if strcmp(cfg.marginal,'MEM')
+    fprintf('Calculating marginal effect at the mean of each spline/continuous predictor.\n');
+    ufresult_avg = uf_predictContinuous(ufresult_avg,'auto_method','average');
+elseif strcmp(cfg.marginal,'AME')
+    fprintf('Calculating average marginal effect of each spline/continuous predictor.\n');
+    % Calculate the average mean marginal effect of each spline predictor.
+    if ~isempty(ufresult_avg.unfold.splines)
+        spl = ufresult_avg.unfold.splines;
+        for s = 1:length(spl)
+            Xspline = mean(spl{s}.X,1,'omitnan'); % Calculate average after applying the nonlinear function
+            BetaIdx = find(strcmp({ufresult_avg.param.name},spl{s}.name));
+            
+            % Average marginal effect (AME)
+            PredictorAME = nan(size(ufresult_avg.(cfg.betaSetname),1),size(ufresult_avg.(cfg.betaSetname),2));
+            for c = 1:size(ufresult_avg.(cfg.betaSetname),1)
+                PredictorAME(c,:) = Xspline * squeeze(ufresult_avg.(cfg.betaSetname)(c,:,BetaIdx))';
+            end
+            
+            % Assign AME to beta
+            ufresult_avg.(cfg.betaSetname)(:,:,BetaIdx(1)) = PredictorAME;
+            ufresult_avg.(cfg.betaSetname)(:,:,BetaIdx(2:end)) = [];
+            ufresult_avg.param(BetaIdx(1)).value = NaN;  % average marginal effect is not marginal effect at the mean
+            ufresult_avg.param(BetaIdx(1)).type = 'spline_converted';
+            ufresult_avg.param(BetaIdx(2:end)) = [];
+        end
+    end
+    
+    % Calculate the average mean marginal effect of each continuous predictor.
+    ContBetaIdx = find(strcmp({ufresult_avg.param.type},'continuous'));
+    for s = 1:length(ContBetaIdx)
+        % Average marginal effect (same as marginal effect at the mean when the relationship is linear)
+        ContPredictor = ufresult_avg.unfold.X(:,ContBetaIdx(s));
+        ContPredictor(ContPredictor==0) = [];
+        PredictorAME = nan(size(ufresult_avg.(cfg.betaSetname),1),size(ufresult_avg.(cfg.betaSetname),2));
+        for c = 1:size(ufresult_avg.(cfg.betaSetname),1)
+            PredictorAME(c,:) = mean(ContPredictor .* squeeze(ufresult_avg.(cfg.betaSetname)(c,:,ContBetaIdx(s))),1);
+        end
+        
+        % Assign AME to beta
+        ufresult_avg.(cfg.betaSetname)(:,:,ContBetaIdx(s)) = PredictorAME;
+        ufresult_avg.param(ContBetaIdx(s)).value = mean(ContPredictor); % Same as AME when linear relationship
+        ufresult_avg.param(ContBetaIdx(s)).type = 'continuous_converted';
+    end
+else
+    error('Unknown method "%s" to calculate the marginal effect!',cfg.marginal);
+end
 
 % find the unique events
 uniqueParamEvents = ufresult.unfold.eventtypes;
+
 
 %% go trough unique event types
 for e = uniqueParamEvents%unique(paramEvents)
