@@ -57,6 +57,19 @@ EEG = uf_designmat(EEG,'formula',{'y~1','y~1+spl(continuousA,5)'},'eventtypes',{
 
 assert(all(find(any(isnan(EEG.unfold.X),2)) == stimCix(5:8)'),'splines do not have nans')
 
+%% bug #82
+% problem if multiple events are combined like e.g. this: {{'A','B'},'C'}
+% with {'y~1','y~1}
+EEG = simulate_test_case(13,'noise',0,'basis','box');
+
+stimAix = find(strcmpi({EEG.event.type},'stimulusA'));
+
+for e = 5:8
+    EEG.event(stimAix(e)).continuousA = nan(1);
+end
+EEG = uf_designmat(EEG,'formula',{'y~1+continuousA','y~1+continuousA'},'eventtypes',{{'stimulusA','stimulusB'},{'stimulusC'}});
+EEG = uf_imputeMissing(EEG,'method','drop');
+
 end
 
 

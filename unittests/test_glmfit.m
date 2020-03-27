@@ -37,7 +37,7 @@ rng(sprev);
 
 cfgDesign = [];
 
-cfgDesign.coding = 'dummy';
+cfgDesign.codingschema = 'reference';
 cfgDesign.formula   = {'y~1+continuousA+continuousB'};
 cfgDesign.eventtypes = {'stimulusA'};
 

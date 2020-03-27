@@ -218,7 +218,7 @@ for currPred = 1:length(paramList)
             % This is supoptimal and I'm sorry if it creates inconveniences.
             % We would need to introduce a whole new field to carry around
             % to compensate for this.
-            warning(sprintf('The predictor ''%s'' is evaluated at its mean or at (auto-spaced) percentiles. Note that the computation of the mean/percentiles for continuous variables excludes all cases where the predictor value is zero. If necessary, specify the values at which to evaluate the predictor manually using ''predictAt''',ufresult.unfold.variablenames{variableIdx}))
+            warning(sprintf('The predictor ''%s'' is evaluated at its mean or at (auto-spaced) percentiles. Note that the computation of the mean/percentiles for continuous variables excludes all cases where the predictor value is exactly zero. If necessary, specify the values at which to evaluate the predictor manually using ''predictAt''',ufresult.unfold.variablenames{variableIdx}))
             contValueSelect = auto_spacing(cfg,values(values~=0));
         end
         
@@ -267,7 +267,9 @@ switch cfg.auto_method
         warning('moving min/max inside by 0.05 of total range in order to reduce bad extreme-estimates');
         contValueSelect = linspace(contmin+0.05*ran,contmax-0.05*ran,cfg.auto_n);
     case 'quantile'
-        contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
+        %contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
+        %contValueSelect = quantile(predVal,linspace(1/cfg.auto_n,1-1/cfg.auto_n,cfg.auto_n-1)); % VERSION OLAF
+        contValueSelect = quantile(predVal,linspace( 1/(cfg.auto_n+1), 1-1/(cfg.auto_n+1), cfg.auto_n)) % update Olaf
     case 'average'
         contValueSelect = nanmean(predVal);
 end

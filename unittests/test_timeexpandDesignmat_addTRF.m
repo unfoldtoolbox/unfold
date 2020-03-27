@@ -19,7 +19,5 @@ EEGsim2 = uf_timeexpandDesignmat_addTRF(EEGsim,'channel',2,'name','covA','timeli
 EEGsim2 = uf_timeexpandDesignmat_addTRF(EEGsim2,'channel',3,'name','covB','timelimits',[-0.01,0.02]);
 EEGsim2 = uf_glmfit(EEGsim2);
 
-figure,plot(EEGsim2.unfold.times,squeeze(EEGsim2.unfold.beta_dcCustomrow(1,:,:))')
-
-assert(near(kernel,squeeze(EEGsim2.unfold.beta_dcCustomrow(1,find(EEGsim2.unfold.times==0):find(EEGsim2.unfold.times==0)+14,1))'))
-assert(near(-0.5*kernel,squeeze(EEGsim2.unfold.beta_dcCustomrow(1,find(EEGsim2.unfold.times==0):find(EEGsim2.unfold.times==0)+14,2))'))
+assert(near(kernel,squeeze(EEGsim2.unfold.beta_dc(1,find(EEGsim2.unfold.times==0):find(EEGsim2.unfold.times==0)+14,1))')==1)
+assert(near(-0.5*kernel,squeeze(EEGsim2.unfold.beta_dc(1,find(EEGsim2.unfold.times==0):find(EEGsim2.unfold.times==0)+14,2))')==1)

@@ -20,7 +20,7 @@ if ~exist('eeg_checkset','file')
     try
         eeglab redraw
     catch
-        warning('%s():EEGLAB could not be found in your path. You should be fine EXCEPT for using uf_epoch (for massive univariate modeling without overlap correction) which requires EEGLAB.\n',mfilename)
+        warning('%s(): EEGLAB could not be found in your path. Please add it to your path. Otherwise, you should be fine EXCEPT if you want to use uf_epoch() (for massive univariate modeling without overlap correction) which requires EEGLAB.\n',mfilename)
         addpath(fullfile(projectFolder,'lib','eeglab'))
     end
 end

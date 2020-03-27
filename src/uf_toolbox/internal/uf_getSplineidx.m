@@ -19,9 +19,11 @@ function [splIdxListAll,paramList] = uf_getSplineidx(EEG)
 
 assert(isfield(EEG,'unfold')&&isfield(EEG.unfold,'splines'),'could not find EEG.unfold.splines')
 
-numParam = size(EEG.unfold.X,2);
+% numParam = size(EEG.unfold.X,2);
+paramList= find(cellfun(@(x)~all(isnan(x)),EEG.unfold.variabletypes));
+paramList = find(ismember(EEG.unfold.cols2variablenames,paramList));
+
 splIdxListAll = [];
-paramList = 1:numParam;
 
 
 splineVar = find(strcmp(EEG.unfold.variabletypes,'spline'));

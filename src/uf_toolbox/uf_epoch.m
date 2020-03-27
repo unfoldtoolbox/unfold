@@ -1,4 +1,4 @@
-function EEG_epoch = uf_epoch(EEG,varargin)
+function [EEG_epoch,keepIX]= uf_epoch(EEG,varargin)
 %% Epoch the data according to the unfold structure
 % Deconvolution works on continuous data, thus to compare it to the
 % "normal" use-case, we have to epoch it. Because the data has not been
@@ -90,6 +90,7 @@ EEG_epoch             = eeg_checkset(EEG_epoch,'eventconsistency'); % needed to 
 eventType = [EEG.unfold.eventtypes{:}];
 eventType = eventType(~cellfun(@(x)isnan(x(1)),eventType));
 convertIND = find(ismember({EEG.event(:).type},eventType));
-EEG_epoch.unfold.X = EEG_epoch.unfold.X(convertIND(event_ind),:);
+keepIX = convertIND(event_ind);
+EEG_epoch.unfold.X = EEG_epoch.unfold.X(keepIX,:);
 
-EEG_epoch.urevent = EEG.urevent(event_ind);
+EEG_epoch.urevent = EEG.urevent(keepIX);

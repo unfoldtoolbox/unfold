@@ -6,7 +6,7 @@ function [EEG, eventwise] = uf_continuousArtifactExclude(EEG,varargin)
 % therefore ignored in the modeling process
 %
 %Arguments:
-%   cfg.winrej (integer): A (2xn) array with n from-to pairs of samples to
+%   cfg.winrej (integer): A (nx2) array with n from-to pairs of samples to
 %   be excluded from further processing This is the same output as from
 %   EEGlabs' eegplot rej
 %
@@ -23,7 +23,7 @@ function [EEG, eventwise] = uf_continuousArtifactExclude(EEG,varargin)
 % uf_continuousArtifactDetect() ):
 %| cfgReject = [];
 %| cfgReject.winrej = [10,50; 100,120; 300,310];
-%| EEG = uf_artefactRemoveDesignmat(cfgReject,EEG)
+%| EEG = uf_continuousArtifactExclude(cfgReject,EEG)
 
 
 cfg = finputcheck(varargin,...
@@ -34,7 +34,7 @@ if(ischar(cfg)); error(cfg);end
 rej = [];
 
 cfg.winrej = round(cfg.winrej);
-
+assert(isfield(EEG.unfold,'times'),'Error: EEG.unfold.times not found, you might not have timeexpanded the designmatrix using uf_timeexpand')
 times = EEG.unfold.times;
 
 eventlat = [EEG.event.latency];
