@@ -112,10 +112,10 @@ ufresult_avg = uf_condense(ufresult); % re-genererate, (without "evaluated" pred
 
 
 % Calculate marginal effect
-if strcmp(cfg.marginal,'MEM')
+if strcmp(cfg.type,'MEM')
     fprintf('Calculating marginal effect at the mean of each spline/continuous predictor.\n');
     ufresult_avg = uf_predictContinuous(ufresult_avg,'auto_method','average');
-elseif strcmp(cfg.marginal,'AME')
+elseif strcmp(cfg.type,'AME')
     fprintf('Calculating average marginal effect of each spline/continuous predictor.\n');
     % Calculate the average mean marginal effect of each spline predictor.
     if ~isempty(ufresult_avg.unfold.splines)
