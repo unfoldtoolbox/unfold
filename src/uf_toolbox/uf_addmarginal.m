@@ -23,7 +23,7 @@ function ufresult = uf_addmarginal(ufresult,varargin)
 %   cfg.betaSetname  ("beta" = deconvolution model) string that indicates which unfold.(field) to use 
 %                    (i.e. ufresult.beta for deconvolution vs. ufresult.beta_nodc for a massive univariate model)
 %   cfg.type ("MEM" or "AME") calculate marginal effect at the mean (MEM) or average
-%                    marginal effect (AME) of each spline/continuous predictor. "AME" default option.
+%                    marginal effect (AME) of each spline/continuous predictor. "MEM" default option.
 %
 % Example
 % For instance the model 1 + cat(facA) + continuousB
