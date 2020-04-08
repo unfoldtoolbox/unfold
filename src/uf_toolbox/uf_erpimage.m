@@ -368,6 +368,7 @@ else
 %     [sort_vector,~] = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],cfg.split_by); % output in ms
     evt_tmp = {EEG_out.urevent.(cfg.split_by)};
     evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
+    evt = cellfun(@num2str,evt,'UniformOutput',0) % fixed by Nicolas Langer
     
     splitlevel = unique(evt);
     n_splits = length(splitlevel);
