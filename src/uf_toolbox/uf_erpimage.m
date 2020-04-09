@@ -4,7 +4,8 @@ function [varargout] = uf_erpimage(EEG,varargin)
 %
 %Arguments:
 % Mandatory
-%  cfg.channel (integer):   Which channel(s) should the erpimage be plotted of?
+%  cfg.channel (integer):   Which channel(s) should the erpimage be plotted of? If 
+%                           there are multiple channels specified, takes the mean.
 %
 % Specify to-be-plotted data
 %  cfg.method(string): default 'deconv'.
