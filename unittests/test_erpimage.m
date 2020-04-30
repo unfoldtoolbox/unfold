@@ -3,7 +3,7 @@ testCase = [15];
 
 EEGsim = simulate_test_case(testCase,'noise',1,'basis','posneg','srate',50,'datalength',10*60);
 %EEGsim.event({EEGsim.event.type} == "stimulusB") = []
-
+EEGsim.data(2,:) = EEGsim.data(1,:);
 cfgDesign = [];
 
 
@@ -17,7 +17,8 @@ cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulu
 uf = uf_designmat(EEGsim,cfgDesign);
 uf = uf_timeexpandDesignmat(uf,'timelimits',[-.3 5.5]);
 uf = uf_glmfit(uf);
-ufres = uf_condense(uf);
+
+
 
 try
     uf_erpimage(uf) % check for required fields
@@ -31,23 +32,25 @@ try
 catch
 end
 %% default call
-uf_erpimage(uf,'channel',1)
+
+uf_erpimage(uf,'channel',[1,2]);
 %% Check types
 figure
-subplot(3,1,1),uf_erpimage(uf,'channel',1,'type','residual'),title('residual')
-subplot(3,1,2),uf_erpimage(uf,'channel',1,'type','modelled'),title('modelled')
-subplot(3,1,3),uf_erpimage(uf,'channel',1,'type','raw'),title('raw')
+subplot(3,1,1),uf_erpimage(uf,'channel',[1,2],'type','residual','figure',0),title('residual')
+subplot(3,1,2),uf_erpimage(uf,'channel',[1,2],'type','modelled','figure',0),title('modelled')
+subplot(3,1,3),uf_erpimage(uf,'channel',[1,2],'type','raw','figure',0),title('raw')
 %%
 figure
-subplot(3,1,1),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',0),title('addResiduals = 0')
-subplot(3,1,2),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',1),title('addResiduals = 1')
-subplot(3,1,3),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',2),title('addResiduals = 2')
+subplot(3,1,1),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',0,'figure',0),title('addResiduals = 0')
+subplot(3,1,2),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',1,'figure',0),title('addResiduals = 1')
+subplot(3,1,3),uf_erpimage(uf,'channel',1,'overlap',0,'addResiduals',2,'figure',0),title('addResiduals = 2')
 
 %%
 figure
 plotList = [1,6,7,8,2,10,3, 11,4,12];
 cfgPlot = [];
-cfgPlot.channel=1;
+cfgPlot.channel=[1,2];
+cfgPlot.figure = 0;
 cfgPlot.alignto = 'stimulus2';
 cfgPlot.sort_alignto = {'stimulus2'};
 cfgPlot.sort_direction = 'forward';
@@ -65,6 +68,7 @@ uf_erpimage(uf,cfgPlot)
 figure
 plotList = [1,6,7,8,2,10,3, 11,4,12];
 cfgPlot = [];
+cfgPlot.figure = 1;
 cfgPlot.channel=1;
 cfgPlot.alignto = 'stimulus2';
 cfgPlot.sort_alignto = {'stimulus3'};
