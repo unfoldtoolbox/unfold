@@ -4,7 +4,8 @@ function [varargout] = uf_erpimage(EEG,varargin)
 %
 %Arguments:
 % Mandatory
-%  cfg.channel (integer):   Which channel(s) should the erpimage be plotted of?
+%  cfg.channel (integer):   Which channel(s) should the erpimage be plotted of? If 
+%                           there are multiple channels specified, takes the mean.
 %
 % Specify to-be-plotted data
 %  cfg.method(string): default 'deconv'.
@@ -86,7 +87,7 @@ function [varargout] = uf_erpimage(EEG,varargin)
 %  cfg.split_by (string):   default []. Use subplots to split the
 %                       erpimage by a categorical variable. Directly uses
 %                       EEG.event.(cfg.split_by)
-%  cfg.figure (integer):   default: 0, plot into a new figure?
+%  cfg.figure (integer):   default: 1, plot into a new figure?
 %  cfg.caxis (2 integer):   Specify caxis, by default let eeglab decide
 
 %
@@ -149,7 +150,7 @@ cfg = finputcheck(input,...
     'plot','boolean',[],n_argout_caller==0;     % if called without requesting output,
     'timelimits','real',[],[]; %from when to when
     'channel','integer',1:size(EEG.data,1),[];
-    'figure','boolean',[],0;
+    'figure','boolean',[],1;
     'caxis','real',[],[];
     },'mode','error');
 
@@ -368,6 +369,7 @@ else
 %     [sort_vector,~] = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],cfg.split_by); % output in ms
     evt_tmp = {EEG_out.urevent.(cfg.split_by)};
     evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
+    evt = cellfun(@num2str,evt,'UniformOutput',0) % fixed by Nicolas Langer
     
     splitlevel = unique(evt);
     n_splits = length(splitlevel);

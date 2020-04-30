@@ -1,4 +1,4 @@
-Non-Linear Predictors using splines
+Analysis from the PeerJ paper
 ====================================
 .. raw:: html
 
