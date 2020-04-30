@@ -38,6 +38,6 @@ contrast(2,uf.unfold.times<1 & uf.unfold.times>-1,2) = 1;
 contrast(3,uf.unfold.times>3,1) = 1;
 contrast(3,uf.unfold.times>3,2) = 1;
 
-se = uf_se(uf,'channel',[1],'contrast',contrast);
+se = uf_se(uf,'channels',[1],'contrast',contrast);
 
 

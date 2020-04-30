@@ -1,7 +1,7 @@
 function se = uf_se(EEG,varargin)
 cfg = finputcheck(varargin,...
     {...
-    'channel','real',1:size(EEG.data,1),[];
+    'channels','real',1:size(EEG.data,1),[]; % combine these channels
     'restrictResidualToModelled','boolean',[],true; % calculate residuals only where something is modelled, or over all samples (including breaks etc.)
     'contrast','real','',[]; % whether to use raw data
     
@@ -30,7 +30,7 @@ end
 Xdc = EEG.unfold.Xdc(ix,:);
 
 % Calculate residual variance
-residualVar = var(mean(EEG.data(cfg.channel,ix),1)' - Xdc*mean(EEG.unfold.beta_dc(cfg.channel,:),1)');
+residualVar = var(mean(EEG.data(cfg.channels,ix),1)' - Xdc*mean(EEG.unfold.beta_dc(cfg.channels,:),1)');
 warning('Autocorrelation was NOT taken into account. Therefore SE are UNRELIABLE. Use at your own discretion')
 
 % Hat matrix
