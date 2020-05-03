@@ -1,7 +1,7 @@
 function se = uf_se(EEG,varargin)
 cfg = finputcheck(varargin,...
     {...
-    'channels','real',1:size(EEG.data,1),[]; % combine these channels
+    'channels','real',[1,size(EEG.data,1)],[]; % combine these channels
     'restrictResidualToModelled','boolean',[],true; % calculate residuals only where something is modelled, or over all samples (including breaks etc.)
     'contrast','real','',[]; % whether to use raw data
     
@@ -34,7 +34,11 @@ residualVar = var(mean(EEG.data(cfg.channels,ix),1)' - Xdc*mean(EEG.unfold.beta_
 warning('Autocorrelation was NOT taken into account. Therefore SE are UNRELIABLE. Use at your own discretion')
 
 % Hat matrix
-hat = full(inv(Xdc'*Xdc)) .* residualVar;
+tic
+XtX = Xdc'*Xdc;
+toc
+hat = full(inv(XtX)) .* residualVar;
+toc
 
 % apply contrast and convert from Variance to SD
 se = sqrt(diag(cfg.contrast(:,:)*hat*cfg.contrast(:,:)'));
