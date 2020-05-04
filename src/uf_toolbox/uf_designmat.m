@@ -550,7 +550,10 @@ EEG.unfold.X = X;
 % We want intercept = 0,continuos = 1, categorical = 2, interaction=3 and spline = 4, then add one and
 % index the labels
 
-varType = [double(is_categorical(1:end-1)) repmat(2,1,sum(is_interaction))] + 1; %the last categorical one is the fake 'y~',
+% Bug #97, interaction was counted multiple times
+n_interactions = sum(length(unique(cols2variablenames(is_interaction))));
+
+varType = [double(is_categorical(1:end-1)) repmat(2,1,n_interactions)] + 1; %the last categorical one is the fake 'y~',
 if has_intercept
     varType = [0 varType];
 end

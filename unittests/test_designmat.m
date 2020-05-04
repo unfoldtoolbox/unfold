@@ -184,6 +184,43 @@ correct  = {'(Intercept)'   , 'condRandom_2', 'condRandom_3', 'continuousA' , 'c
 shouldBeFunction(EEGtest,correct,'colnames');
 correct =     {'(Intercept)','condRandom','continuousA','condRandom:continuousA' ,'2_(Intercept)','2_condRandom' ,'2_continuousA','2_condRandom:2_continuousA'};
 shouldBeFunction(EEGtest,correct,'variablenames');
+
+
+%% Bug #97 three level categorical x 2 level categorical
+EEGtest = EEGsim;
+for e = 1:length(EEGtest.event)
+    EEGtest.event(e).cond3 = randi(3,1);
+    EEGtest.event(e).cond2 = randi(2,1);
+    EEGtest.event(e).cond4 = randi(4,1);
+    EEGtest.event(e).cond5 = randi(5,1);
+end
+cfgDesign = [];
+
+cfgDesign.coding = 'reference';
+cfgDesign.formula   = {'y~1+cat(cond3)*cat(cond2)'};
+cfgDesign.eventtypes = {'stimulus2'};
+
+EEGtest = uf_designmat(EEGtest,cfgDesign);
+
+assert(length(EEGtest.unfold.variabletypes)==4)
+assert(length(EEGtest.unfold.variablenames)==4)
+assert(length(EEGtest.unfold.colnames)==6)
+
+
+% test same thing with three interactions
+cfgDesign = [];
+
+cfgDesign.coding = 'reference';
+cfgDesign.formula   = {'y~1+cat(cond3)*cat(cond2)*cat(cond4)'};
+cfgDesign.eventtypes = {'stimulus2'};
+
+EEGtest = uf_designmat(EEGtest,cfgDesign);
+
+assert(length(EEGtest.unfold.variabletypes)==8)
+assert(length(EEGtest.unfold.variablenames)==8)
+assert(length(EEGtest.unfold.colnames)==24)
+
+
 end
 
 function shouldBeFunction(EEG,shouldBe,field)
