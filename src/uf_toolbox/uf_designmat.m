@@ -607,9 +607,7 @@ end
 % Designmat Checks
 subsetX = EEG.unfold.X(~all(isnan(EEG.unfold.X),2),:);
 if any(isnan(subsetX(:)))
-    warning('NaNs detected in designmat, try to impute them before fitting the model')
-    fprintf(['nans found in: ',EEG.unfold.colnames{any(isnan(subsetX))}])
-    fprintf('\n')
+    warning(sprintf(['NaNs detected in designmat, you should impute them before fitting the model\n nans found in: ',strjoin(EEG.unfold.colnames(any(isnan(subsetX))),' & ')]))
     
 end
 
