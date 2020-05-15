@@ -39,22 +39,25 @@ fprintf('\nCombining information from multiple artifact detection algorithms...'
 % parse input
 EEG_candidates = cellfun(@isstruct, varargin);
 winrej_candidates = cellfun(@(x) isnumeric(x) & size(x, 2) == 2, varargin);
+winrej_empty_candidates = cellfun(@(x) isnumeric(x) & isempty(x), varargin); % in case one of the algorithms did not detect any artifacts
 
 % check assumptions
-assert(all(EEG_candidates | winrej_candidates),...
+assert(all(EEG_candidates | winrej_candidates | winrej_empty_candidates),...
     'I don''t understand input nr. %i',...
-    find(~(EEG_candidates | winrej_candidates))) 
+    find(~(EEG_candidates | winrej_candidates | winrej_empty_candidates))) 
 assert(sum(EEG_candidates) == 1, 'Not sure which EEG structure to use');
-assert(sum(winrej_candidates) > 1, 'Not enough winrej arrays detected');
 winrejcheck = @(y) all(all(arrayfun(@(x) mod(x,1) == 0, y)));
 assert(all(cellfun(winrejcheck, varargin(winrej_candidates))),...
     'winrej arrays should only contain latencies in integer indeces');
+
+% if only one method detected artefacts, the function combines adjacent
+% segments. The excluded samples are the same.
 
 % print a message telling how many winrej arrays are combined
 fprintf('\nCombining information from %i algorithms.', sum(winrej_candidates));
 
 % combine info and sort by start latency
-combi_winrej = vertcat(varargin{winrej_candidates});
+combi_winrej = cat(1, varargin{winrej_candidates});
 combi_winrej = table2array(sortrows(array2table(combi_winrej), 'combi_winrej1'));
 
 % now find overlapping segments of artifactual data and combine them.
