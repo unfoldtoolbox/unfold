@@ -11,6 +11,7 @@ function uf_plotDesignmat(EEG,varargin)
 %   cfg.logColor(boolean): plot the color on logscale (default 0)
 %   cfg.sort(boolean): Sort the designmatrix (only possible for X, not Xdc)
 %   cfg.figure (1/0): Open a new figure (default 1)
+%   cfg.TOTALPLOTWIN_SEC (real): How many seconds to plot designmatrix (default: 60s)
 %
 %*Example:*
 % uf_plot_designmat(EEG)
@@ -23,6 +24,7 @@ cfg = finputcheck(varargin,...
     'logColor','boolean',[0,1],0;...
     'figure','boolean',[],1;...
     'sort','boolean',[0,1],0;...
+    'TOTALPLOTWIN_SEC','real',[],60;... % total width of default (maximum) plotting window (in sec.)
     'addContData','boolean',[0,1],0;... %undocumented, adds y-data as a subplot
     },'mode','error');
 if ischar(cfg)
@@ -61,8 +63,7 @@ if cfg.timeexpand
     
     % time_lim = EEG.times(ceil(end/2)) + [-100,100] * 1000;
     
-    TOTALPLOTWIN_SEC = 60; % total width of default (maximum) plotting window (in sec.)
-    time_lim    = midEventLat + round([-TOTALPLOTWIN_SEC/2,TOTALPLOTWIN_SEC/2])*1000;
+    time_lim    = midEventLat + round([-cfg.TOTALPLOTWIN_SEC/2,cfg.TOTALPLOTWIN_SEC/2])*1000;
     
     if min(EEG.times) > time_lim(1) || max(EEG.times) < time_lim(2)
         warning('the design-matrix is too large to display, we show only the middle 1000 seconds.') % THIS MSG SEEMS WRONG
