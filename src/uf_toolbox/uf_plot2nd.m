@@ -98,7 +98,9 @@ if cfg.singlesubjects
         for s = 1:size(d2nd.beta,4)
             d2nd2 = d2nd;
             d2nd2.beta = d2nd2.beta(:,:,:,s);
+            if isfield(d2nd,'beta_nodc')
             d2nd2.beta_nodc = d2nd2.beta_nodc(:,:,:,s);
+            end
             if s >1
                 cfg.gramm = g;
             end
@@ -121,7 +123,9 @@ if cfg.singlesubjects
 end
 d2nd2 = d2nd;
 d2nd2.beta = mean(d2nd2.beta(:,:,:,:),4);
+if isfield(d2nd,'beta_nodc')
 d2nd2.beta_nodc = mean(d2nd2.beta_nodc(:,:,:,:),4);
+end
 if length(d2nd2.unfold) >1
     d2nd2.unfold  = d2nd2.unfold(1);
 end
