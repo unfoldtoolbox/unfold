@@ -1,5 +1,5 @@
-function [winrej] = uf_continuousJointProbArtifactDetect(EEG, globthresh, locthresh, varargin)
-%winrej = UF_CONTINUOUSJOINTPROBARTIFACTDETECT(EEG, varargin)
+function [winrej] = uf_continuousJointProbArtifactDetect(EEG, varargin)
+%% winrej = UF_CONTINUOUSJOINTPROBARTIFACTDETECT(EEG, varargin)
 %
 %   Mark improbable data segments in continuous data. Intended for use with
 %   the unfold-toolbox (github.com/unfoldtoolbox/unfold). Can be used
@@ -13,6 +13,8 @@ function [winrej] = uf_continuousJointProbArtifactDetect(EEG, globthresh, locthr
 %      As this function works on continuous data, pseudo-segments of length
 %      <seglength> are created.
 %   2. Same as 1. but per channel, using <locthresh>.
+%
+%
 %
 %   Input:
 %     EEG:          continuous EEG dataset (EEGLAB's EEG structure)
@@ -51,90 +53,29 @@ function [winrej] = uf_continuousJointProbArtifactDetect(EEG, globthresh, locthr
 %     You should have received a copy of the GNU General Public License
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-% parse variable input
-p = inputParser;
-p.FunctionName = 'uf_continuousJointProbArtifactDetect';
-p.addRequired('EEG', @isstruct);
-p.addRequired('globthresh', @(x) isnumeric(x) && isscalar(x));
-p.addRequired('locthresh', @(x) isnumeric(x) && isscalar(x));
-p.addParameter('seglength', 0.5, @(x) isnumeric(x) && isscalar(x));
-p.addParameter('verbose', false, @islogical);
-p.addParameter('channels',':',...
-    @(x) (ischar(x) | islogical(x) | isnumeric(x) | iscell(x)));
-p.addParameter('plot', 0, @(x) islogical(x) || ismembc(x, [0,1]));
-parse(p, EEG, globthresh, locthresh, varargin{:})
-P = p.Results;
 
-%% parse channel input
-if strcmp(P.channels, ':')
-    P.channels = 1:length({EEG.chanlocs.labels});
-else
-    if all(size(P.channels) == 1)
-        if iscell(P.channels)
-            P.channels = cell2mat(P.channels);
-        end
-        switch class(P.channels)
-            case 'char' % regex/single channel label
-                chantype = 'regex';
-            case 'double' % single channel index
-                chantype = 'index';
-        end
-    else % logical, numeric indeces, label vector
-        % case cell vector
-        if iscell(P.channels)
-            %sanity check: all inputs the same class?
-            classes = cellfun(@metaclass, P.channels, 'UniformOutput', 0);
-            assert(all(strcmp(classes, classes{1})),...
-                'Please specify channels EITHER as numbers OR as labels!');
-            if strcmp(classes{1}, 'char')
-                chantype = 'labels';
-            elseif strcmp(classes{1}, 'logical')
-                P.channels = cell2mat(P.channels);
-                chantype = 'logindex';
-            elseif isnumeric(P.channels{1})
-                P.channels = cell2mat(P.channels);
-                if all(ismembc(P.channels, [0, 1]))
-                    chantype = 'logindex';
-                else
-                    chantype = 'index';
-                end
-            end
-        elseif isnumeric(P.channels) % case numeric vector
-            if all(ismembc(P.channels, [0, 1]))
-                chantype = 'logindex';
-            else
-                chantype = 'index';
-            end
-        elseif islogical(P.channels) % case logic indeces
-            chantype = 'logindex';
-        elseif ischar(P.channels)
-            chantype = 'regex';
-        end
-    end
-    
-    % pop_select can handle labels and indexes
-    % in case of regex, first convert that to a logical index
-    if strcmp(chantype, 'regex')
-        P.channels = ~cellfun(@isempty, regexp({EEG.chanlocs.labels},...
-            P.channels));
-    end
-    
-    % convert logical to indeces
-    if ismember(chantype, {'regex', 'logindex'})
-        P.channels = find(P.channels);
-    end
+cfg = finputcheck(varargin,...
+    {'globthresh',   'real', [], 3;...
+    'locthresh',     'real', [], 3;...
+    'robust_normalization','boolean',[],1;...
+    'seglength','real',[],0.5;...
+    'verbose','boolean',[],0;...
+    'channel','integer',[],[];...
+    'plot','boolean',[],1;
+    },'mode','error');
+if ischar(cfg)
+    error(cfg)
 end
-
+if isempty(cfg.channel)
+    cfg.channel = 1:size(EEG.data,1);
+end
 % show an erro if eye-tracking channels are included
-assert(~any(~cellfun(@isempty, regexp({EEG.chanlocs(P.channels).labels},...
+if isfield(EEG,'chanlocs') && ~isempty(EEG.chanlocs)
+    assert(~any(~cellfun(@isempty, regexp({EEG.chanlocs(cfg.channel).labels},...
     'Eye|Pupil|EYE'))),...
     ['Detected Eye-Tracking channels. Usually including them is not a',...
     ' very good idea as they scale very different.']);
-
-%% create a reduced set without eyetracking etc.
-fprintf(['\nuf_continuousJointProbArtifactDetect: the following changes '...
-    'are only done internally to detect artefactual latency ranges..\n'])
-JP_EEG = pop_select(EEG, 'channel', P.channels);
+end
 
 %% joint probability is calculated over segments of data, so we need to
 % create artificial epochs including the whole continuous data.
@@ -143,67 +84,91 @@ JP_EEG = pop_select(EEG, 'channel', P.channels);
 % harm joint probability.
 
 % some rare imprecisions in EEG.xmax lead to incomplete segmentation
-rounderr = (1 - JP_EEG.xmax / (JP_EEG.pnts / JP_EEG.srate));
+rounderr = (1 - EEG.xmax / (EEG.pnts / EEG.srate));
 
 % check if such an imprecision is present and if it's just one sampling
 % point. If so, simply correct that.
-if JP_EEG.xmax ~= JP_EEG.pnts / JP_EEG.srate &&...
-        round(rounderr * JP_EEG.pnts) <= 1
+if EEG.xmax ~= EEG.pnts / EEG.srate &&...
+        round(rounderr * EEG.pnts) <= 1
     fprintf('Correcting round-off error of %.6f seconds in EEG.xmax\n',...
         rounderr);
-    JP_EEG.xmax = JP_EEG.pnts/JP_EEG.srate;
+    EEG.xmax = EEG.pnts/EEG.srate;
 end
 
 % remove all event fields that aren't necessary for joint probability.
 % eeg_checkset in eeg_regepoch will otherwise take ages to make them
 % uniform and the temporary dataset will not be used after this script,
 % anyways.
-fnames = fieldnames(JP_EEG.event);
+fnames = fieldnames(EEG.event);
 fnames = fnames(~ismember(fnames, {'type', 'latency', 'epoch'}));
-JP_EEG.event = rmfield(JP_EEG.event, fnames);
+EEG.event = rmfield(EEG.event, fnames);
 
 disp('creating pseudo-epochs...');
 % this also creates pseudo events, which we later use to get the latencies
-if P.verbose
-    JP_EEG = eeg_regepochs(JP_EEG, 'recurrence', P.seglength,...
-        'rmbase', -P.seglength, 'limits', [0, P.seglength],...
+if cfg.verbose
+    EEGreg = eeg_regepochs(EEG, 'recurrence', cfg.seglength,...
+        'rmbase', -cfg.seglength, 'limits', [0, cfg.seglength],...
         'eventtype', 'JP_artificial');
 else
-    evalc(['JP_EEG = eeg_regepochs(JP_EEG, ''recurrence'', P.seglength,',...
-        '''rmbase'', -P.seglength, ''limits'', [0, P.seglength],',...
+    evalc(['EEGreg = eeg_regepochs(EEG, ''recurrence'', cfg.seglength,',...
+        '''rmbase'', -cfg.seglength, ''limits'', [0, cfg.seglength],',...
         '''eventtype'', ''JP_artificial'');']);
 end
+
 % check data
-assert(((JP_EEG.pnts * JP_EEG.trials) / EEG.pnts) == 1,...
+assert(((EEGreg.pnts * EEGreg.trials) / EEG.pnts) == 1,...
     'JP: segmented length of data does not equal continuous length!');
 
-%% run jointprob
-JP_EEG = pop_jointprob(JP_EEG, 1, 1:JP_EEG.nbchan, P.locthresh,...
-    P.globthresh, 1, 0, 1, [], P.plot);
 
+%% run jointprob
+%EEG = pop_jointprob(EEG, 1, 1:EEG.nbchan, P.locthresh,...
+%    P.globthresh, 1, 0, 1, [], P.plot);
+
+% taken from pop_jointprob
+
+% local
+[~,rejEtmp ] = jointprob( EEGreg.data(cfg.channel,:,:), cfg.locthresh,[], cfg.robust_normalization+1); % +1 because 0 = no-norm, 1 = norm, 2=trimmed norm
+
+% "global", i.e. concatenating over channels
+tmpdata2 = permute(EEGreg.data(cfg.channel,:,:), [3 1 2]);
+tmpdata2 = reshape(tmpdata2, size(tmpdata2,1), size(tmpdata2,2)*size(tmpdata2,3));
+[tmp,rejG ] = jointprob( tmpdata2, cfg.globthresh, [], cfg.robust_normalization+1); 
+
+rejE    = zeros(size(EEGreg.data,1), size(rejEtmp,2));
+rejE(cfg.channel,:) = rejEtmp;
+rej = rejG' | max(rejE, [], 1);
+
+
+if cfg.plot
+rejstatepoch( EEGreg.data(cfg.channel,:,:), rejEtmp, 'global', 'on', 'rejglob', rejG, ...
+						'threshold', cfg.locthresh, 'thresholdg', cfg.globthresh, 'normalize', 'on')
+end
 %% translate to winrej for uf_continuousArtifactExclude
 % for artifactual trials, identify the indeces of the artificial triggers created above
-badtrls = {JP_EEG.epoch(JP_EEG.reject.rejjp).eventtype};
+badtrls = {EEGreg.epoch(rej).eventtype};
 
 % by definition, we want the first and last match per "epoch"
 uridx = cellfun(@(x) quantile(find(strcmp(x, 'JP_artificial')), [0, 1]),...
     badtrls, 'UniformOutput', 0);
 
 % extract all urevents
-urevents = {JP_EEG.epoch(JP_EEG.reject.rejjp).eventurevent};
+urevents = {EEGreg.epoch(rej).eventurevent};
 
 % extract latencies
 winrej = zeros(length(uridx), 2);
 for ilat = 1: length(uridx)
     foo = [urevents{ilat}{uridx{ilat}}];
-    winrej(ilat, 1:2) = [JP_EEG.urevent(foo).latency];
+    winrej(ilat, 1:2) = [EEGreg.urevent(foo).latency];
 end
 
 % display results: (% should match what uf_continuousArtifactExclude says)
 dur = sum(winrej(:, 2) - winrej(:, 1));
+durE = sum(max(rejE, [], 1))*cfg.seglength*EEG.srate;
+durG = sum(rej)*cfg.seglength*EEG.srate;
+
 fprintf(['-----------------------------------------\n',...
-    'JointProbability: Marked %.2f seconds as artifactual ',...
-    '(%.2f%% of data)\n',...
-    '-----------------------------------------\n'], dur / JP_EEG.pnts,...
-    dur / EEG.pnts * 100);
+    'JointProbability: Marked %.2f seconds as artifactual (%.2f%% of data)\n'...
+    '%.2f seconds due to local alone, %.2f seconds due to global alone \n',...
+    '-----------------------------------------\n'], dur / EEGreg.srate,...
+    dur / EEG.pnts * 100,durE/EEGreg.srate,durG/EEGreg.srate);
 end
