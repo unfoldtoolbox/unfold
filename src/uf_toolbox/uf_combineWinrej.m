@@ -1,4 +1,4 @@
-function [combi_winrej] = uf_combine_winrej(varargin)
+function [combi_winrej] = uf_combineWinrej(varargin)
 %UF_COMBINE_WINREJ combines winrej arrays
 %
 %   This function can be used to combine the winrej arrays of multiple
@@ -45,7 +45,7 @@ winrej_empty_candidates = cellfun(@(x) isnumeric(x) & isempty(x), varargin); % i
 assert(all(EEG_candidates | winrej_candidates | winrej_empty_candidates),...
     'I don''t understand input nr. %i',...
     find(~(EEG_candidates | winrej_candidates | winrej_empty_candidates))) 
-assert(sum(EEG_candidates) == 1, 'Not sure which EEG structure to use');
+assert(sum(EEG_candidates) < 2, 'More than one EEG structure found');
 winrejcheck = @(y) all(all(arrayfun(@(x) mod(x,1) == 0, y)));
 assert(all(cellfun(winrejcheck, varargin(winrej_candidates))),...
     'winrej arrays should only contain latencies in integer indeces');
@@ -54,11 +54,11 @@ assert(all(cellfun(winrejcheck, varargin(winrej_candidates))),...
 % segments. The excluded samples are the same.
 
 % print a message telling how many winrej arrays are combined
-fprintf('\nCombining information from %i algorithms.', sum(winrej_candidates));
+fprintf('\nCombining information from %i algorithms. \n', sum(winrej_candidates));
 
 % combine info and sort by start latency
 combi_winrej = cat(1, varargin{winrej_candidates});
-combi_winrej = table2array(sortrows(array2table(combi_winrej), 'combi_winrej1'));
+combi_winrej = sortrows(combi_winrej);
 
 % now find overlapping segments of artifactual data and combine them.
 irow = 0;
