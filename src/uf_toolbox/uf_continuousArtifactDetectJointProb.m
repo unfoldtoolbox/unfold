@@ -1,4 +1,4 @@
-function [winrej] = uf_continuousJointProbArtifactDetect(EEG, varargin)
+function [winrej] = uf_continuousArtifactDetectJointProb(EEG, varargin)
 %% winrej = UF_CONTINUOUSJOINTPROBARTIFACTDETECT(EEG, varargin)
 %
 %   Mark improbable data segments in continuous data. Intended for use with
@@ -117,7 +117,9 @@ end
 
 % check data
 assert(((EEGreg.pnts * EEGreg.trials) / EEG.pnts) == 1,...
-    'JP: segmented length of data does not equal continuous length!');
+    sprintf(['JP: segmented length of data does not equal continuous length! \n'...
+    'You have to use multiples of your sampling rate (%f). \n E.g. for srate=256Hz'...
+    '[you could use 1 (because 256*1 = integer, or 256*0.25 = 64 = integer, but not 0.2*256=51.2, not an integer'],EEG.srate));
 
 
 %% run jointprob
