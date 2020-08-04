@@ -11,7 +11,7 @@ function uf_plotDesignmat(EEG,varargin)
 %   cfg.logColor(boolean): plot the color on logscale (default 0)
 %   cfg.sort(boolean): Sort the designmatrix (only possible for X, not Xdc)
 %   cfg.figure (1/0): Open a new figure (default 1)
-%   cfg.TOTALPLOTWIN_SEC (real): How many seconds to plot designmatrix (default: 60s)
+%   cfg.totalplotwin_sec (real): How many seconds to plot designmatrix (default: 60s)
 %
 %*Example:*
 % uf_plot_designmat(EEG)
@@ -24,7 +24,7 @@ cfg = finputcheck(varargin,...
     'logColor','boolean',[0,1],0;...
     'figure','boolean',[],1;...
     'sort','boolean',[0,1],0;...
-    'TOTALPLOTWIN_SEC','real',[],60;... % total width of default (maximum) plotting window (in sec.)
+    'totalplotwin_sec','real',[],60;... % total width of default (maximum) plotting window (in sec.)
     'addContData','boolean',[0,1],0;... %undocumented, adds y-data as a subplot
     },'mode','error');
 if ischar(cfg)
@@ -63,11 +63,8 @@ if cfg.timeexpand
     
     % time_lim = EEG.times(ceil(end/2)) + [-100,100] * 1000;
     
-    time_lim    = midEventLat + round([-cfg.TOTALPLOTWIN_SEC/2,cfg.TOTALPLOTWIN_SEC/2])*1000;
+    time_lim    = midEventLat + round([-cfg.totalplotwin_sec/2,cfg.totalplotwin_sec/2]*1000);
     
-    if min(EEG.times) > time_lim(1) || max(EEG.times) < time_lim(2)
-        warning('the design-matrix is too large to display, we show only the middle 1000 seconds.') % THIS MSG SEEMS WRONG
-    end
     time_ix = find(EEG.times > time_lim(1) & EEG.times < time_lim(2));
     yAxis = EEG.times(time_ix)/1000;
     X = EEG.unfold.Xdc(time_ix,:);
@@ -217,6 +214,7 @@ if cfg.timeexpand
         %ylim([latTmp(ceil(end/2))/1000-3 latTmp(ceil(end/2))/1000+3])
         ZOOMPLOTWIN_SEC = 3;
         ylim([midEventLat/1000-ZOOMPLOTWIN_SEC midEventLat/1000+ZOOMPLOTWIN_SEC])
+        fprintf("Zoomed in version (~%is) of designmatrix Xdc (truncated to middle %is). Use the 'hand'-tool to drag the plot up/down. \n",2*ZOOMPLOTWIN_SEC,cfg.totalplotwin_sec)
     end
     
 end
