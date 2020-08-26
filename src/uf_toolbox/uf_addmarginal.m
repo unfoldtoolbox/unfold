@@ -196,7 +196,10 @@ for e = uniqueParamEvents%unique(paramEvents)
     % multiple times, we can add the same marginal
 
     for p = unique(eventParamNames)
-        
+        if isempty(p) % happens if TRF is in the mix
+            fprintf("found an TRF, ignoring it")
+            continue
+        end
         % Find the names & types of the other parameters
         currEvent       = e_Idx(strcmp(p,eventParamNames));
         otherEvents     = setdiff(e_Idx,currEvent);
