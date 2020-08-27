@@ -110,7 +110,9 @@ paramNames        = {ufresult.param.name};
 fprintf('\nRe-running uf_condense() to recover unconverted splines\n')
 ufresult_avg = uf_condense(ufresult); % re-genererate, (without "evaluated" predictors)
 
-
+if ~isempty(setdiff(cfg.betaSetname,fieldnames(ufresult_avg)))
+    error('currently we do not support custom fieldnames in uf_addmarginal. The reason is that we have to get the values at the average via uf_condense which does not return it for the other values. You have to do this calculations manually')
+end
 % Calculate marginal effect
 if strcmp(cfg.type,'MEM')
     fprintf('Calculating marginal effect at the mean of each spline/continuous predictor.\n');
