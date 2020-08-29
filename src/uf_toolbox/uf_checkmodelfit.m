@@ -112,7 +112,7 @@ end
 %% partialR2
 % calculate partialR2 for variables (predictors)
 function partial_r2_table = partialR2(EEG,testData,testXdc,input)
-    
+
 cfg = finputcheck(input,...
         {'variablename','cell','',{}; % cell of variablename names {'varnameA','varnameB'}
         'channel','integer',[],1:size(EEG.data,1);
@@ -144,10 +144,10 @@ cfg = finputcheck(input,...
         EEG_ca = EEG;
         
         ix_k = Xdc_terms2variablenames == k;
-        EEG_ca.unfold.Xdc(:,ix_k) = [];
+        EEG_ca.unfold.Xdc(:,ix_k) = []; % 4000 columns left --> 16*250
         EEG_ca.unfold.Xdc_terms2cols(ix_k) = [];
         %     EEG_ca.unfold.eventtypes(k) = [];
-        EEG_ca.unfold.variablenames(k) = [];
+        EEG_ca.unfold.variablenames(k) = []; %7
         EEG_ca.unfold.cols2eventtypes(k) = [];
         EEG_ca.unfold.cols2variablenames(k) = [];
         % fit model again
@@ -157,7 +157,8 @@ cfg = finputcheck(input,...
         testXdc_ca = testXdc;
         testXdc_ca(:,ix_k) = [];
         
-        r2_ca = calc_r2(testData(cfg.channel,:,:),testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:));
+        r2_ca = calc_r2(testData,testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:)); % bug-fix by Olaf, 2020-08-29
+        %r2_ca = calc_r2(testData(cfg.channel,:,:),testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:));
         partial_r2(:,end+1) = r2_total-r2_ca;
         varNames{end+1} = EEG.unfold.variablenames{k};
     end
