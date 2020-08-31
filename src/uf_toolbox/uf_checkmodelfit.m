@@ -1,6 +1,6 @@
 function r2 = uf_checkmodelfit(EEG,varargin)
 % Function to compute R2, and partialR2 (in the future possibly AIC/BIC, but
-% normally assumption is wrong! Better to use CrossValR2, I guess)
+% normally assumption is very likely wrong. Probably better to use CrossVal directly)
 %
 % Important: RESIDUALS ARE ONLY CALCULATED WHERE THERE ARE ENTRIES IN
 % EEG.UNFOLD.XDC. thus _not_ in pauses/breaks/in-between trials etc.
@@ -91,7 +91,7 @@ switch cfg.method
         end
         
     case 'partialR2'
-        r2 = partialR2(EEG,EEG.data(cfg.channel,:),EEG.unfold.Xdc,varargin);
+        r2 = partialR2(EEG,EEG.data,EEG.unfold.Xdc,varargin);
         
     case 'R2'
         assert(isfield(EEG.unfold,'beta_dc'),'Missing field EEG.unfold.beta_dc. To obtain non-crossvalidated R2, please run uf_glmfit first manually')
@@ -120,7 +120,7 @@ cfg = finputcheck(input,...
     if ischar(cfg); error(cfg);end
 
     % compute overall R2 of model
-    r2_total = calc_r2(testData,testXdc, EEG.unfold.beta_dc(cfg.channel,:,:)); % r2partial = r2_total - r2_without
+    r2_total = calc_r2(testData(cfg.channel,:),testXdc, EEG.unfold.beta_dc(cfg.channel,:,:)); % r2partial = r2_total - r2_without
 
     Xdc_terms2variablenames = EEG.unfold.cols2variablenames(EEG.unfold.Xdc_terms2cols); % which "Xdc" columns belong to which variables?
     varNames = []; partial_r2 = [];
@@ -144,12 +144,13 @@ cfg = finputcheck(input,...
         EEG_ca = EEG;
         
         ix_k = Xdc_terms2variablenames == k;
-        EEG_ca.unfold.Xdc(:,ix_k) = []; % 4000 columns left --> 16*250
+        EEG_ca.unfold.Xdc(:,ix_k) = [];
         EEG_ca.unfold.Xdc_terms2cols(ix_k) = [];
-        %     EEG_ca.unfold.eventtypes(k) = [];
-        EEG_ca.unfold.variablenames(k) = []; %7
-        EEG_ca.unfold.cols2eventtypes(k) = [];
-        EEG_ca.unfold.cols2variablenames(k) = [];
+        EEG_ca.unfold.variablenames(k) = []; 
+        
+        cols_k = EEG_ca.unfold.cols2variablenames == k;
+        EEG_ca.unfold.cols2eventtypes(cols_k) = [];
+        EEG_ca.unfold.cols2variablenames(cols_k) = [];
         % fit model again
         EEG_ca = uf_glmfit(EEG_ca,'channel',cfg.channel); % debugging: betas of full model: 46*250*19
 
@@ -157,7 +158,7 @@ cfg = finputcheck(input,...
         testXdc_ca = testXdc;
         testXdc_ca(:,ix_k) = [];
         
-        r2_ca = calc_r2(testData,testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:)); % bug-fix by Olaf, 2020-08-29
+        r2_ca = calc_r2(testData(cfg.channel,:),testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:)); % bug-fix by Olaf, 2020-08-29
         %r2_ca = calc_r2(testData(cfg.channel,:,:),testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:));
         partial_r2(:,end+1) = r2_total-r2_ca;
         varNames{end+1} = EEG.unfold.variablenames{k};
@@ -166,7 +167,7 @@ cfg = finputcheck(input,...
     % collect partial R2 values
     partial_r2_table = [];
     for ch = 1:size(partial_r2,1)
-        partial_r2_t          = table(repmat(ch,size(partial_r2(ch,:)))',varNames',partial_r2(ch,:)','VariableNames',{'channel','variablenames','r2_ca'});
+        partial_r2_t          = table(repmat(cfg.channel(ch),size(partial_r2(ch,:)))',varNames',partial_r2(ch,:)','VariableNames',{'channel','variablenames','r2_ca'});
         partial_r2_t.r2_total = repmat(r2_total(ch),size(partial_r2_t,1),1);
         partial_r2_table = [partial_r2_table; partial_r2_t];
     end
