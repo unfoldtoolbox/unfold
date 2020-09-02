@@ -330,8 +330,20 @@ end
 end
 
 function [EEG_out,sort_vector] = get_sortvector(cfg,EEG_out)
-[keep_epoch]= ~isnan(eeg_getepochevent(EEG_out,cfg.alignto,[0,0],'type')); % output in ms
-assert(sum(keep_epoch)>0,'Did not find any events to align to in the epochs')
+[keep_epoch]= find(~isnan(eeg_getepochevent(EEG_out,cfg.alignto,[0,0],'type'))); % output in ms
+assert(~isempty(keep_epoch),'Did not find any events to align to in the epochs')
+% in very specific cases, it can happen that we have two different
+% eventtypes with exactly the same timing. Because we don't want to double
+% epochs, we remove one.
+urev = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],'urevent');
+urev = urev(keep_epoch);
+[~, I] = unique(urev, 'first');
+ix_remove = 1:length(urev);
+ix_remove(I) = [];
+if ~isempty(ix_remove)
+   warning('Generated two epochs that occured at the same time - will remove one. This should be happening only rarely.') 
+end
+keep_epoch(ix_remove) = [];
 EEG_out.data = EEG_out.data(:,:,keep_epoch);
 fprintf('Aligning erpimage to event %s, %i epochs found\n',strjoin(cfg.alignto,':'),sum(keep_epoch))
 
