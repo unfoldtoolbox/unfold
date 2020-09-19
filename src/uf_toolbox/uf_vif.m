@@ -1,4 +1,4 @@
-function vif = uf_vif(X)
+function vif = uf_vif(inp)
 % The VIF is the diagonal of the inverse of the correlation between
 % coefficients.
 % This Algorithm is taken from Belsley, D. A., E. Kuh, and R. E. Welsch. Regression Diagnostics. Hoboken, NJ: John Wiley & Sons, 1980.
@@ -19,6 +19,15 @@ function vif = uf_vif(X)
 % Algorithm to calculate initial 'corrx' taken from Matthew Gunn
 % https://stackoverflow.com/questions/32106370/corr-with-sparse-matrix-matlab/33904776#33904776
 
+
+% Input is either EEG, then by default EEG.unfold.X is checked, or you can
+% put in the Matrix directly (if you e.g. want to check EEG.unfold.Xdc)
+if isstruct(inp)
+    assert(isfield(inp,'unfold'),'couldnt find the EEG.unfold field')
+    X = inp.unfold.X;
+else
+    X = inp;
+end
 if size(X,2) > 30000
     warning('This function needs 3*n^2 bytes ram, so ~ %.1fGB for your matrix \n',size(X,2).^2*3/1024^3)
 end

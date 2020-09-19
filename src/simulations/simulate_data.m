@@ -67,7 +67,7 @@ end
                 case 'spline'
                     r = signals(variable).range;
                     X(variable) = rand(1)*(r(2)-r(1))+r(1);
-                    X(variable) = signals(variable).function(X(variable));
+                    %X(variable) = signals(variable).function(X(variable));
                 otherwise
                     error('unknown variable type: %s', signals(variable).type)
             end

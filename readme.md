@@ -5,9 +5,11 @@ A toolbox for deconvolution of overlapping EEG signals and (non)-linear modeling
 * Linear deconvolution
 * Model specification using R-style formulas (EEG~1+face+age)
 * Programmed in a modular fashion
-* Regularization using glmnet
-* Spline-Regression
+* Spline regression 
+* Regularization (using glmnet)
 * Temporal basis functions (Fourier & Splines)
+* Estimate temporal response functions (TRFs) for time-continuous predictors
+* Cross-validation
 
 ### Installation
 ``` 
@@ -36,4 +38,4 @@ ax = uf_plotParam(ufresult,'channel',1);
 ### Citation
 Please cite as:
 
-Ehinger BV, Dimigen O: "Unfold: An integrated toolbox for overlap correction, non-linear modeling, and regression-based EEG analysis",  peerJ 2019, https://doi.org/10.1101/360156
+Ehinger BV, Dimigen O: "Unfold: An integrated toolbox for overlap correction, non-linear modeling, and regression-based EEG analysis",  peerJ 2019, https://doi.org/10.7717/peerj.7838

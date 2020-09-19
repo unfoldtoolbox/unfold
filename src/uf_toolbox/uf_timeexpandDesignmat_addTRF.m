@@ -22,7 +22,6 @@ function EEG = uf_timeexpandDesignmat_addTRF(EEG,varargin)
 %   * unfold.colnames (and others) added the cfg.name accordingly
 % keep the designmatrix sparse? Put to 0
 
-warning('EXPERIMENTAL FUNCTION - RISKY USAGE')
 cfg = finputcheck(varargin,...
     {
     'timelimits','integer',[],[];...

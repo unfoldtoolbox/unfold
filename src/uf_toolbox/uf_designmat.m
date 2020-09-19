@@ -506,7 +506,18 @@ if sum(is_interaction)>0
         end
     end
     % Also add the interaction to the variableName List
-    variablenames(end+1:(end+sum(is_interaction))) = colnames(is_interaction);
+    % Bug #76. Multi-level predictors got added multiple times to
+    % variablenames.
+    for intIx = unique(cols2variablenames(is_interaction))
+        % add it only once, but first generate the correct label
+        % e.g. finds for facA:facB: "facA", "facB"
+        interactionConstituents= find(terms(find(cols2variablenames==intIx,1),1:end-1));
+        % join them
+        name = strjoin(variablenames(interactionConstituents),':');
+        variablenames{end+1} = name;
+    end
+        
+
     variablenames(removeList) = [];
     is_categorical(removeList) = [];
 end
@@ -539,7 +550,10 @@ EEG.unfold.X = X;
 % We want intercept = 0,continuos = 1, categorical = 2, interaction=3 and spline = 4, then add one and
 % index the labels
 
-varType = [double(is_categorical(1:end-1)) repmat(2,1,sum(is_interaction))] + 1; %the last categorical one is the fake 'y~',
+% Bug #97, interaction was counted multiple times
+n_interactions = sum(length(unique(cols2variablenames(is_interaction))));
+
+varType = [double(is_categorical(1:end-1)) repmat(2,1,n_interactions)] + 1; %the last categorical one is the fake 'y~',
 if has_intercept
     varType = [0 varType];
 end
@@ -593,9 +607,7 @@ end
 % Designmat Checks
 subsetX = EEG.unfold.X(~all(isnan(EEG.unfold.X),2),:);
 if any(isnan(subsetX(:)))
-    warning('NaNs detected in designmat, try to impute them before fitting the model')
-    fprintf(['nans found in: ',EEG.unfold.colnames{any(isnan(subsetX))}])
-    fprintf('\n')
+    warning(sprintf(['NaNs detected in designmat, you should impute them before fitting the model\n nans found in: ',strjoin(EEG.unfold.colnames(any(isnan(subsetX))),' & ')]))
     
 end
 
@@ -668,7 +680,7 @@ for curridx = 1:length(currnames)
 %                 if ismember(j,EEG2.
                   % find all columns, could be more than variablenames because of
                   % dummy coding
-                  ix = c2var(ismember(c2var,curridx));
+                  ix = find(ismember(c2var,curridx));
                   for j = ix
                       % find the substring and replace it. Colnames could be longer
                       % than variablenames, i.e.

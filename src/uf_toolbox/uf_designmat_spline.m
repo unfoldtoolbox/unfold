@@ -100,11 +100,11 @@ if  strcmp(cfg.splinefunction,'cyclical')
         spl.paramValues = x;
         
     elseif isempty(cfg.knotsequence)
-        warning('You specified a cyclical predictor, but neither specified a knotsequence nor a lower/upper-bound. We will assume that the lower/upper bound is min/max of your predictor')
+        warning('You specified a cyclical predictor, but neither specified a knotsequence nor a lower/upper-bound. We will assume that the lower/upper bound is min/max of your predictor \n')
         
     end
     if isempty(cfg.knotsequence)
-        warning('You specified a cyclical predictor, but did not specify an explicit knotsequence. We will apply the splinespacing function (linear/quantile) on the parameter values to find the knotsequence')
+        fprintf('You specified a cyclical predictor, but did not specify an explicit knotsequence. We will apply the splinespacing function (linear/quantile) on the parameter values to find the knotsequence\n')
     end
 end
 

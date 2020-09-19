@@ -11,24 +11,24 @@
       :align: center
       :width: 30 %
 
-Unfold - EEG Deconvolution Toolbox
+Unfold 1.1 - EEG Deconvolution Toolbox
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 A toolbox for *deconvolution* of overlapping EEG (Pupil, LFP etc.) signals and *(non)-linear modeling*
 
 
 Reference Papers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-`Download our reference paper Ehinger & Dimigen 2018 from bioRxiv <https://www.biorxiv.org/content/early/2018/08/30/360156>`_ (accepted in peerJ).
+`Download our reference paper Ehinger & Dimigen 2019 <https://peerj.com/articles/7838/>`_ (peerJ).
 
 We recently published a new preprint on the analysis of Eyetracking/EEG data, with *unfold* playing a prominent role `Dimigen & Ehinger 2019 <https://www.biorxiv.org/content/10.1101/735530v1>`_
 
 
-If you use the toolbox, please cite us as: Ehinger BV & Dimigen O, *Unfold: An integrated toolbox for overlap correction, non-linear modeling, and regression-based EEG analysis*, bioRxiv, https://doi.org/10.1101/360156
+If you use the toolbox, please cite us as: Ehinger BV & Dimigen O, *Unfold: An integrated toolbox for overlap correction, non-linear modeling, and regression-based EEG analysis*, peerJ, https://peerj.com/articles/7838/
 
 Why deconvolution and non-linear modeling?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Find a `twitter thread explaining the general idea here <https://twitter.com/BenediktEhinger/status/1036553493191032832>`_
-or have a look at Figure 1 of `our paper <https://www.biorxiv.org/content/early/2018/08/30/360156>`_
+or have a look at Figure 1 of `our paper <https://peerj.com/articles/7838/>`_
 
 What can you do with *unfold*?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -39,6 +39,7 @@ What can you do with *unfold*?
 * Model **multiple events**, e.g. *Stimulus*, *Response* and *Fixation*
 * Use temporal basis functions (Fourier & Splines)
 * (Optional) **regularization** using glmnet
+* Temporal Response Functions (TRFs)
 
 Unmixed - Unfold addon for mixed Models
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -47,6 +48,7 @@ A new addon *unmixed*, allowing to use mixed models can be found in its alpha ve
 Requirements
 ^^^^^^^^^^^^^^^^^
 * MATLAB 2015a+
+* Statistics Toolbox
 * Continuous data in EEGLAB 12+ format
 * Unfold toolbox `Download it on GitHub <https://github.com/unfoldtoolbox/unfold/>`_
 
