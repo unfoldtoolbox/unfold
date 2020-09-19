@@ -50,10 +50,10 @@ end
 
 EEG = eeg_checkset(EEG);
 
-winrej_loc = uf_continuousJointProbArtifactDetect(EEG,'locthresh',3,'globthresh',3000);
-winrej_glob = uf_continuousJointProbArtifactDetect(EEG,'locthresh',30000,'globthresh',3);
+winrej_loc = uf_continuousArtifactDetectJointProb(EEG,'locthresh',3,'globthresh',3000);
+winrej_glob = uf_continuousArtifactDetectJointProb(EEG,'locthresh',30000,'globthresh',3);
 
-winrej= uf_continuousJointProbArtifactDetect(EEG,'locthresh',3,'globthresh',3);
+winrej= uf_continuousArtifactDetectJointProb(EEG,'locthresh',3,'globthresh',3);
 
 % combine the two separate measures
 winrej_combine = uf_combineWinrej(winrej_loc,winrej_glob);
@@ -62,9 +62,14 @@ winrej_fuse = uf_combineWinrej(winrej);
 % check that they are equal
 assert(all(winrej_combine(:) == winrej_fuse(:)))
 %% Some tests to check if optional arguments work
-winrej = uf_continuousJointProbArtifactDetect(EEG,'robust_normalization',0);
-winrej = uf_continuousJointProbArtifactDetect(EEG,'channel',2);
-winrej = uf_continuousJointProbArtifactDetect(EEG,'verbose',1);
+winrej = uf_continuousArtifactDetectJointProb(EEG,'robust_normalization',0);
+winrej = uf_continuousArtifactDetectJointProb(EEG,'channel',2);
+winrej = uf_continuousArtifactDetectJointProb(EEG,'verbose',1);
+
+%%
+
+winrej_asr = uf_continuousArtifactDetectASR(EEG);
+
 %% Visual Check
 % Visual check that the functions identify the massively obvious artefacts,
 % additional parts can potentially be identified as well
@@ -85,6 +90,10 @@ for k = 1:size(winrej_glob,1)
     set(h,'facealpha',0.3)
 end
 
+for k = 1:size(winrej_asr,1)
+    h = fill(winrej_asr(k,[1 1 2 2]),[-200 300 300 -200],'green');
+    set(h,'facealpha',0.3)
+end
 plot(EEG.data')
 
 %% Check uf_combineWinrej
