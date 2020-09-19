@@ -86,7 +86,9 @@ if isempty(cfg.betaSetname)
     % RECURSION ALERT!
     if length(betaSetname) > 1
         for b = betaSetname
-            ufresult_tmp    = uf_addmarginal(ufresult,'betaSetname',b{1});
+            cfg.betaSetname = b{1};
+            ufresult_tmp = uf_addmarginal(ufresult,cfg);
+            
             ufresult.(b{1}) = ufresult_tmp.(b{1});
         end
         return
