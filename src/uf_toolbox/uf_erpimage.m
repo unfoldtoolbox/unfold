@@ -101,6 +101,15 @@ function [varargout] = uf_erpimage(EEG,varargin)
 assert(isfield(EEG,'data'),'uf_erpimage needs the EEG file after uf_glmfit, before uf_condense')
 % assert(ismatrix(EEG.data)) % data have to be continuous
 
+if ~isfield(EEG.event,'urevent')
+    for e = 1:length(EEG.event)
+        EEG.event(e).urevent  = e;
+    end
+    if isfield(EEG,'urevent') && ~isempty(EEG.urevent)
+        error('found EEG.urevent, but not EEG.event.urevent, thus the two things were split up. Fix it by removing EEG.urevent (or setting to []) prior to calling this function')
+    end
+    EEG.urevent = EEG.event;
+end
 %% parse & check input
 [cfg,EEG_epoch,ufresult] = parse_input(EEG,varargin,nargout);
 %% calculate using remove/keep which betas to set to 0
