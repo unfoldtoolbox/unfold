@@ -2,6 +2,10 @@ function test_erpimage
 testCase = [15];
 
 EEGsim = simulate_test_case(testCase,'noise',1,'basis','posneg','srate',50,'datalength',10*60);
+for e = 1:length(EEGsim.event)
+    EEGsim.event(e).urevent  = e;
+end
+EEGsim.urevent = EEGsim.event;
 %EEGsim.event({EEGsim.event.type} == "stimulusB") = []
 EEGsim.data(2,:) = EEGsim.data(1,:);
 cfgDesign = [];
