@@ -64,7 +64,12 @@ switch cfg.method
         [train,test] = uf_cv_getFolds(EEG,'fold_event',cfg.fold_event);
         r2 = []; % in case of crossValpartialR2 this is necessary
         
-        fprintf('\nIdentified %i folds of the data (separated by event %s)',length(train),cfg.fold_event)
+        if iscell(cfg.fold_event)
+            foldeventNames = strjoin(cfg.fold_event);
+        else
+            foldeventNames = cfg.fold_event;
+        end
+        fprintf('\nIdentified %i folds of the data (separated by event %s)',length(train),foldeventNames)
         % for each fold
         for fold = 1:length(train)
             fprintf('\nModeling fold: %i',fold)
