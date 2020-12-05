@@ -42,6 +42,12 @@ cfg = finputcheck(varargin,...
 if(ischar(cfg)); error(cfg);end
 
 X = EEG.unfold.X;
+trfvariables= find(cellfun(@(x)isnan(x(1)),EEG.unfold.variabletypes));
+
+
+X = X(:,(~ismember(EEG.unfold.cols2variablenames,trfvariables)));
+
+
 if cfg.ica
     data = EEG.icaact;
 else
@@ -87,7 +93,7 @@ elseif strcmp(cfg.method,'matlab') % save time
 elseif strcmp(cfg.method,'glmnet')
     warning('time-basis function currently not implemented')
     %% GLMNET
-    beta = nan(size(EEG.data,1),size(data,2),size(X,2)+1); %plus one, because glmnet adds a intercept
+    beta = nan(size(EEG.data,1),size(data,2),size(X,2));
     
     
     for e = cfg.channel
@@ -95,17 +101,18 @@ elseif strcmp(cfg.method,'glmnet')
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         for time = 1:size(data,2)
             %glmnet needs double precision
-            fit = cvglmnet(X,(double(squeeze(data(e,time,:))')),'gaussian',struct('alpha',cfg.glmnetalpha));
+            fit = cvglmnet(X,(double(squeeze(data(e,time,:))')),'gaussian',struct('alpha',cfg.glmnetalpha,'intr',0));
             
             %find best cv-lambda coefficients
-            beta(e,time,:) = cvglmnetCoef(fit,'lambda_1se')';
+            tmp = cvglmnetCoef(fit,'lambda_1se');
+            beta(e,time,:) = tmp(2:end); % we have to remove the first element as it is the non-fitted intercept. confusing...
             
             
             
         end
-        fprintf('... took %.1fs',toc(t))
+        fprintf('... took %.1fs\n',toc(t))
     end
-    beta = beta([2:end 1],:,:); %put the dc-intercept last
+    %beta = beta([2:end 1],:,:); %put the dc-intercept last
     
     
 elseif strcmp(cfg.method,'lsmr')

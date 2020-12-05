@@ -92,7 +92,7 @@ if cfg.ica
 else
     assert(ndims(EEG.data) ==2,'EEG.data needs to be unconcatenated. Did you epoch your data already? We need continuous data for this fit')
 end
-assert(size(EEG.unfold.Xdc,1) == size(EEG.data,2),'Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.unfold.Xdc),size(EEG.data))
+assert(size(EEG.unfold.Xdc,1) == size(EEG.data,2),sprintf('Size of designmatrix (%d,%d), not compatible with EEG data(%d,%d)',size(EEG.unfold.Xdc),size(EEG.data)))
 if any(isnan(EEG.unfold.Xdc(:)))
     warning('NAN values found in Xdc designmatrix.  Maybe you need uf_imputeMissing?')
 end
@@ -151,8 +151,11 @@ elseif strcmp(cfg.method,'lsmr')
         
         % use iterative solver for least-squares problems (lsmr)
         [beta(:,e),ISTOP,ITN] = lsmr(X,double(data(e,:)'),[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
+
         if ISTOP == 7
-            warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations'])
+            warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations. You can either try to increase the number of iterations using the option ''lsmriterations'' or it might be, that your model is highly collinear and difficult to estimate. Check the designmatrix EEG.unfold.X for collinearity.'])
+        elseif ITN == cfg.lsmriterations
+            warning(['The iterative least squares (likely) did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations. You can either try to increase the number of iterations using the option ''lsmriterations'' or it might be, that your model is highly collinear and difficult to estimate. Check the designmatrix EEG.unfold.X for collinearity.'])
         end
         fprintf('... %i iterations, took %.1fs',ITN,toc(t))
         %beta(:,e) =
@@ -181,7 +184,7 @@ elseif strcmp(cfg.method,'par-lsmr')
         
         fprintf('\nsolving electrode %d (of %d electrodes in total)',e,length(cfg.channel))
         % use iterative solver for least-squares problems (lsmr)
-        [beta(:,e),ISTOP,ITN] = lsmr(parXdc.Value,parData.Value(:,e),[],10^-10,10^-10,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
+        [beta(:,e),ISTOP,ITN] = lsmr(parXdc.Value,parData.Value(:,e),[],10^-8,10^-8,[],cfg.lsmriterations); % ISTOP = reason why algorithm has terminated, ITN = iterations
         if ISTOP == 7
             warning(['The iterative least squares did not converge for channel ',num2str(e), ' after ' num2str(ITN) ' iterations. You can either try to increase the number of iterations using the option ''lsmriterations'' or it might be, that your model is highly collinear and difficult to estimate. Check the designmatrix EEG.unfold.X for collinearity.'])
         elseif ITN == cfg.lsmriterations

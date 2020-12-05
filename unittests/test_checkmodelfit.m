@@ -70,10 +70,28 @@ r2 = uf_checkmodelfit(EEG,'method','partialR2');
 assert(size(r2,1) == 6)
 r2_subset = uf_checkmodelfit(EEG,'method','partialR2','variablename',{'continuousA','continuousB'});
 assert(size(r2_subset,1) == 4)
+
+r2 = uf_checkmodelfit(EEG,'method','partialR2','channel',2);
+assert(all(r2.channel == 2)) %108 channel names not coming through
 %%
 cv_r2 = uf_checkmodelfit(EEG,'method','crossValpartialR2','fold_event',{'pause'});
 groupsummary(cv_r2,{'variablenames','channel'},{'median','std'},{'r2_ca'})
 r2 = uf_checkmodelfit(EEG,'method','crossValpartialR2','variablename',{'continuousA','continuousB'},'fold_event','pause');
 assert(length(unique(r2.variablenames))==2) % check variable selection
+%% bug 108 Splines not working with partialR2
+cfgDesign = [];
+cfgDesign.codingschema = 'reference';
+cfgDesign.formula   = {'y~1+spl(continuousA,10)+continuousB'};
+cfgDesign.eventtypes = {'stimulusA'};
+
+EEG = uf_designmat(EEG,cfgDesign);
+EEG = uf_timeexpandDesignmat(EEG,'timelimits',[0 1]);
+EEG = uf_glmfit(EEG);
+
+ufresult = uf_condense(EEG);
 %%
+r2 = uf_checkmodelfit(EEG,'method','partialR2','fold_event','pause','channel',1);
+assert(size(r2,1)==3)
+r2 = uf_checkmodelfit(EEG,'method','crossValpartialR2','fold_event','pause');
+assert(size(r2,1) == 2*3*10) % 2chan x 3 variables x 10 folds
 

@@ -86,7 +86,9 @@ if isempty(cfg.betaSetname)
     % RECURSION ALERT!
     if length(betaSetname) > 1
         for b = betaSetname
-            ufresult_tmp    = uf_addmarginal(ufresult,'betaSetname',b{1});
+            cfg.betaSetname = b{1};
+            ufresult_tmp = uf_addmarginal(ufresult,cfg);
+            
             ufresult.(b{1}) = ufresult_tmp.(b{1});
         end
         return
@@ -110,7 +112,9 @@ paramNames        = {ufresult.param.name};
 fprintf('\nRe-running uf_condense() to recover unconverted splines\n')
 ufresult_avg = uf_condense(ufresult); % re-genererate, (without "evaluated" predictors)
 
-
+if ~isempty(setdiff(cfg.betaSetname,fieldnames(ufresult_avg)))
+    error('currently we do not support custom fieldnames in uf_addmarginal. The reason is that we have to get the values at the average via uf_condense which does not return it for the other values. You have to do this calculations manually')
+end
 % Calculate marginal effect
 if strcmp(cfg.type,'MEM')
     fprintf('Calculating marginal effect at the mean of each spline/continuous predictor.\n');
@@ -196,7 +200,10 @@ for e = uniqueParamEvents%unique(paramEvents)
     % multiple times, we can add the same marginal
 
     for p = unique(eventParamNames)
-        
+        if isempty(p) % happens if TRF is in the mix
+            fprintf("found an TRF, ignoring it")
+            continue
+        end
         % Find the names & types of the other parameters
         currEvent       = e_Idx(strcmp(p,eventParamNames));
         otherEvents     = setdiff(e_Idx,currEvent);

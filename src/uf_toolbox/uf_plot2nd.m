@@ -29,6 +29,7 @@ cfg = finputcheck(varargin,...
     
     'plotParam','',[],[];
     'bootci','boolean',[],1;
+    'robust','boolean',[],1; % use 20% trimmed mean (default) or normal mean
     'singlesubjects','boolean',[],1;
     
     },[],'ignore');
@@ -57,18 +58,18 @@ if isempty(cfg.plotParam)
 else
     cfgPlot.plotParam = cfg.plotParam;
 end
+betaSetName = uf_unfoldbetaSetname(d2nd);
 
 if cfg.singlesubjects
     
     if ~cfg.withSpline
-        d2nd2 = d2nd;
         
-        d2nd2.param = repmat(d2nd2.param,1,size(d2nd.beta,4));
-        % d2nd2.unfold.X = ones(1,size(d2nd2.param,2));
-        if isfield(d2nd,'beta_nodc')
-            d2nd2.beta_nodc = d2nd2.beta_nodc(:,:,:);
+         d2nd2 = d2nd;
+        for bSet = betaSetName
+            d2nd2.(bSet{1}) = d2nd2.(bSet{1})(:,:,:);
         end
-        d2nd2.beta = d2nd2.beta(:,:,:);
+        d2nd2.param = repmat(d2nd2.param,1,size(d2nd.beta,4));
+        
         
         g = uf_plotParam(d2nd2,cfgPlot);
         
@@ -97,10 +98,12 @@ if cfg.singlesubjects
         
         for s = 1:size(d2nd.beta,4)
             d2nd2 = d2nd;
-            d2nd2.beta = d2nd2.beta(:,:,:,s);
-            d2nd2.beta_nodc = d2nd2.beta_nodc(:,:,:,s);
+            for bSet = betaSetName
+                d2nd2.(bSet{1}) = d2nd2.(bSet{1})(:,:,:,s);
+            end
+            
             if s >1
-                cfg.gramm = g;
+                cfgPlot.gramm = g;
             end
             g = uf_plotParam(d2nd2,cfgPlot);
         end
@@ -120,8 +123,17 @@ if cfg.singlesubjects
     cfgPlot.gramm = g;
 end
 d2nd2 = d2nd;
-d2nd2.beta = mean(d2nd2.beta(:,:,:,:),4);
-d2nd2.beta_nodc = mean(d2nd2.beta_nodc(:,:,:,:),4);
+
+for bSet = betaSetName
+    if cfg.robust
+        meanfun = @(x)trimmean(x,20,'round',4);
+    else
+        meanfun = @(x)mean(x,4);
+    end
+    d2nd2.(bSet{1}) = meanfun(d2nd2.(bSet{1}));
+end
+
+
 if length(d2nd2.unfold) >1
     d2nd2.unfold  = d2nd2.unfold(1);
 end

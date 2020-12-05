@@ -116,6 +116,7 @@ end
 betaNew = [];
 epochNew = ufresult.param(1); %needs to be removed
 
+trfevents= sum(cellfun(@(x)isnan(x(1)),ufresult.unfold.variabletypes));
 
 for currPred = 1:length(paramList)
     predIDX = paramList(currPred);
@@ -123,7 +124,7 @@ for currPred = 1:length(paramList)
     % if we are at the last predictor, this one goes to the end of the
     % designmatrix
     if currPred == length(paramList)
-        predIDX_next = size(ufresult.unfold.X,2);
+        predIDX_next = size(ufresult.unfold.X,2)-trfevents;
     else
         %else it goes to the next predictor
         predIDX_next = paramList(currPred+1)-1;
@@ -269,7 +270,7 @@ switch cfg.auto_method
     case 'quantile'
         %contValueSelect = quantile(predVal,linspace(0,1,cfg.auto_n));
         %contValueSelect = quantile(predVal,linspace(1/cfg.auto_n,1-1/cfg.auto_n,cfg.auto_n-1)); % VERSION OLAF
-        contValueSelect = quantile(predVal,linspace( 1/(cfg.auto_n+1), 1-1/(cfg.auto_n+1), cfg.auto_n)) % update Olaf
+        contValueSelect = quantile(predVal,linspace( 1/(cfg.auto_n+1), 1-1/(cfg.auto_n+1), cfg.auto_n)); % update Olaf
     case 'average'
         contValueSelect = nanmean(predVal);
 end

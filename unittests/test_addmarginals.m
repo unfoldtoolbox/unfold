@@ -137,5 +137,11 @@ x = uf_addmarginal(uf_predictContinuous(ufresult),'type','AME');
 %practical:
 assert(near(mean((([EEG.event.splineA])+0.5).^3),x.beta(:,6,1))==1);
 
+%% Bug where settings were not transported to recursive call of betaSetname
+ufresult.beta_nodc = ufresult.beta;
+ufresult.unfold.beta_nodc = ufresult.unfold.beta_dc;
+x_mem = uf_addmarginal(uf_predictContinuous(ufresult),'type','MEM');
+x_ame = uf_addmarginal(uf_predictContinuous(ufresult),'type','AME');
+assert(~all(x_mem.beta(:) == x_ame.beta(:)))
 end
 
