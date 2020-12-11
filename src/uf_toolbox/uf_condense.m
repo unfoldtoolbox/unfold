@@ -104,11 +104,16 @@ type = name;
 
 loopRunner = 1;
 %% go trough all parameters in parameterList
+if~cfg.deconv
+    % calculate only once
+    inv_timebasis = pinv(EEG.unfold.timebasis);
+end
+
 for pred = paramList
     if cfg.deconv
         signal(:,:,loopRunner) = EEG.unfold.beta_dc(cfg.channel,:,pred)*EEG.unfold.timebasis;
     else
-        signal(:,:,loopRunner) = EEG.unfold.beta_nodc(cfg.channel,:,pred)*pinv(EEG.unfold.timebasis)';
+        signal(:,:,loopRunner) = EEG.unfold.beta_nodc(cfg.channel,:,pred)*inv_timebasis';
     end
     
     % change name incase of spline and no conversion
