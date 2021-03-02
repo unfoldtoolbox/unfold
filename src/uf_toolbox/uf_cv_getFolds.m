@@ -1,3 +1,5 @@
+% produce folds of the data for the purpose of cross-validation
+% see also: uf_checkmodelfit()
 function [train,test] = uf_cv_getFolds(EEG,varargin)
 
 cfg = finputcheck(varargin,...
@@ -34,8 +36,7 @@ if ~cfg.allowOverlap
     assert(all(any(EEG.unfold.Xdc(round(lat),:),2)==0),'Error: The folding events have modelled overlap')
 end
 
-
-% for each fold
+% go trough the folds
 for fold = 1:(length(lat)-1)
     
     % select test & train time-ix
@@ -49,7 +50,6 @@ for fold = 1:(length(lat)-1)
     Xdc_train(test_ix,:) = 0;
     
     % check that there are any left in the fold
-    
     try
         assert(any(any(Xdc_train,2)));
         assert(any(any(Xdc_test,2)));
@@ -62,5 +62,4 @@ for fold = 1:(length(lat)-1)
     
     test(fold).ix = test_ix;
     train(fold).ix = train_ix;
-    
 end

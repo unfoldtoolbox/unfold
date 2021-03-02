@@ -4,7 +4,7 @@ function [betaSetName] = uf_unfoldbetaSetname(ufresult,varargin)
 
 % parse inputs
 cfg = finputcheck(varargin,...
-    {'deconv','integer',[0,1,-1],-1, ... % -1 is autodetect
+    {'deconv','integer',[0,1,-1],-1; ... % -1 is autodetect
     'dataField','string','',''...
     },'mode','ignore');
 
@@ -14,11 +14,13 @@ betaSetName   = [];
 if cfg.deconv == -1
 
     % autodetect 
-    assert(isfield(ufresult,'beta') | isfield(ufresult,'beta_nodc'),'Error: to use autodetect at least the field ufresult.beta or ufresult.beta_nodc needs to exist')
+    assert(~isempty(cfg.dataField) || isfield(ufresult,'beta') || isfield(ufresult,'beta_nodc'),'Error: to use autodetect at least the field ufresult.beta or ufresult.beta_nodc needs to exist')
     fn = fieldnames(ufresult);
     
     % get size of betas
-    if isfield(ufresult,'beta')
+    if ~isempty(cfg.dataField)
+        sizeBeta = size(ufresult.(cfg.dataField));
+    elseif isfield(ufresult,'beta')
         sizeBeta = size(ufresult.beta);
     else
         sizeBeta = size(ufresult.beta_nodc);

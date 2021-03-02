@@ -4,7 +4,8 @@ function [varargout] = uf_erpimage(EEG,varargin)
 %
 %Arguments:
 % Mandatory
-%  cfg.channel (integer):   Which channel(s) should the erpimage be plotted of?
+%  cfg.channel (integer):   Which channel(s) should the erpimage be plotted of? If 
+%                           there are multiple channels specified, takes the mean.
 %
 % Specify to-be-plotted data
 %  cfg.method(string): default 'deconv'.
@@ -100,6 +101,15 @@ function [varargout] = uf_erpimage(EEG,varargin)
 assert(isfield(EEG,'data'),'uf_erpimage needs the EEG file after uf_glmfit, before uf_condense')
 % assert(ismatrix(EEG.data)) % data have to be continuous
 
+if ~isfield(EEG.event,'urevent')
+    for e = 1:length(EEG.event)
+        EEG.event(e).urevent  = e;
+    end
+    if isfield(EEG,'urevent') && ~isempty(EEG.urevent)
+        error('found EEG.urevent, but not EEG.event.urevent, thus the two things were split up. Fix it by removing EEG.urevent (or setting to []) prior to calling this function')
+    end
+    EEG.urevent = EEG.event;
+end
 %% parse & check input
 [cfg,EEG_epoch,ufresult] = parse_input(EEG,varargin,nargout);
 %% calculate using remove/keep which betas to set to 0
@@ -329,8 +339,20 @@ end
 end
 
 function [EEG_out,sort_vector] = get_sortvector(cfg,EEG_out)
-[keep_epoch]= ~isnan(eeg_getepochevent(EEG_out,cfg.alignto,[0,0],'type')); % output in ms
-assert(sum(keep_epoch)>0,'Did not find any events to align to in the epochs')
+[keep_epoch]= find(~isnan(eeg_getepochevent(EEG_out,cfg.alignto,[0,0],'type'))); % output in ms
+assert(~isempty(keep_epoch),'Did not find any events to align to in the epochs')
+% in very specific cases, it can happen that we have two different
+% eventtypes with exactly the same timing. Because we don't want to double
+% epochs, we remove one.
+urev = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],'urevent');
+urev = urev(keep_epoch);
+[~, I] = unique(urev, 'first');
+ix_remove = 1:length(urev);
+ix_remove(I) = [];
+if ~isempty(ix_remove)
+   warning('Generated two epochs that occured at the same time - will remove one. This should be happening only rarely.') 
+end
+keep_epoch(ix_remove) = [];
 EEG_out.data = EEG_out.data(:,:,keep_epoch);
 fprintf('Aligning erpimage to event %s, %i epochs found\n',strjoin(cfg.alignto,':'),sum(keep_epoch))
 
@@ -368,6 +390,7 @@ else
 %     [sort_vector,~] = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],cfg.split_by); % output in ms
     evt_tmp = {EEG_out.urevent.(cfg.split_by)};
     evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
+    evt = cellfun(@num2str,evt,'UniformOutput',0) % fixed by Nicolas Langer
     
     splitlevel = unique(evt);
     n_splits = length(splitlevel);
