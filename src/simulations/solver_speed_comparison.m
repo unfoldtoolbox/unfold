@@ -14,7 +14,7 @@ EEGsim = uf_timeexpandDesignmat(EEGsim,'timelimits',[-0.5 0.5],'method','stick')
 %%
 
 tAll = table();
-for method = {'lsmr','lsqr','matlab'}
+for method = {'lsmr','lsqr','matlab','glmnet'}
    t1 = tic;
    
    EEGsolved = uf_glmfit(EEGsim,'method',method{1},'channel',[1:3]);
