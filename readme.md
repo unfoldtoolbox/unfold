@@ -27,8 +27,8 @@ run('init_unfold.m')
 Check out the [toolbox tutorials](https://www.unfoldtoolbox.org/toolboxtutorials.html) for more information!
 ```
 EEG = tutorial_simulate_data('2x2')
-EEG = uf_designmat('eventtypes',{'fixation'},'formula','y ~ 1+ cat(stimulusType)*cat(color)')
-EEG = uf_timeexpandDesignmat('timelimits',[-0.5 1])
+EEG = uf_designmat(EEG,'eventtypes',{'fixation'},'formula','y ~ 1+ cat(stimulusType)*cat(color)')
+EEG = uf_timeexpandDesignmat(EEG,'timelimits',[-0.5 1])
 EEG = uf_glmfit(EEG)
 % (strictly speaking optional, but recommended)
 ufresult = uf_condense(EEG)
