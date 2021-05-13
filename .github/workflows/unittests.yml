@@ -19,4 +19,4 @@ jobs:
       - name: Run Tests (for now manually)
         uses: matlab-actions/run-command@v0
         with:
-          command: addpath('lib/eeglab_git');init_unfold;addpath('unittests');run('uf_tests.m')
+          command: addpath('lib/eeglab_git');init_unfold;plugin_askinstall('clean_rawdata','clean_data',1);addpath('unittests');run('uf_tests.m')
