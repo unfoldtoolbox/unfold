@@ -170,7 +170,8 @@ if cfg.timeexpand
             
             [un,~,c] = unique(allTypes(latix));
             makeGray = ~ismember(un,modeledEvents);
-            colorList = cbrewer('qual','Set1',max(length(un),3));
+            %colorList = cbrewer('qual','Set1',max(length(un),3));
+            colorList = cbrewer('qual','Dark2',max(length(un),3));
             legendlist = {};
             for ev = 1:length(un)
                 eventlat = lat(latix(c==ev))/1000;
@@ -178,11 +179,11 @@ if cfg.timeexpand
                     continue
                 end
                 if ismember(ev,find(makeGray))
-                    col = [0.9 0.9 0.9];
+                    col = [0.8 0.8 0.8];
                 else
                     col = colorList(ev,:);
                 end
-                lineProp = {'color',col};
+                lineProp = {'color',col,'linewidth',0.7}; % otherwise lines hard to see
                 if length(eventlat) > 1
                     lineProp = repmat({lineProp},length(eventlat),1);
                 end
@@ -204,17 +205,16 @@ if cfg.timeexpand
             end
             legend([legendlist{:,3}],[legendlist(:,1)])
         else
-            warning('more than 1000 events found in the restricted timeframe, this makes matlab crash and we are not plotting them')
+            warning('more than 1000 events found in the restricted timeframe, this makes Matlab crash and we are not plotting them')
         end
         
-        
-        
+                
         % change ylim to zoom in to the event that is in middle of cut data
         %latTmp = lat(latix);
         %ylim([latTmp(ceil(end/2))/1000-3 latTmp(ceil(end/2))/1000+3])
         ZOOMPLOTWIN_SEC = 3;
         ylim([midEventLat/1000-ZOOMPLOTWIN_SEC midEventLat/1000+ZOOMPLOTWIN_SEC])
-        fprintf("Zoomed in version (~%is) of designmatrix Xdc (truncated to middle %is). Use the 'hand'-tool to drag the plot up/down. \n",2*ZOOMPLOTWIN_SEC,cfg.totalplotwin_sec)
+        fprintf("Zoomed in version (~%is) of time-expanded designmatrix Xdc (shown are the middle %is). Use 'hand'-tool to drag the plot up/down. \n",2*ZOOMPLOTWIN_SEC,cfg.totalplotwin_sec)
     end
     
 end
