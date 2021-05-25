@@ -10,17 +10,25 @@ function [varargout] = uf_plotParam(ufresult,varargin)
 %Arguments:
 %    'channel' (integer): Which channel to plot
 %
-%    'predictAt' (cell): a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
-%           This is a shortcut to uf_continuousPredict. We generally
-%           recommend to explicitly use the c function.
-%
 %    'deconv' ([-1 0 1]):default: -1; whether to plot ufresult.beta (1) or
 %       ufresult.beta_nodc(0) or everything/autodetect (-1). Autodetect would
 %       also detect same-shaped other predictors. If e.g. you want to compare
 %       multiple runs from different algorithms or similar
 %
+%    'predictAt' (cell): a cell of cell arrays, e.g. {{'parName',linspace(0,10,5)},{'parname2',1:5}}
+%           This is a shortcut to uf_continuousPredict. We generally
+%           recommend to explicitly use the c function.
+%    'add_marginal' (boolean): Evaluate the marginal effects. The resulting curves include the marginal effects of
+%           the other factors (as specified in uf_addmarginal). Note that in
+%           difference to 'add_intercept', this function might also change the
+%           intercepts in itself.
+%
 %    'add_intercept' (boolean): Add the intercept/constant to each subplot.
-%      This will give ERP-plots that are commonly used. Without add_intercepts the factors (if they are categorical) could be interpretet as difference or sometimes main effect plots (if effects-coding is used)
+%      This will give ERP-plots that are commonly used. Without
+%      add_intercepts the factors (if they are categorical) could be
+%      interpretet as difference or sometimes main effect plots (if
+%      effects-coding is used). Note we highly recommend 'add_marginal' in case
+%      you have spline effects.
 %
 %    'baseline' (2 integers): default none; Performs a baseline corrections on the interval (in seconds = ufresult.times units) given.
 %
