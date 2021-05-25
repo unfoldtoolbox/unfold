@@ -36,7 +36,8 @@ cfg = finputcheck(varargin,...
     {'method', 'string',{'R2','partialR2','crossValR2','crossValpartialR2'}, 'R2';
     'fold_event','','',{}; %can be string or cell
     'channel','integer','',[];
-    },'mode','ignore');
+    'variablename','cell','',{}; % for partialR2
+    },'mode','error');
 if(ischar(cfg)); error(cfg);end
 
 % check EEG structure (continuous? required unfold fields?)
@@ -125,8 +126,9 @@ cfg = finputcheck(input,...
     if ischar(cfg); error(cfg);end
 
     % compute overall R2 of model
+    model_ix = any(testXdc,2);
     r2_total = calc_r2(testData(cfg.channel,:),testXdc, EEG.unfold.beta_dc(cfg.channel,:,:)); % r2partial = r2_total - r2_without
-
+    
     Xdc_terms2variablenames = EEG.unfold.cols2variablenames(EEG.unfold.Xdc_terms2cols); % which "Xdc" columns belong to which variables?
     varNames = []; partial_r2 = [];
 
@@ -163,7 +165,7 @@ cfg = finputcheck(input,...
         testXdc_ca = testXdc;
         testXdc_ca(:,ix_k) = [];
         
-        r2_ca = calc_r2(testData(cfg.channel,:),testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:)); % bug-fix by Olaf, 2020-08-29
+        r2_ca = calc_r2(testData(cfg.channel,:),testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:),model_ix); % bug-fix by Olaf, 2020-08-29
         %r2_ca = calc_r2(testData(cfg.channel,:,:),testXdc_ca,EEG_ca.unfold.beta_dc(cfg.channel,:,:));
         partial_r2(:,end+1) = r2_total-r2_ca;
         varNames{end+1} = EEG.unfold.variablenames{k};
@@ -180,8 +182,15 @@ end
 
 %% calc_r2
 % Calculate coefficient of determination for model
-function r2 = calc_r2(data,Xdc,beta)
-    model_ix  = any(Xdc,2); % rows with entries in DM (= all modeled samples/time points)
+function r2 = calc_r2(data,Xdc,beta,varargin)
+    % the varargin is optional input on which columns to check for R². E.g.
+    % if one removes a whole event, the columns might change else. Thus for
+    % partial R² it might be necessary to specify in edge cases.
+    if length(varargin) == 1
+        model_ix = varargin{1};
+    else
+        model_ix  = any(Xdc,2); % rows with entries in DM (= all modeled samples/time points)
+    end
     residuals = (data' - Xdc*beta(:,:)')'; 
     residSS   = sum(residuals(:,model_ix).^2,2);
     totSS     = (sum(model_ix)-1) * var(data(:,model_ix),[],2);
