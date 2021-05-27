@@ -54,6 +54,8 @@ if isempty(cfg.plotParam)
     param = 1:length(ufresult.param);
 else
     param = find(ismember({ufresult.param(:).name},cfg.plotParam));
+    assert(~isempty(param),'Couldnt find specified parameter in {ufresult.param(:).name} - spelling mistake?')
+
 end
 
 data = data(cfg.channel,:,param);
