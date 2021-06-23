@@ -13,7 +13,7 @@ function output = uf_predictContinuous(ufresult,varargin)
 %       {{'par1',[10 20 30]},{'par2',[0,1,2]}}.
 %       This evaluates parameter 1 at the values 10,20 and 30. Parameter 2
 %       at 0, 1 and 2.
-%       Default behaviour: evaluates 7 linearly spaced values between the min + max. of the
+%       Default behaviour: evaluates "auto_n" (=10) linearly spaced values between the min + max. of the
 %       parameterdomain
 %   cfg.auto_method(string): 'quantile' (default) or 'linear'.
 %       'quantile' - the auto_n values are placed on the quantile of the predictor
