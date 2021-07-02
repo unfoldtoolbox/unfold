@@ -11,8 +11,13 @@ function [varargout] = uf_erpimage(EEG,varargin)
 %  cfg.method(string): default 'deconv'.
 %
 %        * 'raw'        : Using raw-data
+%
 %        * 'modelled'   : Using modelled data (y_hat), usually deconv or
 %                         no-deconv version (specified in cfg.datafield)
+%                         *Note*: If alignto is specified and no further
+%                         remove/keep, then only the modelled data relating
+%                         to the alignto-event are plotted
+%
 %        * 'residual'   : Plot residuals (useful to check for non-modelled
 %                         stimulus locked activity)
 %
@@ -354,6 +359,7 @@ if ~isempty(ix_remove)
 end
 keep_epoch(ix_remove) = [];
 EEG_out.data = EEG_out.data(:,:,keep_epoch);
+
 fprintf('Aligning erpimage to event %s, %i epochs found\n',strjoin(cfg.alignto,':'),sum(keep_epoch))
 
 [sort_vector,sort_vector_cell] = eeg_getepochevent(EEG_out,cfg.sort_alignto,cfg.sort_time*1000,cfg.sort_by); % output in ms
@@ -390,7 +396,7 @@ else
 %     [sort_vector,~] = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],cfg.split_by); % output in ms
     evt_tmp = {EEG_out.urevent.(cfg.split_by)};
     evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
-    evt = cellfun(@num2str,evt,'UniformOutput',0) % fixed by Nicolas Langer
+    evt = cellfun(@num2str,evt,'UniformOutput',0); % fixed by Nicolas Langer
     
     splitlevel = unique(evt);
     n_splits = length(splitlevel);

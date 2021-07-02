@@ -128,3 +128,14 @@ for field = {'beta_nodc','beta'}
         end
     end
 end
+%% Split & Alignto
+% Ticket #106
+EEGsim = simulate_test_case(testCase,'noise',1,'basis','posneg','srate',50,'datalength',10*60);
+EEGsim.event(end+1) = EEGsim.event(2);
+
+uf = uf_designmat(EEGsim,cfgDesign);
+uf = uf_timeexpandDesignmat(uf,'timelimits',[-.3 5.5]);
+uf = uf_glmfit(uf);
+
+uf_erpimage(uf,'channel',1,'alignto','stimulus2','split_by','conditionA','sort_by','continuousA');
+
