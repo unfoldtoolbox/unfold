@@ -134,6 +134,10 @@ if ~iscell(cfg.eventtypes)
     cfg.eventtypes = {cfg.eventtypes};
 end
 
+% later we do a unique({EEG.event.type}), which crashes matlab. We could
+% just remove those events, but I'd prefer the user to fix their EEG.event
+% structure
+assert(all(cellfun(@(x)~isempty(x),{EEG.event.type})),'Error: one of your EEG.event(:).type is empty. This is currently not supported, fill it or remove it.')
 if iscell(cfg.formula)
     if length(cfg.formula)>1
         display('Multiple events with separate model-formula detected')

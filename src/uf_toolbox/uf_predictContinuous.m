@@ -145,19 +145,25 @@ for currPred = 1:length(paramList)
         % that one
         customSplineValue = strcmp(predNameList,spl.name);
         if any(customSplineValue)
-            if size(spl.paramValues,1) == 2
+            if size(spl.paramValues,1) == 2 %2D spline
                 splValueSelect = predValueSelectList{customSplineValue}(2:3);
             else
                 splValueSelect = predValueSelectList{customSplineValue}{2};
             end
         else
-            splValueSelect = auto_spacing(cfg,spl.paramValues);
+            if size(spl.paramValues,1) == 2 %2D spline
+                spl1= auto_spacing(cfg,spl.paramValues(1,:));
+                spl2= auto_spacing(cfg,spl.paramValues(2,:));
+                splValueSelect = {spl1,spl2};
+            else
+                splValueSelect = auto_spacing(cfg,spl.paramValues);
+            end
         end
         
         
         % default case, a spline function has been defined
         if isfield(spl,'splinefunction')
-            if size(spl.paramValues,1) == 2
+            if size(spl.paramValues,1) == 2 % 2D spline
                 auxsiz = size(splValueSelect{2},2);
                 splValueSelect{2}  = reshape(repmat(splValueSelect{2},length(splValueSelect{1}),1),1,length(splValueSelect{1})* size(splValueSelect{2},2));
                 splValueSelect{1}  = repmat(splValueSelect{1},1,auxsiz);
