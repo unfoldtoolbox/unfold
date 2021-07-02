@@ -77,7 +77,7 @@ end
 %% Epoch the data
 EEG.urevent = EEG.event;
 fprintf('Epoching using eeglab pop_epoch (silent mode) \n')
-evalc("[EEG_epoch,event_ind] = pop_epoch(EEG,[EEG.unfold.eventtypes{:}],cfg.timelimits);");
+evalc('[EEG_epoch,event_ind] = pop_epoch(EEG,[EEG.unfold.eventtypes{:}],cfg.timelimits);');
 fprintf('Recalculating the EEG_epoch field using eeg_checkset, might take some time \n')
 evalc("EEG_epoch             = eeg_checkset(EEG_epoch,'eventconsistency');"); % needed to add EEG_epoch.epoch field, don't ask why
 
