@@ -325,7 +325,7 @@ end
 % deletes **** rows ****
 indexList = [];
 for k = 1:length(cfg.eventtypes)
-    indexmatch = find(strcmpi(cfg.eventtypes(k),{EEG.event.type}));
+    indexmatch = find(strcmp(cfg.eventtypes(k),{EEG.event.type}));
     if isempty(indexList)
         indexList = indexmatch;
     else
