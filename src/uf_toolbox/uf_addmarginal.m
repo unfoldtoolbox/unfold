@@ -98,7 +98,7 @@ if isempty(cfg.betaSetname)
     % END OF RECURSION ALERT
 end
 
-fprintf('\n%s(): working on the data in the field \"%s\" \n',mfilename, cfg.betaSetname)
+fprintf('\n%s(): working on the data in the field ''%s'' \n',mfilename, cfg.betaSetname)
 
 % determine number of channels
 if isempty(cfg.channel)
@@ -160,7 +160,7 @@ elseif strcmp(cfg.type,'AME')
         ufresult_avg.param(ContBetaIdx(s)).type = 'continuous_converted';
     end
 else
-    error('Unknown method "%s" to calculate the marginal effect!',cfg.marginal);
+    error('Unknown method ''%s'' to calculate the marginal effect!',cfg.marginal);
 end
 
 % find the unique events
@@ -201,7 +201,7 @@ for e = uniqueParamEvents%unique(paramEvents)
 
     for p = unique(eventParamNames)
         if isempty(p) % happens if TRF is in the mix
-            fprintf("found an TRF, ignoring it")
+            fprintf('found an TRF, ignoring it')
             continue
         end
         % Find the names & types of the other parameters

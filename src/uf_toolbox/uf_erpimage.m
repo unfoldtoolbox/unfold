@@ -199,7 +199,7 @@ else
     ufresult= uf_condense(EEG_epoch);
     
 end
-assert(isfield(ufresult,cfg.datafield),sprintf('"datafield":%s, not found',cfg.datafield))
+assert(isfield(ufresult,cfg.datafield),sprintf('''datafield'':%s, not found',cfg.datafield))
 end
 
 function [keep] = which_parameter_to_keep(ufresult,cfg)
@@ -277,7 +277,7 @@ function [data,data_yhat] = get_data(ufresult,cfg,keep,EEG_epoch)
         data = permute(data,[3 1 2]);
     end
 
-if cfg.type == "raw"
+if strcmp(cfg.type,'raw')
     data = mean(EEG_epoch.data(cfg.channel,:,:),1);
     data_yhat = nan;
 else
@@ -303,7 +303,7 @@ EEG_new.srate = EEG.srate;
 EEG_new.unfold = EEG.unfold;
 EEG_new.event = EEG.event;
 
-if ~cfg.overlap || cfg.type == "raw"
+if ~cfg.overlap || strcmp(cfg.type,'raw')
     % in case of no overlap (or raw), the new data are already epoched
     EEG_out = EEG_epoch;
     EEG_out.data = data;
@@ -317,7 +317,7 @@ else
 end
 %%
 % Adding back residuals
-if cfg.addResiduals~=0 || cfg.type == "residual"
+if cfg.addResiduals~=0 || strcmp(cfg.type,'residual')
     fprintf('adding residuals\n')
     EEG_residuals = EEG_new;
     % this is the fully modelled data
@@ -332,7 +332,7 @@ if cfg.addResiduals~=0 || cfg.type == "residual"
     EEG_residuals.data = mean(EEG_epoch.data(cfg.channel,:,:),1) - EEG_residuals.data;
 
     
-    if cfg.type == "residual"
+    if strcmp(cfg.type,'residual')
         % show only residuals
         EEG_out.data = EEG_residuals.data;
     else
