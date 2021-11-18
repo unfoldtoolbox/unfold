@@ -11,6 +11,10 @@ A toolbox for deconvolution of overlapping EEG signals and (non)-linear modeling
 * Estimate temporal response functions (TRFs) for time-continuous predictors
 * Cross-validation
 
+### Getting help
+  📢 **Try out our [discussion forum](https://github.com/unfoldtoolbox/unfold/discussions)** - we often get questions via email, a more transparent and open way is to use the [github discussions feature](https://github.com/unfoldtoolbox/unfold/discussions)
+
+
 ### Installation
 ``` 
 git clone https://github.com/unfoldtoolbox/unfold
