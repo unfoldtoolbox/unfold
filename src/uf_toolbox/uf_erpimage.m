@@ -123,14 +123,14 @@ keep = which_parameter_to_keep(ufresult,cfg);
 [EEG_out,sort_vector] = get_sortvector(cfg,EEG_out);
 
 %% draw ERPimage  or get output
-if cfg.plot == 1
-    plot_erpimage(EEG_out,cfg,sort_vector)
-end
+
+    evt_ix_out = plot_erpimage(EEG_out,cfg,sort_vector);
 if nargout>0
     outdata = EEG_out.data;
     outsort = sort_vector;
     varargout{1} = outdata;
     varargout{2} = outsort;
+    varargout{3} = evt_ix_out;
 end
 end
 
@@ -354,6 +354,7 @@ if ~isempty(ix_remove)
 end
 keep_epoch(ix_remove) = [];
 EEG_out.data = EEG_out.data(:,:,keep_epoch);
+EEG_out.event_sel = EEG_out.urevent(keep_epoch);
 fprintf('Aligning erpimage to event %s, %i epochs found\n',strjoin(cfg.alignto,':'),sum(keep_epoch))
 
 [sort_vector,sort_vector_cell] = eeg_getepochevent(EEG_out,cfg.sort_alignto,cfg.sort_time*1000,cfg.sort_by); % output in ms
@@ -377,31 +378,40 @@ sort_vector(~sort_isempty) = sort_tmp;
 sort_vector = sort_vector(keep_epoch);
 end
 
-function [] = plot_erpimage(EEG_out,cfg,sort_vector)
+function [evt_ix_out] = plot_erpimage(EEG_out,cfg,sort_vector)
 if isempty(cfg.caxis)
     cfg.caxis = prctile(EEG_out.data(:),[5 95]);
     cfg.caxis = [-max(abs(cfg.caxis)) max(abs(cfg.caxis))];
 end
+evt_ix_out = size(EEG_out.data,2);
 if isempty(cfg.split_by)
     
-    
+    if cfg.plot == 1
     erpimage(EEG_out.data,sort_vector,EEG_out.times,'',10,0,'caxis',cfg.caxis);
+    end
 else
 %     [sort_vector,~] = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],cfg.split_by); % output in ms
-    evt_tmp = {EEG_out.urevent.(cfg.split_by)};
+    evt_tmp = {EEG_out.event_sel.(cfg.split_by)};
     evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
-    evt = cellfun(@num2str,evt,'UniformOutput',0) % fixed by Nicolas Langer
+    evt = cellfun(@num2str,evt,'UniformOutput',0); % fixed by Nicolas Langer
     
     splitlevel = unique(evt);
     n_splits = length(splitlevel);
+    evt_ix_out = cell(1,n_splits);
     for n = 1:n_splits
-        subplot(n_splits,1,n)
+       
         evt_ix = strcmp(evt,splitlevel{n});
+        evt_ix_out{n} = evt_ix;
+        if cfg.plot == 1
+             subplot(n_splits,1,n)
         erpimage(EEG_out.data(:,:,evt_ix),sort_vector(evt_ix),EEG_out.times,'',10,0,'caxis',cfg.caxis);
         
         title(sprintf('split by:%s, level:%s',cfg.split_by,splitlevel{n}))
+        end
     end
 end
+if cfg.plot == 1
 cmap = cbrewer('div','RdBu',256);
 colormap(cmap(end:-1:1,:));
+end
 end
