@@ -95,8 +95,10 @@ if  strcmp(cfg.splinefunction,'cyclical')
         ubound = cfg.cyclical_bounds(2);
         
         x = spl.paramValues;
-        x(x > ubound) = lbound + (x(x > ubound) - ubound); % (ubound - lbound)
-        x(x < lbound) = ubound - (lbound - x(x < lbound)); % (ubound - lbound)
+        
+        x(x > ubound) = lbound + mod((x(x > ubound) - ubound), (ubound - lbound));
+        x(x < lbound) = ubound - mod((lbound - x(x < lbound)),(ubound - lbound));
+        
         spl.paramValues = x;
         
     elseif isempty(cfg.knotsequence)
