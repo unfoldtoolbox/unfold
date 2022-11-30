@@ -8,7 +8,7 @@ function [winrej] = uf_continuousArtifactDetectASR(EEG, varargin)
 %     EEG:          continuous EEG dataset (EEGLAB's EEG structure)
 %
 %   Optional keywords:
-%     'channels':   channels to be used for artifact detection. Can be a
+%     'channel':   channels to be used for artifact detection. Can be a
 %                   logical vector of length equal to EEG.chanlocs.
 %                   Alternatively, numeric indeces, a cell with labels or
 %                   a single regular expression.
