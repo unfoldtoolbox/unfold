@@ -15,9 +15,8 @@ function [winrej] = uf_continuousArtifactDetectASR(EEG, varargin)
 %      'cutoff : Standard deviation cutoff for removal of bursts (via ASR). Data portions whose variance
 %            is larger than this threshold relative to the calibration data are considered missing
 %            data and will be removed. Default: 20 (following Chang 2019)
-%      'tolerance' : Tolerance what to remove, default is 1e⁻10 as
-%                   implemented in the clean_rawdata toolbox, but larger
-%                   value might be more appropriate. Note
+%      'tolerance' : Tolerance what to remove, default is 1e⁻5. This differs to the
+%                   implementation in the clean_rawdata toolbox (1e-10) but we found it better 
 %   Output:
 %     winrej:       winrej matrix flagging artifactual segments of data.
 %                   Use with UF_CONITUOUSARTIFACTREJECT
@@ -26,7 +25,7 @@ function [winrej] = uf_continuousArtifactDetectASR(EEG, varargin)
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[];...
      'cutoff','real',[],20;...
-     'tolerance','real',[],1e-10;
+     'tolerance','real',[],1e-5;
     },'mode','error');
 if ischar(cfg)
     error(cfg)
