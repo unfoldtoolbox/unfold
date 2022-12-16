@@ -220,6 +220,21 @@ assert(length(EEGtest.unfold.variabletypes)==8)
 assert(length(EEGtest.unfold.variablenames)==8)
 assert(length(EEGtest.unfold.colnames)==24)
 
+%% Issue #114, no error when an empty EEG.event.type is put in
+EEGtest = EEGsim;
+cfgDesign = [];
+
+cfgDesign.codingschema = 'reference';
+cfgDesign.formula   = {'y~1',       'y~1+cat(conditionA)*continuousA', 'y~1+spl(splineA,5)+spl(splineB,5)+continuousA'};
+cfgDesign.eventtypes = {'stimulus1', 'stimulus2',                       'stimulus3'};
+
+
+try
+    EEGtest.event(5).type = [];
+    uf_designmat(EEGtest,cfgDesign)
+catch
+   % success
+end
 
 end
 
