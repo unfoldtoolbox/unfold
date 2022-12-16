@@ -11,8 +11,13 @@ function [varargout] = uf_erpimage(EEG,varargin)
 %  cfg.method(string): default 'deconv'.
 %
 %        * 'raw'        : Using raw-data
+%
 %        * 'modelled'   : Using modelled data (y_hat), usually deconv or
 %                         no-deconv version (specified in cfg.datafield)
+%                         *Note*: If alignto is specified and no further
+%                         remove/keep, then only the modelled data relating
+%                         to the alignto-event are plotted
+%
 %        * 'residual'   : Plot residuals (useful to check for non-modelled
 %                         stimulus locked activity)
 %
@@ -194,7 +199,7 @@ else
     ufresult= uf_condense(EEG_epoch);
     
 end
-assert(isfield(ufresult,cfg.datafield),sprintf('"datafield":%s, not found',cfg.datafield))
+assert(isfield(ufresult,cfg.datafield),sprintf('''datafield'':%s, not found',cfg.datafield))
 end
 
 function [keep] = which_parameter_to_keep(ufresult,cfg)
@@ -272,7 +277,7 @@ function [data,data_yhat] = get_data(ufresult,cfg,keep,EEG_epoch)
         data = permute(data,[3 1 2]);
     end
 
-if cfg.type == "raw"
+if strcmp(cfg.type,'raw')
     data = mean(EEG_epoch.data(cfg.channel,:,:),1);
     data_yhat = nan;
 else
@@ -298,7 +303,7 @@ EEG_new.srate = EEG.srate;
 EEG_new.unfold = EEG.unfold;
 EEG_new.event = EEG.event;
 
-if ~cfg.overlap || cfg.type == "raw"
+if ~cfg.overlap || strcmp(cfg.type,'raw')
     % in case of no overlap (or raw), the new data are already epoched
     EEG_out = EEG_epoch;
     EEG_out.data = data;
@@ -312,7 +317,7 @@ else
 end
 %%
 % Adding back residuals
-if cfg.addResiduals~=0 || cfg.type == "residual"
+if cfg.addResiduals~=0 || strcmp(cfg.type,'residual')
     fprintf('adding residuals\n')
     EEG_residuals = EEG_new;
     % this is the fully modelled data
@@ -327,7 +332,7 @@ if cfg.addResiduals~=0 || cfg.type == "residual"
     EEG_residuals.data = mean(EEG_epoch.data(cfg.channel,:,:),1) - EEG_residuals.data;
 
     
-    if cfg.type == "residual"
+    if strcmp(cfg.type,'residual')
         % show only residuals
         EEG_out.data = EEG_residuals.data;
     else
@@ -354,6 +359,7 @@ if ~isempty(ix_remove)
 end
 keep_epoch(ix_remove) = [];
 EEG_out.data = EEG_out.data(:,:,keep_epoch);
+
 fprintf('Aligning erpimage to event %s, %i epochs found\n',strjoin(cfg.alignto,':'),sum(keep_epoch))
 
 [sort_vector,sort_vector_cell] = eeg_getepochevent(EEG_out,cfg.sort_alignto,cfg.sort_time*1000,cfg.sort_by); % output in ms
@@ -390,7 +396,7 @@ else
 %     [sort_vector,~] = eeg_getepochevent(EEG_out,cfg.alignto,[0,0],cfg.split_by); % output in ms
     evt_tmp = {EEG_out.urevent.(cfg.split_by)};
     evt = evt_tmp(cellfun(@(x)~isempty(x),evt_tmp));
-    evt = cellfun(@num2str,evt,'UniformOutput',0) % fixed by Nicolas Langer
+    evt = cellfun(@num2str,evt,'UniformOutput',0); % fixed by Nicolas Langer
     
     splitlevel = unique(evt);
     n_splits = length(splitlevel);

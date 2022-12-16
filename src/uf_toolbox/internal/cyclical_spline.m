@@ -170,7 +170,7 @@ end
 % (lbound, ubound))
 
 
-x(x > ubound) = lbound + (x(x > ubound) - ubound); % (ubound - lbound)
-x(x < lbound) = ubound - (lbound - x(x < lbound)); % (ubound - lbound)
+x(x > ubound) = lbound + mod((x(x > ubound) - ubound), (ubound - lbound));
+x(x < lbound) = ubound - mod((lbound - x(x < lbound)),(ubound - lbound));
 end
 

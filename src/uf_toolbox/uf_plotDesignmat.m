@@ -214,7 +214,7 @@ if cfg.timeexpand
         %ylim([latTmp(ceil(end/2))/1000-3 latTmp(ceil(end/2))/1000+3])
         ZOOMPLOTWIN_SEC = 3;
         ylim([midEventLat/1000-ZOOMPLOTWIN_SEC midEventLat/1000+ZOOMPLOTWIN_SEC])
-        fprintf("Zoomed in version (~%is) of time-expanded designmatrix Xdc (shown are the middle %is). Use 'hand'-tool to drag the plot up/down. \n",2*ZOOMPLOTWIN_SEC,cfg.totalplotwin_sec)
+        fprintf('Zoomed in version (~%is) of time-expanded designmatrix Xdc (shown are the middle %is). Use ''hand''-tool to drag the plot up/down. \n',2*ZOOMPLOTWIN_SEC,cfg.totalplotwin_sec)
     end
     
 end

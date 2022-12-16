@@ -209,7 +209,7 @@ spl = regexp(cfg.formula,splRegexp,'tokens');
 circspl = regexp(cfg.formula,circsplRegexp,'tokens');
 spl2D = regexp(cfg.formula,spl2DRegexp,'tokens');
 
-%% Check the normal spliones
+%% Check the normal splines
 for s = 1:length(spl)
     if length(spl{s})~=2
         error('error while parsing formula. wrongly defined spline in: %s. Needs to be: spl(your_eventname,10)',cfg.formula)
@@ -314,13 +314,18 @@ for e= 1:length(event)
 end
 t = struct2table(event);
 
-
+% Convert logical columns to numeric
+for c = 1:size(t,2)
+   if islogical(t{1,c} )
+       t.(t.Properties.VariableNames{c}) = t.(t.Properties.VariableNames{c}) *1;
+   end
+end
 
 % find and remove all event types that are not needed
 % deletes **** rows ****
 indexList = [];
 for k = 1:length(cfg.eventtypes)
-    indexmatch = find(strcmpi(cfg.eventtypes(k),{EEG.event.type}));
+    indexmatch = find(strcmp(cfg.eventtypes(k),{EEG.event.type}));
     if isempty(indexList)
         indexList = indexmatch;
     else
@@ -348,6 +353,7 @@ end
 %% display infos on the number of events used
 % because other output is printed, mark these sections (due to recursive
 % call, its not easy to print all this information in one nice table)
+    
 fprintf('Modeling %i event(s) of [%s] using formula: %s \n',size(t,1)-length(removeIndex),eventStr,cfg.formula_nozzz)
 if size(t,1)-length(removeIndex)== 0
     error('no events found for the specified eventtype')
@@ -377,6 +383,7 @@ t_clean = t(:,tf);
 % numeric input is easy
 
 t_isnum = varfun(@isnumeric,t_clean,'output','uniform');
+
 for p = 1:size(t_clean,2)
     if t_isnum(p)
         % categorical Levels
@@ -389,8 +396,8 @@ for p = 1:size(t_clean,2)
             t_clean.(t_clean.Properties.VariableNames{p}) = arrayfun(@(x)num2str(x),t_clean{:,p},'UniformOutput',0);
             t_clean{is_nan,p} = repmat({''},sum(is_nan),1);
         end
-
-        continue
+%         if islogical(
+        
         
     elseif ~iscell(t_clean{:,p}) || ~all(cellfun(@isstr,t_clean{:,p}))
         % We don't have a num (checked before), also not a cell of strings.

@@ -235,6 +235,21 @@ try
 catch
    % success
 end
+%% Test logical event
+% Issue #87
+cfgDesign = [];
+cfgDesign.eventtypes = {'stimulus1','stimulus2','stimulus3'}; % we need not have any events = NAN in t_clean
+cfgDesign.formula   = {'y~1+ cond + cat(cond2)'};
+EEGtest = EEGsim;
+EEGtest.event(1).cond = [];
+for e = 1:length(EEGsim.event)
+    EEGtest.event(e).cond = rand(1)>0.5;
+    EEGtest.event(e).cond2 = rand(1)>0.5;
+end
+
+EEGtmp = uf_designmat(EEGtest,cfgDesign);
+
+
 
 end
 

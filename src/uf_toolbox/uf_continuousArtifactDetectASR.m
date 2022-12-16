@@ -8,13 +8,15 @@ function [winrej] = uf_continuousArtifactDetectASR(EEG, varargin)
 %     EEG:          continuous EEG dataset (EEGLAB's EEG structure)
 %
 %   Optional keywords:
-%     'channels':   channels to be used for artifact detection. Can be a
+%     'channel':   channels to be used for artifact detection. Can be a
 %                   logical vector of length equal to EEG.chanlocs.
 %                   Alternatively, numeric indeces, a cell with labels or
 %                   a single regular expression.
 %      'cutoff : Standard deviation cutoff for removal of bursts (via ASR). Data portions whose variance
 %            is larger than this threshold relative to the calibration data are considered missing
 %            data and will be removed. Default: 20 (following Chang 2019)
+%      'tolerance' : Tolerance what to remove, default is 1e⁻5. This differs to the
+%                   implementation in the clean_rawdata toolbox (1e-10) but we found it better 
 %   Output:
 %     winrej:       winrej matrix flagging artifactual segments of data.
 %                   Use with UF_CONITUOUSARTIFACTREJECT
@@ -23,6 +25,7 @@ function [winrej] = uf_continuousArtifactDetectASR(EEG, varargin)
 cfg = finputcheck(varargin,...
     {'channel','integer',[],[];...
      'cutoff','real',[],20;...
+     'tolerance','real',[],1e-5;
     },'mode','error');
 if ischar(cfg)
     error(cfg)
@@ -44,7 +47,7 @@ evalc(sprintf("EEG_clean = clean_asr(EEG,%f,[],[],[],[],[],[],[],0);",cfg.cutoff
 % Following code adapted from "clean_artifcats.m" from 
 % https://github.com/sccn/clean_rawdata
 % detect what changed
-sample_mask = ~(sum(abs(EEG.data-EEG_clean.data),1) < 1e-10);
+sample_mask = ~(sum(abs(EEG.data-EEG_clean.data),1) < cfg.tolerance);
 % build winrej
 winrej = reshape(find(diff([false sample_mask false])),2,[])';
 winrej(:,2) = winrej(:,2)-1;

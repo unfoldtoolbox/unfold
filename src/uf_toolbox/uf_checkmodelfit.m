@@ -79,7 +79,7 @@ switch cfg.method
             % refit model for this fold
             EEGfold = EEG;
             EEGfold.unfold.Xdc = train(fold).Xdc;
-            EEGfold = uf_glmfit(EEGfold);
+            EEGfold = uf_glmfit(EEGfold,'channel',cfg.channel); % changed by OD
             
             % R2 or partial R2?
             switch cfg.method
