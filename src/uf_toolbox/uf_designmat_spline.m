@@ -65,18 +65,23 @@ spl.nSplines = cfg.nsplines;
 spl.name = cfg.name;
 
 assert(~all(isnan(cfg.paramValues(:))),'all paramValues are nans')
-if strcmp(cfg.splinefunction,'2D')
-    if size(cfg.paramValues,2) == 2
-        cfg.paramValues = cfg.paramValues';
-    end
-    splmin = min(cfg.paramValues,[],2);
-    splmax= max(cfg.paramValues,[],2);
-else
+
     if size(cfg.paramValues,2) == 1
         cfg.paramValues = cfg.paramValues';
     end
+if strcmp(cfg.splinefunction,'2D')
+    
+    splmin = min(cfg.paramValues,[],2);
+    splmax= max(cfg.paramValues,[],2);
+elseif strcmp(cfg.splinefunction,'cyclical') && ~isempty(cfg.cyclical_bounds)
+        splmin = cfg.cyclical_bounds(1);
+        splmax = cfg.cyclical_bounds(2);
+    
+else
+
     splmin = min(cfg.paramValues);
     splmax= max(cfg.paramValues);
+    
 end
 spl.paramValues = cfg.paramValues;
 
@@ -140,14 +145,19 @@ if isempty(cfg.knotsequence)
             if strcmp(cfg.splinefunction,'2D')
                 spl.knots      =  quantile(spl.paramValues(1,:),linspace(0,1,spl.nSplines));
                 spl.knots(2,:) =  quantile(spl.paramValues(2,:),linspace(0,1,spl.nSplines));
+            
             else
                 spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines));
+                if strcmp(cfg.splinefunction,'cyclical') && ~isempty(cfg.cyclical_bounds)
+                       spl.knots(1) = cfg.cyclical_bounds(1);
+                       spl.knots(end) = cfg.cyclical_bounds(2);
+                end
             end
         otherwise
             error('wrong cfg.splinespacing. expected linear or quantile')
     end
 else
-    spl.knots =  cfg.knotsequence;
+   spl.knots =  cfg.knotsequence;
 end
 
 if strcmp(cfg.splinefunction,'default')
@@ -165,7 +175,7 @@ elseif strcmp(cfg.splinefunction,'default') || strcmp(cfg.splinefunction,'2D')
     spl.splinefunction = @default_spline;
     
 elseif strcmp(cfg.splinefunction,'cyclical')
-    spl.splinefunction = @cyclical_spline;
+    spl.splinefunction = @(x,y)cyclical_spline(x,y,cfg.cyclical_bounds);
     
 else
     error('unknown spline type')
@@ -178,6 +188,8 @@ if strcmp(cfg.splinefunction,'2D')
         aux = Xspline1(iD,:)'*Xspline2(iD,:);
         Xspline(iD,:) = aux(:)';
     end
+% elseif strcmp(cfg.splinefunction,'cyclical')
+%     Xspline =  spl.splinefunction(spl.paramValues,spl.knots,cfg.cyclical_bounds);
 else
     Xspline =  spl.splinefunction(spl.paramValues,spl.knots);
 end
