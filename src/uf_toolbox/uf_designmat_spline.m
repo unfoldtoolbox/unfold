@@ -10,9 +10,9 @@ function [EEG,spl,nanlist] = uf_designmat_spline(EEG,varargin)
 %           E.g. [-3 4,1,2,3, ... 4]
 %
 %   cfg.nsplines(integer): number of splines to use. too many lead to
-%               overfitting, to few to underfitting. This number will be 
-%               transformed into the number of knots later. As different 
-%               spline functions have different requiements to the number 
+%               overfitting, to few to underfitting. This number will be
+%               transformed into the number of knots later. As different
+%               spline functions have different requiements to the number
 %               of knots, we specify this number and fix the number of
 %               knots later.
 %
@@ -61,27 +61,32 @@ assert(~isempty(cfg.nsplines) | ~isempty(cfg.knotsequence),'you need to specify 
 assert(~isempty(cfg.paramValues),'paramValues were empty')
 
 spl = [];
-spl.nSplines = cfg.nsplines; 
+spl.nSplines = cfg.nsplines;
 spl.name = cfg.name;
 
 assert(~all(isnan(cfg.paramValues(:))),'all paramValues are nans')
 
+
+if strcmp(cfg.splinefunction,'2D')
+    if size(cfg.paramValues,2) == 2
+        cfg.paramValues = cfg.paramValues';
+    end
+    splmin = min(cfg.paramValues,[],2);
+    splmax= max(cfg.paramValues,[],2);
+else
     if size(cfg.paramValues,2) == 1
         cfg.paramValues = cfg.paramValues';
     end
-if strcmp(cfg.splinefunction,'2D')
-    
-    splmin = min(cfg.paramValues,[],2);
-    splmax= max(cfg.paramValues,[],2);
-elseif strcmp(cfg.splinefunction,'cyclical') && ~isempty(cfg.cyclical_bounds)
+    if strcmp(cfg.splinefunction,'cyclical') && ~isempty(cfg.cyclical_bounds)
         splmin = cfg.cyclical_bounds(1);
         splmax = cfg.cyclical_bounds(2);
-    
-else
-
-    splmin = min(cfg.paramValues);
-    splmax= max(cfg.paramValues);
-    
+        
+    else
+        
+        splmin = min(cfg.paramValues);
+        splmax= max(cfg.paramValues);
+        
+    end
 end
 spl.paramValues = cfg.paramValues;
 
@@ -123,11 +128,11 @@ if strcmp(cfg.splinefunction,'cyclical')
     %them
     spl.nSplines = spl.nSplines + 1;
 end
-    
+
 
 if strcmp(cfg.splinefunction,'default') || strcmp(cfg.splinefunction,'2D')  % jpo 15.04.2018: not sure about this
     % the function adds two splines to the knotsequence, we temporaly
-    % remove them 
+    % remove them
     spl.nSplines = spl.nSplines-2;
 end
 
@@ -145,19 +150,19 @@ if isempty(cfg.knotsequence)
             if strcmp(cfg.splinefunction,'2D')
                 spl.knots      =  quantile(spl.paramValues(1,:),linspace(0,1,spl.nSplines));
                 spl.knots(2,:) =  quantile(spl.paramValues(2,:),linspace(0,1,spl.nSplines));
-            
+                
             else
                 spl.knots =  quantile(spl.paramValues,linspace(0,1,spl.nSplines));
                 if strcmp(cfg.splinefunction,'cyclical') && ~isempty(cfg.cyclical_bounds)
-                       spl.knots(1) = cfg.cyclical_bounds(1);
-                       spl.knots(end) = cfg.cyclical_bounds(2);
+                    spl.knots(1) = cfg.cyclical_bounds(1);
+                    spl.knots(end) = cfg.cyclical_bounds(2);
                 end
             end
         otherwise
             error('wrong cfg.splinespacing. expected linear or quantile')
     end
 else
-   spl.knots =  cfg.knotsequence;
+    spl.knots =  cfg.knotsequence;
 end
 
 if strcmp(cfg.splinefunction,'default')
@@ -188,8 +193,8 @@ if strcmp(cfg.splinefunction,'2D')
         aux = Xspline1(iD,:)'*Xspline2(iD,:);
         Xspline(iD,:) = aux(:)';
     end
-% elseif strcmp(cfg.splinefunction,'cyclical')
-%     Xspline =  spl.splinefunction(spl.paramValues,spl.knots,cfg.cyclical_bounds);
+    % elseif strcmp(cfg.splinefunction,'cyclical')
+    %     Xspline =  spl.splinefunction(spl.paramValues,spl.knots,cfg.cyclical_bounds);
 else
     Xspline =  spl.splinefunction(spl.paramValues,spl.knots);
 end
@@ -197,7 +202,7 @@ end
 %%
 % if strcmp(cfg.codingschema,'effects')
 if strcmp(cfg.splinefunction,'2D')
-    [~,minix] = min(sqrt((nanmean(spl.paramValues(1,:))-spl.paramValues(1,:)).^2+(nanmean(spl.paramValues(2,:))-spl.paramValues(2,:)).^2)); % 
+    [~,minix] = min(sqrt((nanmean(spl.paramValues(1,:))-spl.paramValues(1,:)).^2+(nanmean(spl.paramValues(2,:))-spl.paramValues(2,:)).^2)); %
 else
     minix = get_min(nanmean(spl.paramValues),spl.paramValues);
 end
@@ -234,7 +239,7 @@ spl.nSplines = size(spl.X,2);
 % identifier for the spline. Not perfect, but a good approximation
 [~,I] = max(Xspline,[],1);
 if strcmp(cfg.splinefunction,'2D')
-    maxSplVal = spl.paramValues(:,I);  
+    maxSplVal = spl.paramValues(:,I);
 else
     maxSplVal = spl.paramValues(I);
 end
