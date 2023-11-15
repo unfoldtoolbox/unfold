@@ -44,6 +44,11 @@ Please cite as:
 
 Ehinger BV, Dimigen O: "Unfold: An integrated toolbox for overlap correction, non-linear modeling, and regression-based EEG analysis",  peerJ 2019, https://doi.org/10.7717/peerj.7838
 
+In addition, consider citing the following reference, which illustrates the possibilites and options of unfold for a specific application example:
+
+Dimigen O, Ehinger BV: "Regression-based analysis of combined EEG and eye-tracking data: Theory and applications. Journal of Vision, 21(1), 3-3",  https://jov.arvojournals.org/article.aspx?articleid=2772164
+
+
 ### Research notice
 Please note that this repository is participating in a study into sustainability
  of open source projects. Data will be gathered about this repository for
