@@ -11,6 +11,9 @@ A toolbox for deconvolution of overlapping EEG signals and (non)-linear modeling
 * Estimate temporal response functions (TRFs) for time-continuous predictors
 * Cross-validation
 
+> [!NOTE]
+>  Have a look at the [Unfold.jl Julia ecosystem](https://github.com/unfoldtoolbox/UnfoldDocs/) which includes all the latest features, bugfixes and more. Unfold-Matlab is not actively developed, only bugfix releases are provided. PRs for new features are definitely welcome!
+> 
 ### Getting help
   📢 **Try out our [discussion forum](https://github.com/unfoldtoolbox/unfold/discussions)** - we often get questions via email, a more transparent and open way is to use the [github discussions feature](https://github.com/unfoldtoolbox/unfold/discussions)
 
